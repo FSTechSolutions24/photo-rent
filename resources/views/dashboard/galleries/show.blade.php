@@ -1,12 +1,4 @@
-@extends('adminlte::page')
 
-@section('title', 'Dashboard')
-
-@section('content_header')
-    <h1>Dashboard</h1>
-@stop
-
-@section('content')
     <h1 class="text-xl font-bold">{{ $client->name }} / {{ $gallery->name }}</h1>
 
     <a href="{{ route('dashboard.clients.galleries.create', $client) }}" class="btn btn-primary my-3">
@@ -27,13 +19,3 @@
             </li>
         @endforeach
     </ul>
-@stop
-
-@section('css')
-    {{-- Add here extra stylesheets --}}
-    {{-- <link rel="stylesheet" href="/css/admin_custom.css"> --}}
-@stop
-
-@section('js')
-    <script> console.log("Hi, I'm using the Laravel-AdminLTE package!"); </script>
-@stop

@@ -60,6 +60,11 @@ class GalleryController extends Controller
         return view('dashboard.galleries.show', compact('gallery', 'photographer', 'client'));
     }
 
+    public function index(Client $client){
+        abort_if($client->photographer_id !== Auth::id(), 403);
+        return view('dashboard.galleries.index', compact('client'));
+    }
+
 
     public function create(Client $client)
     {
