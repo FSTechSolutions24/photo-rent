@@ -19,44 +19,43 @@
     </ul>
 </div> --}}
 
-
-
-<table class="table">
-  <thead>
-    <tr>
-      <th scope="col">#</th>
-      <th scope="col">First</th>
-      <th scope="col">Last</th>
-      <th scope="col">Handle</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td >1</td>
-      <td>Mark</td>
-      <td>Otto</td>
-      <td>@mdo</td>
-    </tr>
-    <tr>
-      <th >2</th>
-      <td>Jacob</td>
-      <td>Thornton</td>
-      <td>@fat</td>
-    </tr>
-
-  </tbody>
-</table>
+<h4 class="page_header">View Clients</h4>
+<div class="card">
+  <div class="card-body">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">Name</th>
+          <th scope="col">Phone</th>
+          <th scope="col">Phone2</th>
+          <th scope="col">Email</th>
+        </tr>
+      </thead>
+      <tbody>        
+      </tbody>
+    </table>
+  </div>
+</div>
 
 @stop
 
 @section('js')
     <script> 
-        $(document).ready(function(){            
-            window.view_reports =   $('.table').DataTable({
-
-
-            })
+      $(document).ready(function(){            
+        window.view_reports =   $('.table').DataTable({
+          processing: true,
+          serverSide: true,
+          ajax: "{{ route('dashboard.clients.data') }}",
+          columns: [
+            {data:  'id'},
+            { data: 'name'},
+            { data: 'phone'},
+            { data: 'phone2'},
+            { data: 'email'},
+          ]
         })
+      })
     </script>
 @stop
 

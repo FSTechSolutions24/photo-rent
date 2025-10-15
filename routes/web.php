@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\FolderController;
 use App\Http\Controllers\GalleryController;
-use App\Http\Controllers\Photographer\MediaController;
+use App\Http\Controllers\MediaController;
 
 /*
 |--------------------------------------------------------------------------
@@ -29,6 +29,7 @@ Route::get('/dashboard', function () {
 
 Route::middleware(['auth', 'photographer'])->prefix('dashboard')->name('dashboard.')->group(function () {
     // Clients
+    Route::get('clients/data', [ClientController::class, 'getData'])->name('clients.data');
     Route::resource('clients', ClientController::class);
 
     // Galleries (nested under client)

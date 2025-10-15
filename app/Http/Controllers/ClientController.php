@@ -5,6 +5,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Client;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Yajra\DataTables\Facades\DataTables;
+
 
 class ClientController extends Controller
 {
@@ -19,12 +21,21 @@ class ClientController extends Controller
         return view('dashboard.clients.create');
     }
 
+    public function getData(){
+
+        $eloquent = Client::query();
+
+        return DataTables::eloquent($eloquent)
+        ->addIndexColumn()
+        ->make(true);
+    }
+
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'phone' => 'required|string|max:12',
-            'phone2' => 'nullable|string|max:12',
+            'name' => 'required|string|max:255|min:3',
+            'phone' => ['required','regex:/^(?:\+20|0)?1[0125][0-9]{8}$/'],
+            'phone2' => ['nullable','regex:/^(?:\+20|0)?1[0125][0-9]{8}$/'],            
             'email' => 'nullable|email',
         ]);
 
