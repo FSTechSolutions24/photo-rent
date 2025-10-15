@@ -16,4 +16,7 @@ return [
     'important' => 'Important',
     'warning' => 'Warning',
     'information' => 'Information',
+    'view_clients'=>'View Clients',
+    'add_client'=>'Add Client',
+    'clients'=>'Client',
 ];

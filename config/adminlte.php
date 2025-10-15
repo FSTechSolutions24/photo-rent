@@ -368,6 +368,22 @@ return [
                 ],
             ],
         ],
+        [
+            'text' => 'clients',
+            'icon' => 'fas fa-users',
+            'submenu' => [
+                [
+                    'text' => 'add_client',
+                    'url' => 'dashboard/clients/create',
+                    'icon'=>'fas fa-user'
+                ],                
+                [
+                    'text' => 'view_clients',
+                    'url' => 'dashboard/clients',
+                    'icon'=>'fas fa-users'
+                ],                
+            ],
+        ],
         // ['header' => 'labels'],
         // [
         //     'text' => 'important',
@@ -422,7 +438,7 @@ return [
 
     'plugins' => [
         'Datatables' => [
-            'active' => false,
+            'active' => true,
             'files' => [
                 [
                     'type' => 'js',

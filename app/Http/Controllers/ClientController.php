@@ -23,10 +23,14 @@ class ClientController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
+            'phone' => 'required|string|max:12',
+            'phone2' => 'nullable|string|max:12',
             'email' => 'nullable|email',
         ]);
 
-        Auth::user()->clients()->create($validated);
+        $validated['photographer_id'] = Auth::id();
+
+        Client::create($validated);
 
         return redirect()->route('dashboard.clients.index')->with('success', 'Client added successfully.');
     }
