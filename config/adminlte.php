@@ -331,7 +331,7 @@ return [
         ['header' => 'account_settings'],
         [
             'text' => 'profile',
-            'url' => 'admin/settings',
+            'url' => 'dashboard/profile/create',
             'icon' => 'fas fa-fw fa-user',
         ],
         [
@@ -372,6 +372,7 @@ return [
         [
             'text' => 'clients',
             'icon' => 'fas fa-users',
+            'can' => 'has-photographer',
             'submenu' => [
                 [
                     'text' => 'add_client',
@@ -385,22 +386,6 @@ return [
                 ],                
             ],
         ],
-        // ['header' => 'labels'],
-        // [
-        //     'text' => 'important',
-        //     'icon_color' => 'red',
-        //     'url' => '#',
-        // ],
-        // [
-        //     'text' => 'warning',
-        //     'icon_color' => 'yellow',
-        //     'url' => '#',
-        // ],
-        // [
-        //     'text' => 'information',
-        //     'icon_color' => 'cyan',
-        //     'url' => '#',
-        // ],
     ],
 
     /*

@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 
 class EnsureUserIsPhotographer
 {
@@ -15,7 +16,11 @@ class EnsureUserIsPhotographer
         $user = Auth::user();
 
         if (! $user || $user->type !== 'photographer') {
-            abort(403, 'Access denied. Only photographers can access this section.');
+            abort(403, 'Access denied. Only active photographers can access this section.');
+        }
+
+        if(!Gate::allows('has-photographer', $user)) { //the profile is not completed yet
+            return redirect()->route('dashboard.profile.create');
         }
 
         return $next($request);

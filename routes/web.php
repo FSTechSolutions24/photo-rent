@@ -1,10 +1,11 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\MediaController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\FolderController;
 use App\Http\Controllers\GalleryController;
-use App\Http\Controllers\MediaController;
+use App\Http\Controllers\ProfileController;
 
 /*
 |--------------------------------------------------------------------------
@@ -40,6 +41,10 @@ Route::middleware(['auth', 'photographer'])->prefix('dashboard')->name('dashboar
 
     // Photos (nested under gallery)
     Route::post('galleries/{gallery}/photos', [MediaController::class, 'store'])->name('photos.store');
+});
+
+Route::middleware(['auth'])->prefix('dashboard')->name('dashboard.')->group(function () {
+    Route::resource('profile', ProfileController::class);
 });
 
 

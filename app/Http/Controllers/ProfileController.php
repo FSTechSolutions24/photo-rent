@@ -8,28 +8,16 @@ use Illuminate\Support\Facades\Auth;
 use Yajra\DataTables\Facades\DataTables;
 
 
-class ClientController extends Controller
+class ProfileController extends Controller
 {
     public function index()
     {
-        $photographer = Auth::user()->photographer;
-        $clients = $photographer ? $photographer->clients : collect(); // empty collection if null
-
-        return view('dashboard.clients.index', compact('clients'));
+        
     }
 
     public function create()
     {
-        return view('dashboard.clients.create');
-    }
-
-    public function getData(){
-
-        $eloquent = Client::query();
-
-        return DataTables::eloquent($eloquent)
-        ->addIndexColumn()
-        ->make(true);
+        return view('dashboard.profile.create');
     }
 
     public function store(Request $request)
@@ -57,6 +45,6 @@ class ClientController extends Controller
 
     private function authorizeClient(Client $client)
     {
-        abort_if($client->photographer_id !== Auth::id(), 403);
+        
     }
 }
