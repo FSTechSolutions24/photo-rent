@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 use Yajra\DataTables\Facades\DataTables;
+use Illuminate\Support\Facades\Crypt;
 
 class GalleryController extends Controller
 {
@@ -46,6 +47,9 @@ class GalleryController extends Controller
                 // if (!Hash::check($request->password, $gallery->password)) {
                 //     return back()->withErrors(['password' => 'Incorrect password.'])->withInput();
                 // }
+
+                // $password = Crypt::decryptString($gallery->client_password);
+
                 if (($request->password != $gallery->password)) {
                     return back()->withErrors(['password' => 'Incorrect password.'])->withInput();
                 }
@@ -90,7 +94,8 @@ class GalleryController extends Controller
     public function edit($id){
         $gallery = Gallery::findOrFail($id);
         $clients = Client::where('photographer_id', Auth::id())->get();
-        // dd('here');
+        $gallery->client_password = Crypt::decryptString($gallery->client_password);
+        $gallery->guest_password = Crypt::decryptString($gallery->guest_password);
         return view('dashboard.galleries.edit', compact('gallery','clients'));   
     }
 
@@ -126,8 +131,8 @@ class GalleryController extends Controller
         Gallery::create([
             'name' => $validated['name'],
             'slug' => $slug,
-            'client_password' => Hash::make($validated['client_password']),
-            'guest_password' => Hash::make($validated['guest_password']),
+            'client_password' => Crypt::encryptString($validated['client_password']),
+            'guest_password' => Crypt::encryptString($validated['guest_password']),
             'thumbnail_path' => $thumbnailPath,
             'client_id'=>$validated['client_id'],
         ]);

@@ -31,7 +31,7 @@
 
 <div class="mb-3">
     <label>Client Password:</label>
-    <input type="text" name="client_password" class="input form-control" required>
+    <input type="text" name="client_password" value="{{ old('client_password', $gallery->client_password ?? '') }}" class="input form-control" required>
     @error('client_password')
         <small class="text-danger">{{ $message }}</small>
     @enderror
@@ -39,7 +39,7 @@
 
 <div class="mb-3">
     <label>Guest Password:</label>
-    <input type="text" name="guest_password" class="input form-control" required>
+    <input type="text" name="guest_password"  value="{{ old('guest_password', $gallery->guest_password ?? '') }}" class="input form-control"  required>
     @error('guest_password')
         <small class="text-danger">{{ $message }}</small>
     @enderror
