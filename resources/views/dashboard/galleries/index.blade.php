@@ -1,39 +1,27 @@
 @extends('adminlte::page')
-@section('title', 'Dashboard')
+@section('title', 'Galleries')
 
 @section('content_header')
-    <h1>Dashboard</h1>
+    <h1>Galleries</h1>
 @stop
 
 @section('content')
-    <h2 class="text-xl font-semibold mb-3">Galleries for {{ $client->name }}</h2>
-
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Number of items</th>
-                <th>Created at</th>                
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>Gallery1</td>
-                <td>20</td>
-                <td>12/10/2025</td>
-            </tr>
-            <tr>
-                <td>Gallery1</td>
-                <td>20</td>
-                <td>12/10/2025</td>
-            </tr>
-            <tr>
-                <td>Gallery1</td>
-                <td>20</td>
-                <td>12/10/2025</td>
-            </tr>
-        </tbody>
-    </table>
+    <div class="card">
+        <div class="card-body">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Actions</th>
+                        <th>#</th>
+                        <th>Client</th>
+                        <th>Gallery Name</th>                
+                    </tr>
+                </thead>
+                <tbody>            
+                </tbody>
+            </table>
+        </div>
+    </div>
 @stop
 
 @section('css')
@@ -42,5 +30,19 @@
 @stop
 
 @section('js')
-    <script> console.log("Hi, I'm using the Laravel-AdminLTE package!"); </script>
+    <script> 
+      $(document).ready(function(){            
+        window.view_reports =  $('.table').DataTable({
+          processing: true,
+          serverSide: true,
+          ajax: "{{ route('dashboard.galleries.data') }}",
+          columns: [
+            {data:  'actions'},
+            {data:  'id'},
+            {data:  'client_id'},
+            { data: 'name'},
+          ]
+        })
+      })
+    </script>
 @stop

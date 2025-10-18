@@ -1,30 +1,16 @@
 @extends('adminlte::page')
-
+@section('title', 'View Clients')
+@section('content_header')
+    <h1>View Clients</h1>
+@stop
 @section('content')
-{{-- 
-<div>
-    <h1 class="text-2xl font-bold mb-4">My Clients</h1>
 
-
-    <a href="{{ route('dashboard.clients.create') }}" class="btn btn-primary mb-3">+ Add Client</a>
-
-    <ul>
-        @foreach($clients as $client)
-            <li class="mb-2">
-                <a href="{{ route('dashboard.clients.show', $client) }}" class="text-blue-600">
-                    {{ $client->name }}
-                </a>
-            </li>
-        @endforeach
-    </ul>
-</div> --}}
-
-<h4 class="page_header">View Clients</h4>
 <div class="card">
   <div class="card-body">
     <table class="table table-striped">
       <thead>
         <tr>
+          <th scope="col">Actions</th>
           <th scope="col">#</th>
           <th scope="col">Name</th>
           <th scope="col">Phone</th>
@@ -48,6 +34,7 @@
           serverSide: true,
           ajax: "{{ route('dashboard.clients.data') }}",
           columns: [
+            {data:  'actions'},
             {data:  'id'},
             { data: 'name'},
             { data: 'phone'},

@@ -19,7 +19,8 @@ class CreateGalleriesTable extends Migration
             $table->string('name');
             $table->string('slug'); // for URLs like wedding, gallery1
             $table->string('thumbnail_path')->nullable();
-            $table->string('password');
+            $table->string('client_password');
+            $table->string('guest_password');
             $table->boolean('is_public')->default(false);
             $table->timestamps();
         });

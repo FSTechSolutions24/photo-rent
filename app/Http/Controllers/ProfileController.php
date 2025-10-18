@@ -17,6 +17,13 @@ class ProfileController extends Controller
 
     public function create()
     {
+        $user = auth()->user();
+
+        // Check if user has photographer relation
+        if ($user->photographer) {
+            return redirect()->route('dashboard'); // or 'dashboard.index' depending on your route name
+        }
+
         return view('dashboard.profile.create');
     }
 

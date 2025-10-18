@@ -3,7 +3,7 @@
 {{-- @section('content') --}}
     {{-- <h1 class="text-xl font-bold">{{ $client->name }} / {{ $gallery->name }}</h1>
 
-    <a href="{{ route('dashboard.clients.galleries.create', $client) }}" class="btn btn-primary my-3">
+    <a href="{{ route('dashboard.galleries.create', $client) }}" class="btn btn-primary my-3">
         + Add Gallery
     </a>
 

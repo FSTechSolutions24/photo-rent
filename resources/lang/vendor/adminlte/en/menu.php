@@ -1,7 +1,6 @@
 <?php
 
 return [
-
     'main_navigation' => 'MAIN NAVIGATION',
     'blog' => 'Blog',
     'pages' => 'Pages',
@@ -19,4 +18,6 @@ return [
     'view_clients'=>'View Clients',
     'add_client'=>'Add Client',
     'clients'=>'Client',
+    'add_gallery'=>'Add Gallery',
+    'view_galleries'=>'View Galleries',
 ];

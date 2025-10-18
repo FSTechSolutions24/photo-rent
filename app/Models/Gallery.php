@@ -9,7 +9,7 @@ class Gallery extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['client_id', 'name', 'slug', 'thumbnail_path', 'password', 'is_public'];
+    protected $fillable = ['client_id', 'name', 'slug', 'thumbnail_path', 'client_password', 'guest_password', 'is_public'];
 
     public function client()
     {

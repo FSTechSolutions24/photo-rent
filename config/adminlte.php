@@ -377,12 +377,29 @@ return [
                 [
                     'text' => 'add_client',
                     'url' => 'dashboard/clients/create',
-                    'icon'=>'fas fa-user'
+                    'icon'=>'fas fa-plus'
                 ],                
                 [
                     'text' => 'view_clients',
                     'url' => 'dashboard/clients',
-                    'icon'=>'fas fa-users'
+                    'icon'=>'fas fa-eye'
+                ],                
+            ],
+        ],
+        [
+            'text' => 'Gallery',
+            'icon' => 'fas fa-images',
+            'can' => 'has-photographer',
+            'submenu' => [
+                [
+                    'text' => 'add_gallery',
+                    'url' => 'dashboard/galleries/create',
+                    'icon'=>'fas fa-plus'
+                ],                
+                [
+                    'text' => 'view_galleries',
+                    'url' => 'dashboard/galleries',
+                    'icon'=>'fas fa-eye'
                 ],                
             ],
         ],
@@ -444,7 +461,7 @@ return [
             ],
         ],
         'Select2' => [
-            'active' => false,
+            'active' => true,
             'files' => [
                 [
                     'type' => 'js',
@@ -500,6 +517,16 @@ return [
                     'type' => 'css',
                     'asset' => true,
                     'location' => 'css/customized.css',
+                ],
+            ],
+        ],
+        'Custom' => [
+            'active' => true,
+            'files' => [
+                [
+                    'type' => 'js',
+                    'asset' => true,
+                    'location' => 'js/custom.js',
                 ],
             ],
         ],

@@ -22,9 +22,7 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth'])->name('dashboard');
+
 
 
 
@@ -34,13 +32,19 @@ Route::middleware(['auth', 'photographer'])->prefix('dashboard')->name('dashboar
     Route::resource('clients', ClientController::class);
 
     // Galleries (nested under client)
-    Route::resource('clients.galleries', GalleryController::class);
+    Route::get('galleries/data', [GalleryController::class, 'getData'])->name('galleries.data');
+    Route::resource('galleries', GalleryController::class);
 
     // Folders (nested under gallery)
-    Route::resource('galleries.folders', FolderController::class);
+    Route::resource('folders', FolderController::class);
 
     // Photos (nested under gallery)
     Route::post('galleries/{gallery}/photos', [MediaController::class, 'store'])->name('photos.store');
+
+});
+
+Route::middleware(['auth', 'photographer'])->group(function () {
+    Route::get('/dashboard', function () {return view('dashboard');})->name('dashboard');
 });
 
 Route::middleware(['auth'])->prefix('dashboard')->name('dashboard.')->group(function () {

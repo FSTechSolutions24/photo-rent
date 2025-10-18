@@ -17,8 +17,8 @@ class CreateClientsTable extends Migration
             $table->id();
             $table->foreignId('photographer_id')->constrained()->onDelete('cascade');
             $table->string('name');
-            $table->string('phone')->unique();
-            $table->string('phone2')->nullable()->unique();
+            $table->string('phone');
+            $table->string('phone2')->nullable();
             $table->string('email')->nullable();
             $table->timestamps();
         });
