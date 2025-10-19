@@ -39,8 +39,8 @@
           columns: [
             {data:  'actions'},
             {data:  'id'},
-            {data:  'client_id'},
-            { data: 'name'},
+            {data:  'client_name'},
+            {data:  'name'},
           ]
         })
       })

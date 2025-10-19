@@ -8,10 +8,10 @@ use Illuminate\Support\Str;
 use App\Models\Photographer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\Storage;
 
 class GalleryController extends Controller
 {
@@ -72,17 +72,22 @@ class GalleryController extends Controller
     }
 
     public function getData(){
-
-        $photographer = Auth::user()->photographer;
-        $clients = $photographer ? $photographer->clients()->with('galleries')->get() : collect();
-        $eloquent = $clients->pluck('galleries')->flatten();        
     
-        return DataTables::of($eloquent)
-         ->addColumn('actions', function ($model) {
+        $photographer = Auth::user()->photographer;
+        $galleries = $photographer
+            ? $photographer->galleries()->with('client')->get()
+            : collect();
+
+        return DataTables::of($galleries)
+        ->addColumn('actions', function ($model) {
             $editUrl = route('dashboard.galleries.edit', $model->id);
             return '<a href="'.$editUrl.'" class="btn btn-sm btn-primary">
                 <i class="fas fa-edit"></i> Edit
             </a>';
+        })
+        // Add a client_name column instead of overriding client_id
+        ->addColumn('client_name', function ($model) {
+            return $model->client ? $model->client->name : '-';
         })
         ->addIndexColumn()
         ->rawColumns(['actions'])
@@ -99,16 +104,8 @@ class GalleryController extends Controller
         return view('dashboard.galleries.edit', compact('gallery','clients'));   
     }
 
-    public function create()
-    {
-        $clients = Client::where('photographer_id', Auth::id())->get();
-        return view('dashboard.galleries.create', compact('clients'));
-    }
-
-    public function store(Request $request)
-    {
-
-        $validated = $request->validate([
+    protected function validateGallery(Request $request, $id = null){
+        return $request->validate([
             'name' => 'required|string|max:255',
             'client_password' => ['required', 'string', 'min:6', 'different:guest_password'],
             'guest_password' => ['required', 'string', 'min:6', 'different:client_password'],
@@ -119,26 +116,66 @@ class GalleryController extends Controller
                 Rule::exists('clients', 'id')->where('photographer_id', Auth::id()),
             ],
         ]);
+    }
 
+    public function create()
+    {
+        $clients = Client::where('photographer_id', Auth::id())->get();
+        return view('dashboard.galleries.create', compact('clients'));
+    }
 
-        $slug = Str::slug($validated['name']) ?: Str::random(8);
-        $thumbnailPath = null;
+    public function update(Request $request, Gallery $gallery){
+        $data = $this->validateGallery($request);
 
-        if ($request->hasFile('thumbnail')) {
-            $thumbnailPath = $request->file('thumbnail') ->store("thumbnails/{$validated['client']}", 'local'); //change local later to wasabi or s3
+        $data = $this->prepare_gallery_data($data);
+
+        $gallery->update($data);
+        
+        $this->update_gallery_thumbnail($request, $gallery);
+
+        return redirect()->route('dashboard.galleries.index')->with('success', 'Client updated successfully.');
+    }
+
+    public function store(Request $request)
+    {
+        $data = $this->validateGallery($request);
+
+        $data['photographer_id'] = Auth::id();
+
+        $data = $this->prepare_gallery_data($data);
+        
+        $gallery = Gallery::create($data);
+
+        $this->update_gallery_thumbnail($request, $gallery);
+
+        return redirect()->route('dashboard.galleries.index', $data['client_id'])->with('success', 'Gallery created successfully.');
+    }
+
+    public function update_gallery_thumbnail(Request $request, $gallery){
+        // Handle thumbnail upload
+        if ($request->hasFile('thumbnail_path')) {
+
+            // 1. Delete old thumbnail if it exists
+            if ($gallery->thumbnail_path && Storage::disk('public')->exists($gallery->thumbnail_path)) {
+                Storage::disk('public')->delete($gallery->thumbnail_path);
+            }
+
+            // Store file locally under /storage/app/thumbnails/{gallery_id}
+            $thumbnailPath = $request->file('thumbnail_path')->store("galleries/{$gallery->id}/thumbnail", 'public'); // 'local' can later be changed to 's3' or 'wasabi'
+            // Update the gallery model
+            $gallery->thumbnail_path = $thumbnailPath;
+            $gallery->save();
         }
+    }
 
-        Gallery::create([
-            'name' => $validated['name'],
-            'slug' => $slug,
-            'client_password' => Crypt::encryptString($validated['client_password']),
-            'guest_password' => Crypt::encryptString($validated['guest_password']),
-            'thumbnail_path' => $thumbnailPath,
-            'client_id'=>$validated['client_id'],
-        ]);
+    public function prepare_gallery_data(array $data){
 
-        return redirect()->route('dashboard.galleries.index', $validated['client_id'])
-            ->with('success', 'Gallery created successfully.');
+        // Prepare other fields
+        $data['slug'] = Str::slug($data['name']) ?: Str::random(8);
+        $data['client_password'] = Crypt::encryptString($data['client_password']);
+        $data['guest_password'] = Crypt::encryptString($data['guest_password']);
+
+        return $data;
     }
 
     private function authorizeClient(Client $client)

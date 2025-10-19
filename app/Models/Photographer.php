@@ -22,4 +22,9 @@ class Photographer extends Model
     {
         return $this->hasMany(Client::class);
     }
+
+    public function galleries()
+    {
+        return $this->hasMany(Gallery::class);
+    }
 }

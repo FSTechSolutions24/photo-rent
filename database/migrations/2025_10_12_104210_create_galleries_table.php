@@ -15,7 +15,8 @@ class CreateGalleriesTable extends Migration
     {
         Schema::create('galleries', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('client_id')->constrained()->onDelete('cascade');
+            $table->foreignId('photographer_id')->constrained()->onDelete('cascade');
+            $table->foreignId('client_id')->nullable()->constrained()->onDelete('cascade');
             $table->string('name');
             $table->string('slug'); // for URLs like wedding, gallery1
             $table->string('thumbnail_path')->nullable();
