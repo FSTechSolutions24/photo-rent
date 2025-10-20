@@ -22,6 +22,20 @@ class FolderController extends Controller
         return back()->with('success', 'Folder created successfully.');
     }
 
+    public function index(Gallery $gallery)
+    {
+        // Pass gallery and folders to the Blade view
+        return view('dashboard.folders.index', [
+            'gallery' => $gallery,
+        ]);
+    }
+
+    public function upload()
+    {
+        dd('here');
+    }
+
+
     private function authorizeGallery(Gallery $gallery)
     {
         abort_if($gallery->client->photographer_id !== Auth::id(), 403);

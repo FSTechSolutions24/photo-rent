@@ -80,10 +80,22 @@ class GalleryController extends Controller
 
         return DataTables::of($galleries)
         ->addColumn('actions', function ($model) {
+
             $editUrl = route('dashboard.galleries.edit', $model->id);
-            return '<a href="'.$editUrl.'" class="btn btn-sm btn-primary">
+
+            $buffer = '<a href="'.$editUrl.'" class="btn btn-sm btn-primary">
                 <i class="fas fa-edit"></i> Edit
             </a>';
+
+            $folderUrl = route('dashboard.galleries.folders.index', [
+                'gallery' => $model->id,
+            ]);
+
+            $buffer .= '<a href="'.$folderUrl.'" class="btn btn-sm btn-success">
+                <i class="fas fa-edit"></i> Folders
+            </a>';
+            
+            return $buffer;
         })
         // Add a client_name column instead of overriding client_id
         ->addColumn('client_name', function ($model) {

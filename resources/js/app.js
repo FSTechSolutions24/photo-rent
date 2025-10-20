@@ -1,7 +1,20 @@
-import './bootstrap';
+import { createApp } from 'vue'
+import draggable from 'vuedraggable'
+import FolderGrid from './components/FolderGrid.vue'
+import Uploader from './Uploader';
 
-import Alpine from 'alpinejs';
+// Create the app instance
+const app = createApp({})
 
-window.Alpine = Alpine;
+// Register components globally
+app.component('draggable', draggable)
+app.component('folder-grid', FolderGrid)
 
-Alpine.start();
+// Mount Vue
+app.mount('#app')
+
+console.log('✅ Vue app mounted successfully')
+
+if ($('.dropzone').length !== 0) {
+    new Uploader();
+}

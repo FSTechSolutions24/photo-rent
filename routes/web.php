@@ -36,7 +36,8 @@ Route::middleware(['auth', 'photographer'])->prefix('dashboard')->name('dashboar
     Route::resource('galleries', GalleryController::class);
 
     // Folders (nested under gallery)
-    Route::resource('folders', FolderController::class);
+    Route::post('/galleries/{gallery}/folders/{folder}/upload', [FolderController::class, 'upload'])->name('galleries.folders.upload');
+    Route::resource('galleries.folders', FolderController::class);
 
     // Photos (nested under gallery)
     Route::post('galleries/{gallery}/photos', [MediaController::class, 'store'])->name('photos.store');
