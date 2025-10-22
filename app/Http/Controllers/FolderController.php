@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
+use App\Models\Folder;
 use App\Models\Gallery;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 
 class FolderController extends Controller
@@ -28,6 +29,12 @@ class FolderController extends Controller
         return view('dashboard.folders.index', [
             'gallery' => $gallery,
         ]);
+    }
+
+    public function listJson($galleryId)
+    {
+        $folders = Folder::where('gallery_id', $galleryId)->get();
+        return response()->json($folders);
     }
 
     public function upload()
