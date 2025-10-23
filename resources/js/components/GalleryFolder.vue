@@ -98,6 +98,8 @@ export default {
         border-image: none;
         border-width: 1px 0;
         border-radius: 15px;
+        /* box-shadow: 0px 5px 10px rgba(51, 66, 87, 0.05); */
+        box-shadow: 0px 5px 10px rgb(51 66 87 / 10%);
     }
     .ibox-footer {
         color: inherit;

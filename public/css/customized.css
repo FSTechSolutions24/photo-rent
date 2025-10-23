@@ -10,3 +10,52 @@
 .select2-container {
     width: 100% !important;
 }
+
+
+
+/* new customized style for the sidbar and colors */
+.sidebar-custom-primary .sidebar nav .form-inline .input-group {
+    border: 1px solid rgba(233, 243, 255, 0.4);
+    background: rgba(153, 167, 186, 0.2);
+    color: #99a7ba !important;
+    border-radius: 5px;
+    overflow: hidden;
+    margin: 0px 10px;
+}
+.sidebar-custom-primary .sidebar nav .form-inline .input-group button {
+    background: rgba(153, 167, 186, 0.2);
+    color: #99a7ba !important;
+}
+.sidebar-custom-primary .sidebar nav .form-inline .input-group .form-control-sidebar {
+    border: unset;
+    padding: 5px 20px;
+    background: rgba(153, 167, 186, 0.2);
+}
+.sidebar-custom-primary .sidebar nav .form-inline .input-group .btn.btn-sidebar {
+    border: unset;
+}
+.sidebar-custom-primary {
+    background-color: #073b74 !important;
+}
+.sidebar-custom-primary .sidebar nav .nav-header {
+    color: #fff !important;
+}
+.sidebar-custom-primary .sidebar nav li.nav-item .nav-link p {
+    color: #fff !important;
+    font-size: .875rem;
+}
+.main-header li.nav-item a {
+    color: #000 !important;
+}
+.sidebar-custom-primary .sidebar nav li.nav-item .nav-link i {
+    font-size: 0.9rem;
+}
+.navbar-expand .fa-bars {
+    color: #073b74;
+}
+.brand-link {
+    border-bottom: 1px solid #7391b3 !important;
+}
+.content-wrapper {
+    background: #f9f9fb !important;
+}
