@@ -1,11 +1,9 @@
 @extends('adminlte::page')
 @section('title', 'Galleries')
 
-@section('content_header')
-    <h1>Galleries</h1>
-@stop
-
 @section('content')
+
+    <h4 class="page_header">Gallery List</h4>
     <div class="ibox-content">
         <table class="table">
             <thead>

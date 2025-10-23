@@ -2,7 +2,7 @@
 
 @section('content')
 
-<h4 class="page_header">Add Client</h4>
+<h4 class="page_header">Create Client</h4>
 
 <form method="POST" action="{{ route('dashboard.clients.store') }}" enctype="multipart/form-data">
 

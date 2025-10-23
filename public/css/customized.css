@@ -126,3 +126,26 @@ label {
     vertical-align: middle !important;
     font-size: .8125rem;
 }
+.table thead th {
+    border-bottom: unset;
+}
+.table td, .table th {
+    color: #334257 !important;
+    font-weight: 500 !important;
+    font-size: .875rem !important;
+}
+.page_header {
+    font-weight: 700;
+    color: #334257 !important;
+    margin-bottom: 25px !important;
+    font-size: 1.6rem;
+    letter-spacing: 0.5px;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+.input-group-append {
+    height: 38px;
+}
+div.dataTables_wrapper div.dataTables_filter input {
+    border-radius: 5px !important;
+}

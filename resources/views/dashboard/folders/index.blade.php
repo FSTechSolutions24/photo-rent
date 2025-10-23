@@ -1,11 +1,9 @@
 @extends('adminlte::page')
 @section('title', 'Folders')
 
-@section('content_header')
-    <h1>{{ $gallery->name }}</h1>
-@stop
-
 @section('content')
+
+    <h4 class="page_header">{{ $gallery->name }}</h4>
     <div id="app">
         {{-- <folder-grid></folder-grid> --}}
         <div class="row">
