@@ -44,6 +44,9 @@
     color: #fff !important;
     font-size: .875rem;
 }
+.sidebar-custom-primary .sidebar nav li.nav-item .nav-link p i {
+    color: rgb(113, 134, 157) !important;    
+}
 .main-header li.nav-item a {
     color: #000 !important;
 }
@@ -58,4 +61,68 @@
 }
 .content-wrapper {
     background: #f9f9fb !important;
+}
+.sidebar-dark-primary .nav-sidebar>.nav-item>.nav-link.active, .sidebar-light-primary .nav-sidebar>.nav-item>.nav-link.active {
+    background-color: rgba(255, 255, 255, .1) !important;    
+}
+.nav-pills .nav-link.active, .nav-pills .show>.nav-link {
+    color: #fff !important;
+    background-color: rgba(255, 255, 255, .1) !important;
+}
+.ibox-content {
+    background-color: #ffffff !important;
+    color: inherit !important;
+    padding: 25px !important;
+    border-color: #e7eaec !important;
+    -o-border-image: none !important;
+    border-image: none !important;
+    border-width: 1px 0 !important;
+    border-radius: 15px !important;
+    box-shadow: 0px 5px 10px rgb(51 66 87 / 10%) !important;
+    transition: box-shadow 0.4s ease, transform 0.4s ease;
+}
+.ibox-content:hover {
+    box-shadow: 0px 5px 24px rgba(7, 59, 116, 0.15) !important;
+    transform: translateY(-1px); /* subtle lift effect */
+}
+.form-control, .select2-selection.select2-selection--single {
+    border-color: rgb(208, 219, 233) !important;
+}
+label {
+    color: #334257 !important;
+    font-weight: 500 !important;
+    font-size: .875rem !important;
+}
+.btn {
+    padding: .54688rem .875rem;
+    font-size: .875rem;
+    line-height: 1.6;
+    border-radius: .3125rem;
+}
+.btn-outline-primary {
+    color: #1455ac !important;
+    border-color: #1455ac !important;
+}
+.btn-outline-primary:hover{
+    color: #fff !important;
+    background-color: #1455ac !important;
+}
+.btn-primary {
+    background-color: #1455ac !important;   
+    color: #fff !important;
+    border: .0625rem solid transparent;
+}
+.btn-success {
+    color: #fff !important;
+    border: .0625rem solid transparent;
+}
+.btn-sm {
+    width: 30px;
+    height: 30px;
+    padding: 3px;
+    place-items: center;
+}
+.btn-sm i {
+    vertical-align: middle !important;
+    font-size: .8125rem;
 }

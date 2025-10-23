@@ -5,23 +5,21 @@
 @stop
 @section('content')
 
-<div class="card">
-  <div class="card-body">
-    <table class="table table-striped">
-      <thead>
-        <tr>
-          <th scope="col">Actions</th>
-          <th scope="col">#</th>
-          <th scope="col">Name</th>
-          <th scope="col">Phone</th>
-          <th scope="col">Phone2</th>
-          <th scope="col">Email</th>
-        </tr>
-      </thead>
-      <tbody>        
-      </tbody>
-    </table>
-  </div>
+<div class="ibox-content">
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th scope="col">Actions</th>
+        <th scope="col">#</th>
+        <th scope="col">Name</th>
+        <th scope="col">Phone</th>
+        <th scope="col">Phone2</th>
+        <th scope="col">Email</th>
+      </tr>
+    </thead>
+    <tbody>        
+    </tbody>
+  </table>
 </div>
 
 @stop

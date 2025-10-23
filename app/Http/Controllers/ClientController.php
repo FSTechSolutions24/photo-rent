@@ -27,8 +27,8 @@ class ClientController extends Controller
         return DataTables::eloquent($eloquent)
          ->addColumn('actions', function ($model) {
             $editUrl = route('dashboard.clients.edit', $model->id);
-            return '<a href="'.$editUrl.'" class="btn btn-sm btn-primary">
-                <i class="fas fa-edit"></i> Edit
+            return '<a href="'.$editUrl.'" class="btn btn-sm btn-outline-primary">
+                <i class="fas fa-edit"></i>
             </a>';
         })
         ->addIndexColumn()

@@ -89,18 +89,6 @@ export default {
         margin-right: 8px;
         color: #3d4d5d;
     }
-    .ibox-content {
-        background-color: #ffffff;
-        color: inherit;
-        padding: 25px;
-        border-color: #e7eaec;
-        -o-border-image: none;
-        border-image: none;
-        border-width: 1px 0;
-        border-radius: 15px;
-        /* box-shadow: 0px 5px 10px rgba(51, 66, 87, 0.05); */
-        box-shadow: 0px 5px 10px rgb(51 66 87 / 10%);
-    }
     .ibox-footer {
         color: inherit;
         border-top: 1px solid #e7eaec;

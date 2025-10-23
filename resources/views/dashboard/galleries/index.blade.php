@@ -6,21 +6,19 @@
 @stop
 
 @section('content')
-    <div class="card">
-        <div class="card-body">
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>Actions</th>
-                        <th>#</th>
-                        <th>Client</th>
-                        <th>Gallery Name</th>                
-                    </tr>
-                </thead>
-                <tbody>            
-                </tbody>
-            </table>
-        </div>
+    <div class="ibox-content">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Actions</th>
+                    <th>#</th>
+                    <th>Client</th>
+                    <th>Gallery Name</th>                
+                </tr>
+            </thead>
+            <tbody>            
+            </tbody>
+        </table>
     </div>
 @stop
 

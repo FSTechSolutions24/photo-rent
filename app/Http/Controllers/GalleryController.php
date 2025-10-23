@@ -83,16 +83,16 @@ class GalleryController extends Controller
 
             $editUrl = route('dashboard.galleries.edit', $model->id);
 
-            $buffer = '<a href="'.$editUrl.'" class="btn btn-sm btn-primary">
-                <i class="fas fa-edit"></i> Edit
+            $buffer = '<a href="'.$editUrl.'" class="btn btn-sm btn-outline-primary">
+                <i class="fas fa-edit"></i>
             </a>';
 
             $folderUrl = route('dashboard.galleries.folders.index', [
                 'gallery' => $model->id,
             ]);
 
-            $buffer .= '<a href="'.$folderUrl.'" class="btn btn-sm btn-success">
-                <i class="fas fa-edit"></i> Folders
+            $buffer .= '<a href="'.$folderUrl.'" class="btn btn-sm btn-outline-success" style="margin-left: 10px;">
+                <i class="fas fa-cogs"></i>
             </a>';
             
             return $buffer;
