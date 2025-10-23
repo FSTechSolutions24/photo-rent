@@ -18,9 +18,9 @@
     border: 1px solid rgba(233, 243, 255, 0.4);
     background: rgba(153, 167, 186, 0.2);
     color: #99a7ba !important;
-    border-radius: 5px;
+    border-radius: 20px;
     overflow: hidden;
-    margin: 0px 10px;
+    margin: 0px 5px;
 }
 .sidebar-custom-primary .sidebar nav .form-inline .input-group button {
     background: rgba(153, 167, 186, 0.2);
