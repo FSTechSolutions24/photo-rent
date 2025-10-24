@@ -24178,6 +24178,9 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
     this.load_folders();
   },
   methods: {
+    addNewFolder: function addNewFolder() {
+      $('#exampleModal').modal('show');
+    },
     load_folders: function load_folders() {
       var _this = this;
       return _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee() {
@@ -24267,6 +24270,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   render: () => (/* binding */ render)
 /* harmony export */ });
 /* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm-bundler.js");
+function _toConsumableArray(r) { return _arrayWithoutHoles(r) || _iterableToArray(r) || _unsupportedIterableToArray(r) || _nonIterableSpread(); }
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function _unsupportedIterableToArray(r, a) { if (r) { if ("string" == typeof r) return _arrayLikeToArray(r, a); var t = {}.toString.call(r).slice(8, -1); return "Object" === t && r.constructor && (t = r.constructor.name), "Map" === t || "Set" === t ? Array.from(r) : "Arguments" === t || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(t) ? _arrayLikeToArray(r, a) : void 0; } }
+function _iterableToArray(r) { if ("undefined" != typeof Symbol && null != r[Symbol.iterator] || null != r["@@iterator"]) return Array.from(r); }
+function _arrayWithoutHoles(r) { if (Array.isArray(r)) return _arrayLikeToArray(r); }
+function _arrayLikeToArray(r, a) { (null == a || a > r.length) && (a = r.length); for (var e = 0, n = Array(a); e < a; e++) n[e] = r[e]; return n; }
 
 var _hoisted_1 = {
   "class": "ibox float-e-margins"
@@ -24284,26 +24293,32 @@ var _hoisted_3 = {
   }
 };
 var _hoisted_4 = {
+  "class": "selected-folder placeholder"
+};
+var _hoisted_5 = {
   "class": "folder-list",
   style: {
     "padding": "0"
   }
 };
-var _hoisted_5 = ["onClick"];
-var _hoisted_6 = {
+var _hoisted_6 = ["onClick"];
+var _hoisted_7 = {
   "class": "selected-folder-info"
 };
-var _hoisted_7 = {
+var _hoisted_8 = {
   "class": "folder-title"
 };
 function render(_ctx, _cache, $props, $setup, $data, $options) {
-  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_3, [_cache[1] || (_cache[1] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_3, [_cache[3] || (_cache[3] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
     "class": "hr-line-dashed"
-  }, null, -1 /* CACHED */)), _cache[2] || (_cache[2] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
-    "class": "selected-folder placeholder"
-  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
-    "class": "fas fa-folder"
-  }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "FOLDERS")], -1 /* CACHED */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("ul", _hoisted_4, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.folders, function (folder) {
+  }, null, -1 /* CACHED */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_4, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+    onClick: _cache[0] || (_cache[0] = function ($event) {
+      return $options.addNewFolder();
+    }),
+    "class": "btn-effects"
+  }, _toConsumableArray(_cache[1] || (_cache[1] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+    "class": "fas fa-plus-circle"
+  }, null, -1 /* CACHED */)]))), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <i class=\"fas fa-folder\"></i> "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <span>FOLDERS</span> ")]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("ul", _hoisted_5, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.folders, function (folder) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
       "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["selected-folder btn selected-folder-element", {
         active: folder.id === $data.selectedFolderId
@@ -24312,14 +24327,14 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         return $options.selectFolder(folder);
       },
       key: folder.id
-    }, [_cache[0] || (_cache[0] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+    }, [_cache[2] || (_cache[2] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
       "class": "selected-folder-icon"
     }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
       "class": "fas fa-folder"
-    })], -1 /* CACHED */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_6, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h5", _hoisted_7, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(folder.name), 1 /* TEXT */)])], 10 /* CLASS, PROPS */, _hoisted_5);
-  }), 128 /* KEYED_FRAGMENT */))]), _cache[3] || (_cache[3] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+    })], -1 /* CACHED */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_7, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h5", _hoisted_8, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(folder.name), 1 /* TEXT */)])], 10 /* CLASS, PROPS */, _hoisted_6);
+  }), 128 /* KEYED_FRAGMENT */))]), _cache[4] || (_cache[4] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
     "class": "clearfix"
-  }, null, -1 /* CACHED */))])])]);
+  }, null, -1 /* CACHED */))])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Modal "), _cache[5] || (_cache[5] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createStaticVNode)("<div class=\"modal fade\" id=\"exampleModal\" tabindex=\"-1\" aria-hidden=\"true\"><div class=\"modal-dialog\"><div class=\"modal-content\"><div class=\"modal-header\"><h5 class=\"modal-title fs-5\" id=\"exampleModalLabel\">Modal title</h5><button type=\"button\" class=\"btn-close\" data-bs-dismiss=\"modal\" aria-label=\"Close\"></button></div><div class=\"modal-body\"><div class=\"mb-3\"><label class=\"form-label\">Folder Name: <span class=\"required_start\">*</span></label><input type=\"text\" name=\"phone\" class=\"input form-control\" autocomplete=\"false\"></div><div class=\"mb-3\"><label class=\"form-label\">Folder Description: <span class=\"required_start\">*</span></label><input type=\"text\" name=\"phone\" class=\"input form-control\" autocomplete=\"false\"></div></div><div class=\"modal-footer\"><button type=\"button\" class=\"btn btn-blank\" data-bs-dismiss=\"modal\">Cancel</button><button type=\"button\" class=\"btn btn-primary\">Save changes</button></div></div></div></div>", 1))]);
 }
 
 /***/ }),
@@ -24389,7 +24404,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.folder-list li {\r\n        color: #666666;\r\n        display: block;\r\n        padding: 5px 0;\r\n        cursor: pointer;\r\n        user-select: none;       \r\n        -webkit-user-select: none; \r\n        -moz-user-select: none;\n}\n.folder-list li:hover {\r\n        background-color: #f1f1f1;\n}\n.folder-list li {\r\n        border-bottom: 1px solid #e7eaec;\r\n        display: block;\r\n        padding-left: 15px;\n}\n.folder-list li i {\r\n        margin-right: 8px;\r\n        color: #3d4d5d;\n}\n.ibox-content {\r\n        background-color: #ffffff;\r\n        color: inherit;\r\n        padding: 25px;\r\n        border-color: #e7eaec;\r\n        -o-border-image: none;\r\n        border-image: none;\r\n        border-width: 1px 0;\r\n        border-radius: 15px;\r\n        /* box-shadow: 0px 5px 10px rgba(51, 66, 87, 0.05); */\r\n        box-shadow: 0px 5px 10px rgb(51 66 87 / 10%);\n}\n.ibox-footer {\r\n        color: inherit;\r\n        border-top: 1px solid #e7eaec;\r\n        font-size: 90%;\r\n        background: #ffffff;\r\n        padding: 10px 15px;\n}\n.selected-folder {\r\n        display: flex;\r\n        align-items: center;\r\n        background: #f8fafc;\r\n        border: 1px solid #e0e6ed;\r\n        border-radius: 10px;\r\n        padding: 10px 16px;\r\n        margin-bottom: 15px;\r\n        box-shadow: 0 2px 4px rgba(0,0,0,0.05);\r\n        transition: all 0.2s ease-in-out;\n}\n.selected-folder-element {\r\n        background-color: unset;\r\n        /* padding: 7px 15px; */\n}\r\n    /* .selected-folder-element .selected-folder-icon{\r\n        font-size: 16px;\r\n        width: 28px;\r\n        height: 28px;\r\n    } */\r\n    /* .selected-folder-element .selected-folder-info .folder-title{\r\n        font-size: 14px;\r\n    } */\n.selected-folder:hover {\r\n        background: #f5f5f5;\r\n        box-shadow: 0 4px 6px rgba(0,0,0,0.08);\n}\n.selected-folder.placeholder:hover {\r\n        box-shadow: 0 2px 4px rgba(0,0,0,0.05);\n}\n.selected-folder-icon {\r\n        background-color: #007bff1a;\r\n        color: #007bff;\r\n        font-size: 22px;\r\n        border-radius: 50%;\r\n        width: 40px;\r\n        height: 40px;\r\n        display: flex;\r\n        align-items: center;\r\n        justify-content: center;\r\n        margin-right: 12px;\n}\n.selected-folder-info {\r\n        display: flex;\r\n        flex-direction: column;\r\n        justify-content: center;\n}\n.folder-title {\r\n        font-size: 16px;\r\n        font-weight: 600;\r\n        color: #343a40;\r\n        margin: 0;\n}\n.folder-subtitle {\r\n        font-size: 13px;\r\n        color: #6c757d;\n}\n.selected-folder.placeholder {\r\n        justify-content: center;\r\n        color: #999;\r\n        font-style: italic;\r\n        border: 1px dashed #ddd;\r\n        background: #fafafa;\n}\n.selected-folder.placeholder i {\r\n        margin-right: 4px;\n}\n.selected-folder.active {\r\n        background: #f5f5f5;\r\n        box-shadow: 0 4px 6px rgba(0,0,0,0.08);\r\n        border-left: 4px solid #007bff;\r\n        font-weight: 600;\r\n        color: #2c3e50;\n}\r\n\r\n    /* Optional slight variation when hovering over the selected one */\n.selected-folder.active:hover {\r\n        background: #f5f5f5;\n}\r\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.folder-list li {\r\n        color: #666666;\r\n        display: block;\r\n        padding: 5px 0;\r\n        cursor: pointer;\r\n        user-select: none;       \r\n        -webkit-user-select: none; \r\n        -moz-user-select: none;\n}\n.folder-list li:hover {\r\n        background-color: #f1f1f1;\n}\n.folder-list li {\r\n        border-bottom: 1px solid #e7eaec;\r\n        display: block;\r\n        padding-left: 15px;\n}\n.folder-list li i {\r\n        margin-right: 8px;\r\n        color: #3d4d5d;\n}\n.ibox-footer {\r\n        color: inherit;\r\n        border-top: 1px solid #e7eaec;\r\n        font-size: 90%;\r\n        background: #ffffff;\r\n        padding: 10px 15px;\n}\n.selected-folder {\r\n        display: flex;\r\n        align-items: center;\r\n        background: #f8fafc;\r\n        border: 1px solid #e0e6ed;\r\n        border-radius: 10px;\r\n        padding: 10px 16px;\r\n        margin-bottom: 15px;\r\n        box-shadow: 0 2px 4px rgba(0,0,0,0.05);\r\n        transition: all 0.2s ease-in-out;\n}\n.selected-folder-element {\r\n        background-color: unset;\r\n        /* padding: 7px 15px; */\n}\r\n    /* .selected-folder-element .selected-folder-icon{\r\n        font-size: 16px;\r\n        width: 28px;\r\n        height: 28px;\r\n    } */\r\n    /* .selected-folder-element .selected-folder-info .folder-title{\r\n        font-size: 14px;\r\n    } */\n.selected-folder:hover {\r\n        background: #f5f5f5;\r\n        box-shadow: 0 4px 6px rgba(0,0,0,0.08);\n}\n.selected-folder.placeholder:hover {\r\n        box-shadow: 0 2px 4px rgba(0,0,0,0.05);\n}\n.selected-folder-icon {\r\n        background-color: #007bff1a;\r\n        color: #007bff;\r\n        font-size: 22px;\r\n        border-radius: 50%;\r\n        width: 40px;\r\n        height: 40px;\r\n        display: flex;\r\n        align-items: center;\r\n        justify-content: center;\r\n        margin-right: 12px;\n}\n.selected-folder-info {\r\n        display: flex;\r\n        flex-direction: column;\r\n        justify-content: center;\n}\n.folder-title {\r\n        font-size: 16px;\r\n        font-weight: 600;\r\n        color: #343a40;\r\n        margin: 0;\n}\n.folder-subtitle {\r\n        font-size: 13px;\r\n        color: #6c757d;\n}\n.selected-folder.placeholder {\r\n        justify-content: center;\r\n        color: #999;\r\n        font-style: italic;\r\n        border: 1px dashed #ddd;\r\n        background: #fafafa;\n}\n.selected-folder.placeholder i {\r\n        margin-right: 4px;\n}\n.selected-folder.active {\r\n        background: #f5f5f5;\r\n        box-shadow: 0 4px 6px rgba(0,0,0,0.08);\r\n        border-left: 4px solid #007bff;\r\n        font-weight: 600;\r\n        color: #2c3e50;\n}\r\n\r\n    /* Optional slight variation when hovering over the selected one */\n.selected-folder.active:hover {\r\n        background: #f5f5f5;\n}\r\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -37265,7 +37280,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _FolderGrid_vue_vue_type_template_id_494b5102_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./FolderGrid.vue?vue&type=template&id=494b5102&scoped=true */ "./resources/js/components/FolderGrid.vue?vue&type=template&id=494b5102&scoped=true");
 /* harmony import */ var _FolderGrid_vue_vue_type_script_setup_true_lang_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./FolderGrid.vue?vue&type=script&setup=true&lang=js */ "./resources/js/components/FolderGrid.vue?vue&type=script&setup=true&lang=js");
 /* harmony import */ var _FolderGrid_vue_vue_type_style_index_0_id_494b5102_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./FolderGrid.vue?vue&type=style&index=0&id=494b5102&scoped=true&lang=css */ "./resources/js/components/FolderGrid.vue?vue&type=style&index=0&id=494b5102&scoped=true&lang=css");
-/* harmony import */ var D_Beshoy_photo_rent_photo_rent_node_modules_vue_loader_dist_exportHelper_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./node_modules/vue-loader/dist/exportHelper.js */ "./node_modules/vue-loader/dist/exportHelper.js");
+/* harmony import */ var C_xampp_htdocs_photo_rent_node_modules_vue_loader_dist_exportHelper_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./node_modules/vue-loader/dist/exportHelper.js */ "./node_modules/vue-loader/dist/exportHelper.js");
 
 
 
@@ -37273,7 +37288,7 @@ __webpack_require__.r(__webpack_exports__);
 ;
 
 
-const __exports__ = /*#__PURE__*/(0,D_Beshoy_photo_rent_photo_rent_node_modules_vue_loader_dist_exportHelper_js__WEBPACK_IMPORTED_MODULE_3__["default"])(_FolderGrid_vue_vue_type_script_setup_true_lang_js__WEBPACK_IMPORTED_MODULE_1__["default"], [['render',_FolderGrid_vue_vue_type_template_id_494b5102_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render],['__scopeId',"data-v-494b5102"],['__file',"resources/js/components/FolderGrid.vue"]])
+const __exports__ = /*#__PURE__*/(0,C_xampp_htdocs_photo_rent_node_modules_vue_loader_dist_exportHelper_js__WEBPACK_IMPORTED_MODULE_3__["default"])(_FolderGrid_vue_vue_type_script_setup_true_lang_js__WEBPACK_IMPORTED_MODULE_1__["default"], [['render',_FolderGrid_vue_vue_type_template_id_494b5102_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render],['__scopeId',"data-v-494b5102"],['__file',"resources/js/components/FolderGrid.vue"]])
 /* hot reload */
 if (false) // removed by dead control flow
 {}
@@ -37342,7 +37357,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _GalleryFolder_vue_vue_type_template_id_3bc62605__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./GalleryFolder.vue?vue&type=template&id=3bc62605 */ "./resources/js/components/GalleryFolder.vue?vue&type=template&id=3bc62605");
 /* harmony import */ var _GalleryFolder_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./GalleryFolder.vue?vue&type=script&lang=js */ "./resources/js/components/GalleryFolder.vue?vue&type=script&lang=js");
 /* harmony import */ var _GalleryFolder_vue_vue_type_style_index_0_id_3bc62605_lang_css__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./GalleryFolder.vue?vue&type=style&index=0&id=3bc62605&lang=css */ "./resources/js/components/GalleryFolder.vue?vue&type=style&index=0&id=3bc62605&lang=css");
-/* harmony import */ var D_Beshoy_photo_rent_photo_rent_node_modules_vue_loader_dist_exportHelper_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./node_modules/vue-loader/dist/exportHelper.js */ "./node_modules/vue-loader/dist/exportHelper.js");
+/* harmony import */ var C_xampp_htdocs_photo_rent_node_modules_vue_loader_dist_exportHelper_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./node_modules/vue-loader/dist/exportHelper.js */ "./node_modules/vue-loader/dist/exportHelper.js");
 
 
 
@@ -37350,7 +37365,7 @@ __webpack_require__.r(__webpack_exports__);
 ;
 
 
-const __exports__ = /*#__PURE__*/(0,D_Beshoy_photo_rent_photo_rent_node_modules_vue_loader_dist_exportHelper_js__WEBPACK_IMPORTED_MODULE_3__["default"])(_GalleryFolder_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__["default"], [['render',_GalleryFolder_vue_vue_type_template_id_3bc62605__WEBPACK_IMPORTED_MODULE_0__.render],['__file',"resources/js/components/GalleryFolder.vue"]])
+const __exports__ = /*#__PURE__*/(0,C_xampp_htdocs_photo_rent_node_modules_vue_loader_dist_exportHelper_js__WEBPACK_IMPORTED_MODULE_3__["default"])(_GalleryFolder_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__["default"], [['render',_GalleryFolder_vue_vue_type_template_id_3bc62605__WEBPACK_IMPORTED_MODULE_0__.render],['__file',"resources/js/components/GalleryFolder.vue"]])
 /* hot reload */
 if (false) // removed by dead control flow
 {}

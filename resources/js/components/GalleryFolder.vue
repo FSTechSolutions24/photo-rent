@@ -5,8 +5,13 @@
                 <div class="hr-line-dashed"></div>
                 
                 <div class="selected-folder placeholder">
-                    <i class="fas fa-folder"></i>
-                    <span>FOLDERS</span>
+
+                    <div @click="addNewFolder()" class="btn-effects">
+                        <i class="fas fa-plus-circle"></i>
+                    </div>
+
+                    <!-- <i class="fas fa-folder"></i> -->
+                    <!-- <span>FOLDERS</span> -->
                 </div>
 
                 <ul class="folder-list" style="padding:0;">
@@ -28,6 +33,33 @@
                 <div class="clearfix"></div>
             </div>
         </div>
+
+        <!-- Modal -->
+        <div class="modal fade" id="exampleModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog ">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title fs-5" id="exampleModalLabel">Modal title</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">Folder Name: <span class="required_start">*</span></label>
+                            <input type="text" name="phone" class="input form-control" autocomplete="false">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Folder Description: <span class="required_start">*</span></label>
+                            <input type="text" name="phone" class="input form-control" autocomplete="false">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-blank" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-primary">Save changes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
 </template>
 
@@ -50,6 +82,9 @@ export default {
         this.load_folders();
     },
     methods: {
+        addNewFolder(){
+            $('#exampleModal').modal('show');
+        },
         async load_folders() {
             try {
                 const response = await axios.get(`/dashboard/api/galleries/${this.gallery_id}/folders`)

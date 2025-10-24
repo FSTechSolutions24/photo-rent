@@ -112,6 +112,16 @@ label {
     color: #fff !important;
     border: .0625rem solid transparent;
 }
+.btn-blank {
+    background-color: #fff !important;   
+    color: #6c757d !important;
+    border: .0625rem solid #6c757d;
+}
+.btn-blank:hover {
+    background-color: #6c757d !important;   
+    color: #fff !important;
+    border: .0625rem solid #6c757d;
+}
 .btn-success {
     color: #fff !important;
     border: .0625rem solid transparent;
@@ -148,4 +158,35 @@ label {
 }
 div.dataTables_wrapper div.dataTables_filter input {
     border-radius: 5px !important;
+}
+.btn-close {
+    padding: 8px;
+    border: unset;
+    color: #000;
+    background-color: unset;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23000'%3e%3cpath d='M.146 14.854a.5.5 0 0 1 0-.708L6.293 8 .146 1.854a.5.5 0 1 1 .708-.708L7 7.293l6.146-6.147a.5.5 0 0 1 .708.708L7.707 8l6.147 6.146a.5.5 0 0 1-.708.708L7 8.707l-6.146 6.147a.5.5 0 0 1-.708 0z'/%3e%3c/svg%3e");
+}
+.btn-effects {
+    cursor: pointer;
+}
+.modal-header {
+    border-bottom: unset !important;
+}
+.modal-footer {
+    border: unset !important;
+}
+.modal-content {
+    padding: 15px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+    border-radius: 2rem;
+}
+.modal-footer button {
+    border-radius: 20px !important;
+}
+.modal-backdrop.show {
+    background-color: rgb(0 0 0 / 38%) !important;
+    backdrop-filter: blur(2px);
+}
+.modal-content input {
+    border-radius: 20px;
 }

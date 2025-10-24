@@ -4,4 +4,8 @@ $(function () {
         placeholder: 'Select an option',
         allowClear: true
     });
+
+    $('.btn-close, .btn[data-bs-dismiss="modal"]').on('click',()=>{
+        $('.modal').modal('hide');
+    })
 });
