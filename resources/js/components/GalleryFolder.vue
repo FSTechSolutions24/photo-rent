@@ -160,6 +160,7 @@ export default {
             this.folder.name = '';
             this.folder.thumbnail_path = null;
             this.folder.thumbnailPreview = null;
+            this.errors.folderName = null
         },
         updateOrCreateFolder() {
             if(this.folder.name == ''){

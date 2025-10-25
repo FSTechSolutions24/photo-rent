@@ -27235,6 +27235,7 @@ __webpack_require__.r(__webpack_exports__);
       this.folder.name = '';
       this.folder.thumbnail_path = null;
       this.folder.thumbnailPreview = null;
+      this.errors.folderName = null;
     },
     updateOrCreateFolder: function updateOrCreateFolder() {
       var _this = this;
