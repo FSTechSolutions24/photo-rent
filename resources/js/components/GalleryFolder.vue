@@ -25,7 +25,7 @@
                         </div>
 
                         <!-- Cogs icon -->
-                        <div class="selected-folder-icon-setting" @click="PreviewFolderSettings(folder)">
+                        <div class="selected-folder-icon-setting" @click="previewFolderSettings(folder)">
                             <i class="fas fa-cog"></i>
                         </div>
                     </div>
@@ -128,14 +128,14 @@ export default {
         this.load_folders();
     },
     methods: {
-        PreviewFolderSettings(Selectedfolder){
-            this.folder.id = Selectedfolder.id;
-            this.folder.name = Selectedfolder.name;
-            this.folder.thumbnail_path = Selectedfolder.thumbnail_path;
+        previewFolderSettings(selectedFolder){
+            this.folder.id = selectedFolder.id;
+            this.folder.name = selectedFolder.name;
+            this.folder.thumbnail_path = selectedFolder.thumbnail_path;
             this.folder.isLocalPreview = false;
             // set thumbnail preview if available
-            if (Selectedfolder.thumbnail_path) {
-                this.folder.thumbnailPreview = Selectedfolder.thumbnail_path;
+            if (selectedFolder.thumbnail_path) {
+                this.folder.thumbnailPreview = selectedFolder.thumbnail_path;
             } else {
                 this.folder.thumbnailPreview = null;
             }

@@ -27203,14 +27203,14 @@ __webpack_require__.r(__webpack_exports__);
     this.load_folders();
   },
   methods: {
-    PreviewFolderSettings: function PreviewFolderSettings(Selectedfolder) {
-      this.folder.id = Selectedfolder.id;
-      this.folder.name = Selectedfolder.name;
-      this.folder.thumbnail_path = Selectedfolder.thumbnail_path;
+    previewFolderSettings: function previewFolderSettings(selectedFolder) {
+      this.folder.id = selectedFolder.id;
+      this.folder.name = selectedFolder.name;
+      this.folder.thumbnail_path = selectedFolder.thumbnail_path;
       this.folder.isLocalPreview = false;
       // set thumbnail preview if available
-      if (Selectedfolder.thumbnail_path) {
-        this.folder.thumbnailPreview = Selectedfolder.thumbnail_path;
+      if (selectedFolder.thumbnail_path) {
+        this.folder.thumbnailPreview = selectedFolder.thumbnail_path;
       } else {
         this.folder.thumbnailPreview = null;
       }
@@ -27455,7 +27455,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     })], -1 /* CACHED */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Folder info "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_7, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h5", _hoisted_8, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(folder.name), 1 /* TEXT */)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Cogs icon "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
       "class": "selected-folder-icon-setting",
       onClick: function onClick($event) {
-        return $options.PreviewFolderSettings(folder);
+        return $options.previewFolderSettings(folder);
       }
     }, _toConsumableArray(_cache[6] || (_cache[6] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
       "class": "fas fa-cog"
