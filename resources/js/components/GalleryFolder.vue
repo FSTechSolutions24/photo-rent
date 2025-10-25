@@ -125,7 +125,7 @@ export default {
         }
     },
     created(){
-        this.load_folders();
+        this.loadFolders();
     },
     methods: {
         previewFolderSettings(selectedFolder){
@@ -198,7 +198,7 @@ export default {
                 toastr.error('Failed to save folder.' + error);
             });
         },
-        load_folders() {
+        loadFolders() {
             axios.get(`/dashboard/api/galleries/${this.gallery_id}/folders`)
             .then(response => {
                 this.folders = response.data;

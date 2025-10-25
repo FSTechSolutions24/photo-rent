@@ -27200,7 +27200,7 @@ __webpack_require__.r(__webpack_exports__);
     }
   },
   created: function created() {
-    this.load_folders();
+    this.loadFolders();
   },
   methods: {
     previewFolderSettings: function previewFolderSettings(selectedFolder) {
@@ -27272,7 +27272,7 @@ __webpack_require__.r(__webpack_exports__);
         toastr.error('Failed to save folder.' + error);
       });
     },
-    load_folders: function load_folders() {
+    loadFolders: function loadFolders() {
       var _this2 = this;
       axios.get("/dashboard/api/galleries/".concat(this.gallery_id, "/folders")).then(function (response) {
         _this2.folders = response.data;
