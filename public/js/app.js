@@ -27184,8 +27184,20 @@ __webpack_require__.r(__webpack_exports__);
         thumbnail_path: '',
         thumbnail: null,
         thumbnailPreview: null
+      },
+      errors: {
+        folderName: null
       }
     };
+  },
+  watch: {
+    'folder.name': function folderName(newValue) {
+      if (newValue && newValue.trim() !== '') {
+        this.errors.folderName = null;
+      } else {
+        this.errors.folderName = 'Folder name is required';
+      }
+    }
   },
   created: function created() {
     this.load_folders();
@@ -27196,15 +27208,12 @@ __webpack_require__.r(__webpack_exports__);
       this.folder.name = Selectedfolder.name;
       this.folder.thumbnail_path = Selectedfolder.thumbnail_path;
       this.folder.isLocalPreview = false;
-
       // set thumbnail preview if available
       if (Selectedfolder.thumbnail_path) {
         this.folder.thumbnailPreview = Selectedfolder.thumbnail_path;
       } else {
         this.folder.thumbnailPreview = null;
       }
-      console.log('grrrrrrr');
-      console.log(Selectedfolder.thumbnail_path);
       setTimeout(function () {
         $('#folderModal').modal('show');
       }, 100);
@@ -27229,6 +27238,10 @@ __webpack_require__.r(__webpack_exports__);
     },
     updateOrCreateFolder: function updateOrCreateFolder() {
       var _this = this;
+      if (this.folder.name == '') {
+        this.errors.folderName = 'Folder name is required';
+        return;
+      }
       var formData = new FormData();
       if (this.folder.id) {
         formData.append('id', this.folder.id);
@@ -27255,8 +27268,7 @@ __webpack_require__.r(__webpack_exports__);
           toastr.success(_this.folder.id ? 'Folder updated successfully!' : 'Folder created successfully!');
         }, 100);
       })["catch"](function (error) {
-        console.error(error);
-        toastr.error('Failed to save folder.');
+        toastr.error('Failed to save folder.' + error);
       });
     },
     load_folders: function load_folders() {
@@ -27264,12 +27276,10 @@ __webpack_require__.r(__webpack_exports__);
       axios.get("/dashboard/api/galleries/".concat(this.gallery_id, "/folders")).then(function (response) {
         _this2.folders = response.data;
       })["catch"](function (error) {
-        console.error('Failed to load folders:', error);
-        window.toastr.error('Failed to load folders.');
+        window.toastr.error('Failed to load folders.' + error);
       });
     },
     selectFolder: function selectFolder(folder) {
-      // Emit an event to the parent Vue app
       this.selectedFolderId = folder.id;
       this.$emit('folder-selected', folder);
     }
@@ -27403,22 +27413,19 @@ var _hoisted_18 = {
   "class": "mb-3"
 };
 var _hoisted_19 = {
-  "class": "mb-3"
+  key: 0
 };
 var _hoisted_20 = {
-  key: 0
-};
-var _hoisted_21 = {
   key: 1
 };
-var _hoisted_22 = ["src"];
-var _hoisted_23 = {
+var _hoisted_21 = ["src"];
+var _hoisted_22 = {
   "class": "modal-footer"
 };
-var _hoisted_24 = {
+var _hoisted_23 = {
   key: 0
 };
-var _hoisted_25 = {
+var _hoisted_24 = {
   key: 1
 };
 function render(_ctx, _cache, $props, $setup, $data, $options) {
@@ -27470,7 +27477,9 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     }),
     "class": "input form-control",
     autocomplete: "off"
-  }, null, 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.folder.name]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Thumbnail Upload "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_19, [_cache[14] || (_cache[14] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+  }, null, 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.folder.name]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+    "class": "text-danger"
+  }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.errors.folderName), 513 /* TEXT, NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vShow, $data.errors.folderName]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Thumbnail Upload "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [_cache[14] || (_cache[14] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
     "class": "form-label"
   }, "Folder Thumbnail", -1 /* CACHED */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
     "class": "thumbnail-upload text-center p-3 border rounded-3",
@@ -27482,20 +27491,20 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       "transition": "0.2s",
       "border-style": "dashed"
     }
-  }, [!$data.folder.thumbnailPreview ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_20, _toConsumableArray(_cache[12] || (_cache[12] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+  }, [!$data.folder.thumbnailPreview ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_19, _toConsumableArray(_cache[12] || (_cache[12] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
     "class": "bi bi-cloud-upload fs-2 text-primary"
   }, null, -1 /* CACHED */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", {
     "class": "mb-0 text-muted"
   }, "Click to upload an image", -1 /* CACHED */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("small", {
     "class": "text-secondary"
-  }, "PNG, JPG, or JPEG (max 2MB)", -1 /* CACHED */)])))) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_21, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
+  }, "PNG, JPG, or JPEG (max 2MB)", -1 /* CACHED */)])))) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_20, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
     src: $data.folder.isLocalPreview ? $data.folder.thumbnailPreview : "/storage/".concat($data.folder.thumbnail_path),
     "class": "img-fluid rounded",
     style: {
       "max-height": "120px",
       "object-fit": "cover"
     }
-  }, null, 8 /* PROPS */, _hoisted_22), _cache[13] || (_cache[13] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", {
+  }, null, 8 /* PROPS */, _hoisted_21), _cache[13] || (_cache[13] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", {
     "class": "text-muted mt-2 mb-0"
   }, "Click to change image", -1 /* CACHED */))]))]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     type: "file",
@@ -27505,7 +27514,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     onChange: _cache[3] || (_cache[3] = function () {
       return $options.handleThumbnailUpload && $options.handleThumbnailUpload.apply($options, arguments);
     })
-  }, null, 544 /* NEED_HYDRATION, NEED_PATCH */)])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_23, [_cache[15] || (_cache[15] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+  }, null, 544 /* NEED_HYDRATION, NEED_PATCH */)])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_22, [_cache[15] || (_cache[15] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     type: "button",
     "class": "btn btn-blank",
     "data-bs-dismiss": "modal"
@@ -27515,7 +27524,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     onClick: _cache[4] || (_cache[4] = function ($event) {
       return $options.updateOrCreateFolder();
     })
-  }, [!$data.folder.id ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_24, "Create Folder")) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_25, "Update Folder"))])])])])])]);
+  }, [!$data.folder.id ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_23, "Create Folder")) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_24, "Update Folder"))])])])])])]);
 }
 
 /***/ }),

@@ -56,10 +56,11 @@
                         <div class="mb-3">
                             <label class="form-label">Folder Name: <span class="required_start">*</span></label>
                             <input type="text" v-model="folder.name" class="input form-control" autocomplete="off">
+                            <label v-show="errors.folderName" class="text-danger">{{ errors.folderName }}</label>
                         </div>
 
                         <!-- Thumbnail Upload -->
-                        <div class="mb-3">
+                        <div>
                             <label class="form-label">Folder Thumbnail</label>
                             <div class="thumbnail-upload text-center p-3 border rounded-3" @click="$refs.thumbnailInput.click()" style="cursor:pointer; transition:0.2s; border-style:dashed;">
                                 <div v-if="!folder.thumbnailPreview">
@@ -109,6 +110,18 @@ export default {
                 thumbnail: null,
                 thumbnailPreview: null,
             },
+            errors: {
+                folderName: null
+            }
+        }
+    },
+    watch: {
+        'folder.name'(newValue) {
+            if (newValue && newValue.trim() !== '') {
+                this.errors.folderName = null;
+            } else {
+                this.errors.folderName = 'Folder name is required';
+            }
         }
     },
     created(){
@@ -116,26 +129,19 @@ export default {
     },
     methods: {
         PreviewFolderSettings(Selectedfolder){
-
             this.folder.id = Selectedfolder.id;
             this.folder.name = Selectedfolder.name;
             this.folder.thumbnail_path = Selectedfolder.thumbnail_path;
             this.folder.isLocalPreview = false;
-
             // set thumbnail preview if available
             if (Selectedfolder.thumbnail_path) {
                 this.folder.thumbnailPreview = Selectedfolder.thumbnail_path;
             } else {
                 this.folder.thumbnailPreview = null;
             }
-
-            console.log('grrrrrrr');
-            console.log(Selectedfolder.thumbnail_path);
-
             setTimeout(()=>{
                 $('#folderModal').modal('show');
             }, 100)
-
         },
         handleThumbnailUpload(event) {
             const file = event.target.files[0];
@@ -156,6 +162,10 @@ export default {
             this.folder.thumbnailPreview = null;
         },
         updateOrCreateFolder() {
+            if(this.folder.name == ''){
+                this.errors.folderName = 'Folder name is required';
+                return;
+            }
             const formData = new FormData();
             if (this.folder.id) {
                 formData.append('id', this.folder.id);
@@ -184,23 +194,19 @@ export default {
                 }, 100)
             })
             .catch(error => {
-                console.error(error);
-                toastr.error('Failed to save folder.');
+                toastr.error('Failed to save folder.' + error);
             });
         },
-
         load_folders() {
             axios.get(`/dashboard/api/galleries/${this.gallery_id}/folders`)
             .then(response => {
                 this.folders = response.data;
             })
             .catch(error => {
-                console.error('Failed to load folders:', error);
-                window.toastr.error('Failed to load folders.');
+                window.toastr.error('Failed to load folders.' + error);
             });
         },
         selectFolder(folder) {
-            // Emit an event to the parent Vue app
             this.selectedFolderId = folder.id
             this.$emit('folder-selected', folder);
         },
