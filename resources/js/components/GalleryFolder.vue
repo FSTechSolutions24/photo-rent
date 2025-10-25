@@ -10,56 +10,82 @@
                         <i class="fas fa-plus-circle"></i>
                     </div>
 
-                    <!-- <i class="fas fa-folder"></i> -->
-                    <!-- <span>FOLDERS</span> -->
                 </div>
 
                 <ul class="folder-list" style="padding:0;">
-
-
-
                     <div class="selected-folder btn selected-folder-element" v-for="folder in folders" @click="selectFolder(folder)" :key="folder.id" :class="{ active: folder.id === selectedFolderId }">
+                        <!-- Folder icon -->
                         <div class="selected-folder-icon">
                             <i class="fas fa-folder"></i>
                         </div>
+
+                        <!-- Folder info -->
                         <div class="selected-folder-info">
                             <h5 class="folder-title">{{ folder.name }}</h5>
                         </div>
+
+                        <!-- Cogs icon -->
+                        <div class="selected-folder-icon-setting" @click="PreviewFolderSettings(folder)">
+                            <i class="fas fa-cog"></i>
+                        </div>
                     </div>
+                </ul>  
 
-
-
-                </ul>                            
                 <div class="clearfix"></div>
             </div>
         </div>
 
         <!-- Modal -->
-        <div class="modal fade" id="exampleModal" tabindex="-1" aria-hidden="true">
+        <div class="modal fade" id="folderModal" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog ">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title fs-5" id="exampleModalLabel">Modal title</h5>
+
+
+
+                        <h5 class="modal-title fs-5" id="folderModalLabel">
+                            <span v-if="!folder.id">Create New Folder</span>
+                            <span v-else>Update {{ folder.name }}</span>
+                        </h5>
+
+
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
+
                         <div class="mb-3">
                             <label class="form-label">Folder Name: <span class="required_start">*</span></label>
-                            <input type="text" name="phone" class="input form-control" autocomplete="false">
+                            <input type="text" v-model="folder.name" class="input form-control" autocomplete="off">
                         </div>
+
+                        <!-- Thumbnail Upload -->
                         <div class="mb-3">
-                            <label class="form-label">Folder Description: <span class="required_start">*</span></label>
-                            <input type="text" name="phone" class="input form-control" autocomplete="false">
+                            <label class="form-label">Folder Thumbnail</label>
+                            <div class="thumbnail-upload text-center p-3 border rounded-3" @click="$refs.thumbnailInput.click()" style="cursor:pointer; transition:0.2s; border-style:dashed;">
+                                <div v-if="!folder.thumbnailPreview">
+                                    <i class="bi bi-cloud-upload fs-2 text-primary"></i>
+                                    <p class="mb-0 text-muted">Click to upload an image</p>
+                                    <small class="text-secondary">PNG, JPG, or JPEG (max 2MB)</small>
+                                </div>
+                                <div v-else>
+                                    <img :src="folder.isLocalPreview ? folder.thumbnailPreview : `/storage/${folder.thumbnail_path}`" class="img-fluid rounded" style="max-height: 120px; object-fit: cover;">
+                                    <p class="text-muted mt-2 mb-0">Click to change image</p>
+                                </div>
+                            </div>
+                            <input type="file" ref="thumbnailInput" class="d-none" accept="image/*" @change="handleThumbnailUpload">
                         </div>
+
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-blank" data-bs-dismiss="modal">Cancel</button>
-                        <button type="button" class="btn btn-primary">Save changes</button>
+                        <button type="button" class="btn btn-primary" @click="updateOrCreateFolder()">
+                            <span v-if="!folder.id">Create Folder</span>
+                            <span v-else>Update Folder</span>
+                        </button>
                     </div>
                 </div>
             </div>
         </div>
-
     </div>
 </template>
 
@@ -75,23 +101,103 @@ export default {
     data() {
         return {
             folders: [],
-            selectedFolderId: null
+            selectedFolderId: null,
+            folder: {
+                id: '',
+                name: '',
+                thumbnail_path: '',
+                thumbnail: null,
+                thumbnailPreview: null,
+            },
         }
     },
     created(){
         this.load_folders();
     },
     methods: {
-        addNewFolder(){
-            $('#exampleModal').modal('show');
-        },
-        async load_folders() {
-            try {
-                const response = await axios.get(`/dashboard/api/galleries/${this.gallery_id}/folders`)
-                this.folders = response.data
-            } catch (error) {
-                console.error('Failed to load folders:', error)
+        PreviewFolderSettings(Selectedfolder){
+
+            this.folder.id = Selectedfolder.id;
+            this.folder.name = Selectedfolder.name;
+            this.folder.thumbnail_path = Selectedfolder.thumbnail_path;
+            this.folder.isLocalPreview = false;
+
+            // set thumbnail preview if available
+            if (Selectedfolder.thumbnail_path) {
+                this.folder.thumbnailPreview = Selectedfolder.thumbnail_path;
+            } else {
+                this.folder.thumbnailPreview = null;
             }
+
+            console.log('grrrrrrr');
+            console.log(Selectedfolder.thumbnail_path);
+
+            setTimeout(()=>{
+                $('#folderModal').modal('show');
+            }, 100)
+
+        },
+        handleThumbnailUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                this.folder.thumbnail_path = file;
+                this.folder.thumbnailPreview = URL.createObjectURL(file);
+                this.folder.isLocalPreview = true; // mark as local
+            }
+        },
+        addNewFolder(){
+            $('#folderModal').modal('show');
+            this.clearFolderPopup();
+        },
+        clearFolderPopup(){
+            this.folder.id = '';
+            this.folder.name = '';
+            this.folder.thumbnail_path = null;
+            this.folder.thumbnailPreview = null;
+        },
+        updateOrCreateFolder() {
+            const formData = new FormData();
+            if (this.folder.id) {
+                formData.append('id', this.folder.id);
+            }
+            formData.append('name', this.folder.name);
+            if (this.folder.thumbnail_path) {
+                formData.append('thumbnail_path', this.folder.thumbnail_path);
+            }
+
+            axios.post(`/dashboard/galleries/${this.gallery_id}/folders`, formData)
+            .then(response => {
+                const updatedFolder = response.data.folder;
+
+                // Check if folder exists in current list
+                const index = this.folders.findIndex(f => f.id === updatedFolder.id);
+                if (index !== -1) {
+                    this.folders[index] = updatedFolder;
+                } else {
+                    this.folders.push(updatedFolder);
+                }
+
+                $('#folderModal').modal('hide');
+                setTimeout(()=>{
+                    this.clearFolderPopup();
+                    toastr.success(this.folder.id ? 'Folder updated successfully!' : 'Folder created successfully!');
+                }, 100)
+            })
+            .catch(error => {
+                console.error(error);
+                toastr.error('Failed to save folder.');
+            });
+        },
+
+        load_folders() {
+            axios.get(`/dashboard/api/galleries/${this.gallery_id}/folders`)
+            .then(response => {
+                this.folders = response.data;
+            })
+            .catch(error => {
+                console.error('Failed to load folders:', error);
+                window.toastr.error('Failed to load folders.');
+            });
         },
         selectFolder(folder) {
             // Emit an event to the parent Vue app
@@ -213,6 +319,29 @@ export default {
     /* Optional slight variation when hovering over the selected one */
     .selected-folder.active:hover {
         background: #f5f5f5;
+    }
+
+    .thumbnail-upload {
+        border: 2px dashed #d2d6de !important;
+        border-radius: 20px;
+        padding: 30px 20px !important;
+    }
+
+    .selected-folder-icon-setting {
+        margin-left: auto;
+        color: #999999;
+    }
+    .selected-folder-icon-setting:hover {
+        color: #323232;
+    }
+
+    .selected-folder-icon-setting {
+        opacity: 0;
+        transition: opacity 0.2s ease;
+    }
+
+    .selected-folder:hover .selected-folder-icon-setting {
+        opacity: 1;
     }
 </style>
 

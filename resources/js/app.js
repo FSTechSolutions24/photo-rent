@@ -1,3 +1,4 @@
+import './bootstrap';
 import { createApp } from 'vue'
 import draggable from 'vuedraggable'
 import FolderGrid from './components/FolderGrid.vue'

@@ -9,7 +9,7 @@ class Folder extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['gallery_id', 'name'];
+    protected $fillable = ['gallery_id', 'name', 'thumbnail_path'];
 
     public function gallery()
     {
