@@ -8,4 +8,9 @@ $(function () {
     $('.btn-close, .btn[data-bs-dismiss="modal"]').on('click',()=>{
         $('.modal').modal('hide');
     })
+
+    $('.modal').modal({
+        backdrop: 'static',
+        keyboard: false
+    });
 });

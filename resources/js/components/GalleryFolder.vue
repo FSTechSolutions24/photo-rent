@@ -51,7 +51,7 @@
 
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                    <div class="modal-body">
+                    <div class="modal-body position-relative">
 
                         <div class="mb-3">
                             <label class="form-label">Folder Name: <span class="required_start">*</span></label>
@@ -78,6 +78,7 @@
 
                     </div>
                     <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-danger" @click="deleteFolder(folder)">Delete</button>
                         <button type="button" class="btn btn-blank" data-bs-dismiss="modal">Cancel</button>
                         <button type="button" class="btn btn-primary" @click="updateOrCreateFolder()">
                             <span v-if="!folder.id">Create Folder</span>
@@ -210,6 +211,31 @@ export default {
         selectFolder(folder) {
             this.selectedFolderId = folder.id
             this.$emit('folder-selected', folder);
+        },
+        deleteFolder(folder){
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "This folder and its contents will be deleted!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Yes, delete it!',
+                cancelButtonText: 'Cancel',
+                }).then((result) => {
+                if (result.isConfirmed) {
+                    axios.delete(`/dashboard/galleries/${this.gallery_id}/folders/${folder.id}`)
+                    .then(response => {
+                        Swal.fire('Deleted!', 'The folder has been deleted.', 'success');
+                        this.folders = this.folders.filter(f => f.id !== folder.id);
+                        $('#folderModal').modal('hide');
+                    })
+                    .catch(error => {
+                        Swal.fire('Error', 'Something went wrong while deleting.', 'error');
+                        console.error(error);
+                    });
+                }
+            });
         },
     }
 }
