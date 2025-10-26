@@ -31,7 +31,6 @@ class FolderController extends Controller
         return response()->json(['folder' => $folder]);
     }
 
-
     function update_folder_thumbnail(Request $request, $gallery, $folder)
     {   
         // Handle thumbnail upload if exists     
@@ -66,9 +65,9 @@ class FolderController extends Controller
         dd('here');
     }
 
-
     private function authorizeGallery(Gallery $gallery)
     {
         abort_if($gallery->client->photographer_id !== Auth::id(), 403);
     }
+    
 }
