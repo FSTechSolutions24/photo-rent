@@ -92,5 +92,28 @@ class FolderController extends Controller
     {
         abort_if($gallery->client->photographer_id !== Auth::id(), 403);
     }
-    
+
+    public function destroy(Gallery $gallery, Folder $folder)
+    {
+        // Ensure folder belongs to this gallery
+        if ($folder->gallery_id !== $gallery->id) {
+            return response()->json(['message' => 'Folder does not belong to this gallery'], 403);
+        }
+ 
+        // Build the folder path used for storing files
+        $folderPath = "galleries/{$gallery->id}/folders/{$folder->id}";
+ 
+        // Delete all files in that folder (including thumbnail)
+        if (Storage::disk('public')->exists($folderPath)) {
+            Storage::disk('public')->deleteDirectory($folderPath);
+        }
+ 
+        // NEED TO DELETED FROM MEDIA TABLE
+ 
+        // Delete DB record
+        $folder->delete();
+ 
+        return response()->json(['message' => 'Folder and its contents deleted successfully']);
+    }
+
 }
