@@ -33,6 +33,7 @@ class FolderController extends Controller
 
     public function destroy(Gallery $gallery, Folder $folder)
     {
+        //I'm pushingggggggggggggggggggggg
         // Ensure folder belongs to this gallery
         if ($folder->gallery_id !== $gallery->id) {
             return response()->json(['message' => 'Folder does not belong to this gallery'], 403);
