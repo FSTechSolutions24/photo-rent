@@ -92,6 +92,8 @@
 </template>
 
 <script>
+
+import emitter from '../eventBus'; // Adjust path as needed
 export default {
     name: 'GalleryFolder',
     props: {
@@ -211,6 +213,7 @@ export default {
         selectFolder(folder) {
             this.selectedFolderId = folder.id
             this.$emit('folder-selected', folder);
+            emitter.emit('folder-selected-action', folder);
         },
         deleteFolder(folder){
             Swal.fire({

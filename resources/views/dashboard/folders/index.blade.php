@@ -7,13 +7,21 @@
     <div id="app">
         {{-- <folder-grid></folder-grid> --}}
         <div class="row">
-            <div class="col-sm-4 col-md-3">                    
+            <div class="col-sm-4 col-md-3" :class="{ 'd-none': sidebarCollapsed }">                    
                 <gallery-folder :gallery_id="{{ $gallery->id }}" @folder-selected="setCurrentFolder"></gallery-folder>
             </div>
 
-            <div class="col-sm-8 col-md-9 ibox-content">
+            <div class="col-sm-8 col-md-9 ibox-content" :class="{ 'col-sm-12 col-md-12': sidebarCollapsed }">
 
-                {{-- folder name here --}}
+
+
+                <!-- Collapse/Expand Button -->
+                <div style="position: absolute;top: -10px;left: -5px;">
+                    <button style="border-radius: 50%;" class="btn btn-sm btn-secondary" @click="toggleSidebar">
+                        <i v-if="sidebarCollapsed" class="fas fa-step-forward"></i>
+                        <i v-else class="fas fa-step-backward"></i>
+                    </button>
+                </div>
 
                 <div class="selected-folder" v-if="currentFolderName">
                     <div class="selected-folder-icon">
@@ -31,9 +39,13 @@
 
 
 
-                <div 
+                {{-- <div 
                     class="dropzone" data-gallery-id="{{ $gallery->id }}" :data-folder-id="currentFolderId">
-                </div>
+                </div> --}}
+
+                <dropzone-uploader :gallery-id="{{ $gallery->id }}" :current-folder-id="currentFolderId"></dropzone-uploader>
+
+                
             </div>
         </div>
     </div>
@@ -48,6 +60,12 @@
             color: #646c7f;
             font-size: 20px;
             margin-top: 82px;
+        }
+        .col-sm-4.col-md-3 {
+            /* transition: all 0.3s ease; */
+        }
+        .ibox-content {
+            /* transition: all 0.3s ease; */
         }
     </style>
 @stop

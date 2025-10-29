@@ -60,9 +60,38 @@ class FolderController extends Controller
         return response()->json($folders);
     }
 
-    public function upload()
+    public function upload(Request $request, $galleryId, $folderId)
     {
-        dd('here');
+        // Validate file
+        $request->validate([
+            'file' => 'required|file|mimes:jpeg,png,gif,mp4,mov,avi|max:30720', // max 30MB, adjust as needed
+        ]);
+
+        // Get uploaded file
+        $file = $request->file('file');
+
+        // Define a path, e.g. galleries/{galleryId}/{folderId}/
+        $path = "galleries/{$galleryId}/folders/{$folderId}/media";
+
+        // Store file in the public disk
+        $storedPath = $file->store($path, 'public');
+
+        // Optional: Save record in DB if you have a File/Media model
+        // Example:
+        // $uploadedFile = Media::create([
+        //     'gallery_id' => $galleryId,
+        //     'folder_id' => $folderId,
+        //     'filename' => $file->getClientOriginalName(),
+        //     'path' => $storedPath,
+        //     'size' => $file->getSize(),
+        //     'mime_type' => $file->getMimeType(),
+        // ]);
+
+        return response()->json([
+            'success' => true,
+            'path' => Storage::url($storedPath),
+            'name' => $file->getClientOriginalName(),
+        ]);
     }
 
     private function authorizeGallery(Gallery $gallery)

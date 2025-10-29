@@ -2,10 +2,11 @@ import './bootstrap';
 import { createApp } from 'vue'
 import draggable from 'vuedraggable'
 import FolderGrid from './components/FolderGrid.vue'
-import Uploader from './Uploader'
+// import Uploader from './Uploader'
 import GalleryFolder from './components/GalleryFolder.vue'
 import axios from 'axios'
 import registerVueApp from './vueApp'  // renamed for clarity
+import mitt from 'mitt';
 
 window.axios = axios
 
@@ -24,9 +25,9 @@ app.mount('#app')
 console.log('✅ Vue app mounted successfully')
 
 // Initialize Dropzone if exists
-if ($('.dropzone').length !== 0) {
-    new Uploader()
-}
+// if ($('.dropzone').length !== 0) {
+//     new Uploader()
+// }
 
 // CSRF setup
 const token = document.head.querySelector('meta[name="csrf-token"]')
