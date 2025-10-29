@@ -14,7 +14,7 @@
             <div class="col-sm-8 col-md-9 ibox-content" :class="{ 'col-sm-12 col-md-12': sidebarCollapsed }">
 
                 <!-- Collapse/Expand Button -->
-                <div style="position: absolute;top: -15px;left: -5px;">
+                <div style="position: absolute;top: -10px;left: -5px;">
                     <button class="btn btn-sm btn-secondary" @click="toggleSidebar">
                         <i v-if="sidebarCollapsed" class="fas fa-chevron-right"></i>
                         <i v-else class="fas fa-chevron-left"></i> 
