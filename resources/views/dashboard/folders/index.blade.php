@@ -15,7 +15,7 @@
 
                 <!-- Collapse/Expand Button -->
                 <div style="position: absolute;top: -10px;left: -5px;">
-                    <button class="btn btn-sm btn-secondary" @click="toggleSidebar">
+                    <button class="btn btn-sm btn-secondary toggle_btn" @click="toggleSidebar">
                         <i v-if="sidebarCollapsed" class="fas fa-chevron-right"></i>
                         <i v-else class="fas fa-chevron-left"></i> 
                     </button>
@@ -51,6 +51,11 @@
             color: #646c7f;
             font-size: 20px;
             margin-top: 82px;
+        }
+        .toggle_btn{
+            background-color: #fafafa !important;
+            color: #000 !important;
+            border: 1px solid #ddd !important;
         }
     </style>
 @stop

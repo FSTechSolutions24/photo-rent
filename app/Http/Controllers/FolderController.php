@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Media;
 use App\Models\Folder;
 use App\Models\Gallery;
 use Illuminate\Http\Request;
@@ -62,6 +63,12 @@ class FolderController extends Controller
 
     public function upload(Request $request, $galleryId, $folderId)
     {
+        /**
+         * Important logic:
+         * We need to stop the upload if the file size exceeds the available remaining space
+         * We also need to add this validation in Dropzone to prevent the upload from starting
+         */
+
         // Validate file
         $request->validate([
             'file' => 'required|file|mimes:jpeg,png,gif,mp4,mov,avi|max:30720', // max 30MB, adjust as needed
@@ -77,20 +84,24 @@ class FolderController extends Controller
         $storedPath = $file->store($path, 'public');
 
         // Optional: Save record in DB if you have a File/Media model
-        // Example:
-        // $uploadedFile = Media::create([
-        //     'gallery_id' => $galleryId,
-        //     'folder_id' => $folderId,
-        //     'filename' => $file->getClientOriginalName(),
-        //     'path' => $storedPath,
-        //     'size' => $file->getSize(),
-        //     'mime_type' => $file->getMimeType(),
-        // ]);
+        $this->save_media_record($galleryId, $folderId, $storedPath, $file);
 
         return response()->json([
             'success' => true,
             'path' => Storage::url($storedPath),
             'name' => $file->getClientOriginalName(),
+        ]);
+    }
+
+    function save_media_record($galleryId, $folderId, $storedPath, $file){
+        return Media::create([
+            'gallery_id' => $galleryId,
+            'folder_id' => $folderId,
+            'name' => $file->getClientOriginalName(),
+            'path' => $storedPath,
+            'size' => $file->getSize(),
+            'disk' => 'local',
+            'mime_type' => $file->getMimeType(),
         ]);
     }
 
@@ -118,6 +129,9 @@ class FolderController extends Controller
  
         // Delete DB record
         $folder->delete();
+
+        // Delete linked media records
+        Media::where('gallery_id', $gallery->id)->where('folder_id', $folder->id)->delete();
  
         return response()->json(['message' => 'Folder and its contents deleted successfully']);
     }
