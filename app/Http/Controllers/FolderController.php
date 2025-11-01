@@ -157,12 +157,15 @@ class FolderController extends Controller
                 return $size . ' bytes';
             }
         })
+        ->addColumn('multiselect', function ($model) {           
+            return '<input class="form-control" type="checkbox">';
+        })
         ->addColumn('thumbnail', function ($model) {
             $url = Storage::url($model->path);
             return '<div class="thumbnail-holder"><img class="img-fluid" src="'.$url.'" width="80"></div>';
         })
         ->addIndexColumn()
-        ->rawColumns(['thumbnail'])
+        ->rawColumns(['thumbnail','multiselect'])
         ->make(true);
     }
 

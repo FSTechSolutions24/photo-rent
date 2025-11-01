@@ -5,6 +5,7 @@
         <thead>
             <tr>
                 <th scope="col">#</th>
+                <th scope="col"><input class="form-control" type="checkbox"></th>
                 <th scope="col">Thumbnail</th>
                 <th scope="col">Name</th>
                 <th scope="col">Disk</th>
@@ -87,8 +88,12 @@ export default {
                             d.gallery_id = this.galleryId;
                         },
                     },
+                    columnDefs: [
+                        { orderable: false, targets: 1 }
+                    ],
                     columns: [
                         { data: 'id' },
+                        { data: 'multiselect' },
                         { data: 'thumbnail' },
                         { data: 'name' },
                         { data: 'disk' },
