@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Yajra\DataTables\Facades\DataTables;
 
 class FolderController extends Controller
 {
@@ -59,6 +60,20 @@ class FolderController extends Controller
     {
         $folders = Folder::where('gallery_id', $galleryId)->get();
         return response()->json($folders);
+    }
+
+    public function listJsonMedia($galleryId, $folderId)
+    {
+        $eloquent = Media::where('gallery_id', $galleryId)->where('folder_id', $folderId);
+
+        return DataTables::eloquent($eloquent)
+        ->addColumn('thumbnail', function ($model) {
+            $url = Storage::url($model->path);
+            return '<div class="thumbnail-holder"><img class="img-fluid" src="'.$url.'" width="80"></div>';
+        })
+        ->addIndexColumn()
+        ->rawColumns(['thumbnail'])
+        ->make(true);
     }
 
     public function upload(Request $request, $galleryId, $folderId)

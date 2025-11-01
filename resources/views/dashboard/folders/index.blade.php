@@ -36,6 +36,11 @@
                 </div>
 
                 <dropzone-uploader :gallery-id="{{ $gallery->id }}" :current-folder-id="currentFolderId"></dropzone-uploader>
+                
+                {{-- table --}}
+                <br>          
+                <media-table :gallery-id="{{ $gallery->id }}" :current-folder-id="currentFolderId"></media-table>
+
 
             </div>
         </div>

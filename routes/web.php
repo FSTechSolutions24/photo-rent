@@ -36,6 +36,7 @@ Route::middleware(['auth', 'photographer'])->prefix('dashboard')->name('dashboar
     Route::resource('galleries', GalleryController::class);
 
     // Folders (nested under gallery)
+    Route::post('/api/galleries/{gallery}/folders/{folder}/media', [FolderController::class, 'listJsonMedia'])->name('api.galleries.folders.media');
     Route::post('/galleries/{gallery}/folders/{folder}/upload', [FolderController::class, 'upload'])->name('galleries.folders.upload');
     Route::get('/api/galleries/{gallery}/folders', [FolderController::class, 'listJson'])->name('api.galleries.folders.index');
     Route::resource('galleries.folders', FolderController::class);
