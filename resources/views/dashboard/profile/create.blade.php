@@ -66,32 +66,34 @@
 </div>
   
 <br><br>
-<div class="browser-wrapper">
-<div class="browser-header">
-    <div class="browser-dots">
-    <span class="red"></span>
-    <span class="yellow"></span>
-    <span class="green"></span>
+<div class="container">
+    <div class="browser-wrapper">
+    <div class="browser-header">
+        <div class="browser-dots">
+        <span class="red"></span>
+        <span class="yellow"></span>
+        <span class="green"></span>
+        </div>
+        <div class="browser-tab" id="tabTitle">yourdomain.com</div>
     </div>
-    <div class="browser-tab" id="tabTitle">yourdomain.com</div>
-</div>
-
-<div class="browser-body">
-    <h5 class="text-center mb-3 fw-semibold text-secondary">
-    Claim your portfolio link
-    </h5>
-
-    <div class="domain-input">
-    <input id="subdomain-input" type="text" placeholder="yourname" />
-    <span>.yourdomain.com</span>
+    
+    <div class="browser-body">
+        <h5 class="mb-3 fw-semibold text-secondary">
+            Claim your portfolio link
+        </h5>
+    
+        <div class="domain-input">
+            <input id="subdomain-input" type="text" placeholder="yourname" />
+            <span>.yourdomain.com</span>
+        </div>
+    
+        <div id="status"></div>
+    
+        <button id="create-btn" class="btn btn-checker" disabled>
+            Create Portfolio
+        </button>
     </div>
-
-    <div id="status"></div>
-
-    <button id="create-btn" class="btn btn-checker" disabled>
-    Create Portfolio
-    </button>
-</div>
+    </div>
 </div>
  
 <br><br><br><br>
@@ -138,7 +140,7 @@ input.addEventListener("input", () => {
 <style>
 
     .browser-wrapper {
-      max-width: 480px;
+      /* max-width: 480px; */
       margin: auto;
       border-radius: 16px;
       background-color: #fff;
@@ -241,7 +243,6 @@ input.addEventListener("input", () => {
       min-height: 22px;
       margin-top: 10px;
       font-size: 0.9rem;
-      text-align: center;
     }
 
     .spinner-border {
