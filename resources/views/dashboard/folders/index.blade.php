@@ -14,7 +14,7 @@
             <div class="col-sm-8 col-md-9 ibox-content" :class="{ 'col-sm-12 col-md-12': sidebarCollapsed }">
 
                 <!-- Collapse/Expand Button -->
-                <div style="position: absolute;top: -10px;left: -5px;">
+                <div style="position: absolute;top: -10px;left: -10px;">
                     <button class="btn btn-sm btn-secondary toggle_btn" @click="toggleSidebar">
                         <i v-if="sidebarCollapsed" class="fas fa-chevron-right"></i>
                         <i v-else class="fas fa-chevron-left"></i> 
@@ -59,8 +59,9 @@
         }
         .toggle_btn{
             background-color: #fafafa !important;
-            color: #000 !important;
+            color: #999 !important;
             border: 1px solid #ddd !important;
+            border-radius: 20px !important;
         }
     </style>
 @stop
