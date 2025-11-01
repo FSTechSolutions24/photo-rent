@@ -6,6 +6,7 @@ import FolderGrid from './components/FolderGrid.vue'
 import GalleryFolder from './components/GalleryFolder.vue'
 import axios from 'axios'
 import registerVueApp from './vueApp'  // renamed for clarity
+import datatableJS from './datatableJS' //this to fix some datatable issue like resize the columns in zoom in and out
 import mitt from 'mitt';
 
 window.axios = axios

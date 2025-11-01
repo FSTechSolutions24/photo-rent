@@ -27150,8 +27150,8 @@ __webpack_require__.r(__webpack_exports__);
         paramName: 'file',
         maxFilesize: 30,
         // 30MB
-        acceptedFiles: 'image/*,video/*',
-        // ✅ only images or videos
+        acceptedFiles: ".jpeg,.jpg,.png,.gif,.mp4,.mov,.avi",
+        // same formats
         dictDefaultMessage: '<i class="fas fa-ban dropzone-icon"></i> Please select a folder before uploading'
       });
       this.dropzone.on('sending', function (file, xhr, formData) {
@@ -27160,6 +27160,7 @@ __webpack_require__.r(__webpack_exports__);
       this.dropzone.on('success', function (file, response) {
         console.log('✅ Uploaded:', response);
         _this.dropzone.removeFile(file);
+        _eventBus__WEBPACK_IMPORTED_MODULE_2__["default"].emit('media-uploaded');
       });
       this.dropzone.on('error', function (file, errorMessage) {
         if (file.accepted === false) {
@@ -27423,8 +27424,20 @@ __webpack_require__.r(__webpack_exports__);
       this.initDataTable();
     }
     _eventBus__WEBPACK_IMPORTED_MODULE_0__["default"].on('folder-selected-action', this.handleFolderAction);
+    _eventBus__WEBPACK_IMPORTED_MODULE_0__["default"].on('media-uploaded', this.reloadTable);
   },
   methods: {
+    reloadTable: function reloadTable() {
+      // Otherwise safely reload from the new folder
+      var table = window.view_reports;
+      var url = this.getApiUrl();
+      if (url) {
+        table.ajax.url(url);
+        table.ajax.reload(null, false);
+      } else {
+        console.warn('No valid URL found — reload skipped.');
+      }
+    },
     getApiUrl: function getApiUrl() {
       // dynamically build the correct route inside Vue
       return "/dashboard/api/galleries/".concat(this.galleryId, "/folders/").concat(this.currentFolderId, "/media");
@@ -27443,16 +27456,7 @@ __webpack_require__.r(__webpack_exports__);
         this.initDataTable();
         return;
       }
-
-      // Otherwise safely reload from the new folder
-      var table = window.view_reports;
-      var url = this.getApiUrl();
-      if (url) {
-        table.ajax.url(url);
-        table.ajax.reload(null, false);
-      } else {
-        console.warn('No valid URL found — reload skipped.');
-      }
+      this.reloadTable();
     },
     initDataTable: function initDataTable() {
       var _this = this;
@@ -27460,6 +27464,10 @@ __webpack_require__.r(__webpack_exports__);
         window.view_reports = $('.table').DataTable({
           processing: true,
           serverSide: true,
+          responsive: true,
+          autoWidth: false,
+          scrollX: true,
+          // optional, if you have many columns
           ajax: {
             url: _this.getApiUrl(),
             type: 'POST',
@@ -27479,6 +27487,8 @@ __webpack_require__.r(__webpack_exports__);
             data: 'disk'
           }, {
             data: 'size'
+          }, {
+            data: 'created_at'
           }]
         });
       });
@@ -27768,7 +27778,9 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     scope: "col"
   }, "Disk"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", {
     scope: "col"
-  }, "Size")])], -1 /* CACHED */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tbody", null, null, -1 /* CACHED */)])));
+  }, "Size"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", {
+    scope: "col"
+  }, "Created")])], -1 /* CACHED */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tbody", null, null, -1 /* CACHED */)])));
 }
 
 /***/ }),
@@ -73667,7 +73679,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! axios */ "./node_modules/axios/index.js");
 /* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(axios__WEBPACK_IMPORTED_MODULE_5__);
 /* harmony import */ var _vueApp__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./vueApp */ "./resources/js/vueApp.js");
-/* harmony import */ var mitt__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! mitt */ "./node_modules/mitt/dist/mitt.mjs");
+/* harmony import */ var _datatableJS__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./datatableJS */ "./resources/js/datatableJS.js");
+/* harmony import */ var _datatableJS__WEBPACK_IMPORTED_MODULE_7___default = /*#__PURE__*/__webpack_require__.n(_datatableJS__WEBPACK_IMPORTED_MODULE_7__);
+/* harmony import */ var mitt__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! mitt */ "./node_modules/mitt/dist/mitt.mjs");
 
 
 
@@ -73676,6 +73690,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
  // renamed for clarity
+ //this to fix some datatable issue like resize the columns in zoom in and out
 
 window.axios = (axios__WEBPACK_IMPORTED_MODULE_5___default());
 var app = (0,vue__WEBPACK_IMPORTED_MODULE_1__.createApp)({});
@@ -74053,6 +74068,63 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_MediaTable_vue_vue_type_template_id_74b3a1f5__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!../../../node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./MediaTable.vue?vue&type=template&id=74b3a1f5 */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/MediaTable.vue?vue&type=template&id=74b3a1f5");
 
+
+/***/ }),
+
+/***/ "./resources/js/datatableJS.js":
+/*!*************************************!*\
+  !*** ./resources/js/datatableJS.js ***!
+  \*************************************/
+/***/ (() => {
+
+$(document).ready(function () {
+  // Apply to every DataTable automatically
+  $(document).on('init.dt', function (e, settings) {
+    var table = new $.fn.dataTable.Api(settings);
+    var tableNode = table.table().container();
+
+    // Observe parent width changes
+    if (window.ResizeObserver) {
+      var ro = new ResizeObserver(function () {
+        table.columns.adjust();
+        if (table.responsive && typeof table.responsive.recalc === 'function') {
+          table.responsive.recalc();
+        }
+      });
+
+      // Observe the closest visible parent (for width changes)
+      var parent = $(tableNode).closest(':visible')[0];
+      if (parent) {
+        ro.observe(parent);
+      }
+    }
+
+    // Fallback for window resize (and zoom)
+    $(window).on('resize.dt-' + settings.sInstance, function () {
+      table.columns.adjust();
+      if (table.responsive && typeof table.responsive.recalc === 'function') {
+        table.responsive.recalc();
+      }
+    });
+  });
+
+  // Handle zoom changes (for completeness)
+  if (window.visualViewport) {
+    var lastZoom = window.visualViewport.scale;
+    window.visualViewport.addEventListener('resize', function () {
+      if (window.visualViewport.scale !== lastZoom) {
+        lastZoom = window.visualViewport.scale;
+        $('table.dataTable').each(function () {
+          var t = $(this).DataTable();
+          t.columns.adjust();
+          if (t.responsive && typeof t.responsive.recalc === 'function') {
+            t.responsive.recalc();
+          }
+        });
+      }
+    });
+  }
+});
 
 /***/ }),
 

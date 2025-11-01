@@ -40,7 +40,7 @@ export default {
                 autoProcessQueue: true,
                 paramName: 'file',
                 maxFilesize: 30, // 30MB
-                acceptedFiles: 'image/*,video/*', // ✅ only images or videos
+                acceptedFiles: ".jpeg,.jpg,.png,.gif,.mp4,.mov,.avi", // same formats
                 dictDefaultMessage: '<i class="fas fa-ban dropzone-icon"></i> Please select a folder before uploading',
             });
 
@@ -51,6 +51,7 @@ export default {
             this.dropzone.on('success', (file, response) => {
                 console.log('✅ Uploaded:', response);
                 this.dropzone.removeFile(file);
+                emitter.emit('media-uploaded');
             });
 
             this.dropzone.on('error', (file, errorMessage) => {

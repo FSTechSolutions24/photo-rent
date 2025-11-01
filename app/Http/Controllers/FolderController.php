@@ -62,20 +62,6 @@ class FolderController extends Controller
         return response()->json($folders);
     }
 
-    public function listJsonMedia($galleryId, $folderId)
-    {
-        $eloquent = Media::where('gallery_id', $galleryId)->where('folder_id', $folderId);
-
-        return DataTables::eloquent($eloquent)
-        ->addColumn('thumbnail', function ($model) {
-            $url = Storage::url($model->path);
-            return '<div class="thumbnail-holder"><img class="img-fluid" src="'.$url.'" width="80"></div>';
-        })
-        ->addIndexColumn()
-        ->rawColumns(['thumbnail'])
-        ->make(true);
-    }
-
     public function upload(Request $request, $galleryId, $folderId)
     {
         /**
@@ -149,6 +135,35 @@ class FolderController extends Controller
         Media::where('gallery_id', $gallery->id)->where('folder_id', $folder->id)->delete();
  
         return response()->json(['message' => 'Folder and its contents deleted successfully']);
+    }
+
+    public function listJsonMedia($galleryId, $folderId)
+    {
+        $eloquent = Media::where('gallery_id', $galleryId)->where('folder_id', $folderId);
+
+        return DataTables::eloquent($eloquent)
+        ->editColumn('created_at', function ($model) {
+            return date_format($model->created_at, 'd/m/Y');
+        })
+        ->editColumn('size', function ($model) {
+            $size = $model->size; // in bytes
+            if ($size >= 1073741824) { // 1 GB
+                return number_format($size / 1073741824, 2) . ' GB';
+            } elseif ($size >= 1048576) { // 1 MB
+                return number_format($size / 1048576, 2) . ' MB';
+            } elseif ($size >= 1024) { // 1 KB
+                return number_format($size / 1024, 2) . ' KB';
+            } else {
+                return $size . ' bytes';
+            }
+        })
+        ->addColumn('thumbnail', function ($model) {
+            $url = Storage::url($model->path);
+            return '<div class="thumbnail-holder"><img class="img-fluid" src="'.$url.'" width="80"></div>';
+        })
+        ->addIndexColumn()
+        ->rawColumns(['thumbnail'])
+        ->make(true);
     }
 
 }

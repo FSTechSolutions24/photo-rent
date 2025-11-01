@@ -9,6 +9,7 @@
                 <th scope="col">Name</th>
                 <th scope="col">Disk</th>
                 <th scope="col">Size</th>            
+                <th scope="col">Created</th>            
             </tr>
         </thead>
         <tbody>                  
@@ -32,9 +33,22 @@ export default {
             this.initDataTable();
         }
         emitter.on('folder-selected-action', this.handleFolderAction);
+        emitter.on('media-uploaded', this.reloadTable);
     },
 
     methods: {
+        reloadTable(){
+            // Otherwise safely reload from the new folder
+            const table = window.view_reports;
+            const url = this.getApiUrl();
+
+            if (url) {
+                table.ajax.url(url);
+                table.ajax.reload(null, false);
+            } else {
+                console.warn('No valid URL found — reload skipped.');
+            }
+        },
         getApiUrl() {
             // dynamically build the correct route inside Vue
             return `/dashboard/api/galleries/${this.galleryId}/folders/${this.currentFolderId}/media`;
@@ -54,22 +68,16 @@ export default {
                 return;
             }
 
-            // Otherwise safely reload from the new folder
-            const table = window.view_reports;
-            const url = this.getApiUrl();
-
-            if (url) {
-                table.ajax.url(url);
-                table.ajax.reload(null, false);
-            } else {
-                console.warn('No valid URL found — reload skipped.');
-            }
+            this.reloadTable();
         },
         initDataTable() {
             $(document).ready(() => {
                 window.view_reports = $('.table').DataTable({
                     processing: true,
                     serverSide: true,
+                    responsive: true,
+                    autoWidth: false,
+                    scrollX: true, // optional, if you have many columns
                     ajax: {
                         url: this.getApiUrl(),
                         type: 'POST',
@@ -85,6 +93,7 @@ export default {
                         { data: 'name' },
                         { data: 'disk' },
                         { data: 'size' },
+                        { data: 'created_at' },
                     ],
                 });
             });
