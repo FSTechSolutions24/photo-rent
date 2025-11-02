@@ -22,7 +22,7 @@
             <li>Basic Analytics</li>
             <li>Email Support</li>
           </ul>
-          <button class="btn plan-btn">Get Started</button>
+          <button class="btn plan-btn">Select Plan</button>
         </div>
       </div>
 
@@ -41,7 +41,7 @@
             <li>Priority Support</li>
             <li>Custom Domain</li>
           </ul>
-          <button class="btn plan-btn">Upgrade Now</button>
+          <button class="btn plan-btn">Select Plan</button>
         </div>
       </div>
 
@@ -59,7 +59,7 @@
             <li>Custom Integrations</li>
             <li>Dedicated Support</li>
           </ul>
-          <button class="btn plan-btn">Contact Sales</button>
+          <button class="btn plan-btn">Select Plan</button>
         </div>
       </div>
     </div>
@@ -128,10 +128,10 @@ input.addEventListener("input", () => {
     const available = Math.random() > 0.5;
 
     if (available) {
-        status.innerHTML = `<span class="text-success fw-semibold">✅ Available!</span>`;
+        status.innerHTML = `<span class="text-success fw-semibold"> Available!</span>`;
         btn.disabled = false;
     } else {
-        status.innerHTML = `<span class="text-danger fw-semibold">❌ Taken, please try another.</span>`;
+        status.innerHTML = `<span class="text-danger fw-semibold"> Taken, please try another.</span>`;
     }
     }, 1000);
 });
@@ -346,10 +346,19 @@ input.addEventListener("input", () => {
       gap: 8px;
     }
 
-    .plan-features li::before {
+    .plan-features li::before, .text-success.fw-semibold::before {
       content: "✓";
       color: #22c55e;
       font-weight: bold;
+    }
+    .text-danger.fw-semibold::before {
+        content: "✕";
+    }
+    .text-danger.fw-semibold {
+        color: #dc3545
+    }
+    .text-success.fw-semibold {
+        color: #22c55e
     }
 
     .plan-btn {
@@ -366,6 +375,7 @@ input.addEventListener("input", () => {
 
     .plan-btn:hover {
       background-color: #4338ca;
+      color: white;
     }
 
     .recommended {
