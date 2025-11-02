@@ -267,6 +267,7 @@ input.addEventListener("input", () => {
 
     .btn-checker:hover:not(:disabled) {
       background-color: #4338ca;
+      color: #fff;
     }
 
     .btn-checker:disabled {
