@@ -124,12 +124,14 @@
     clearTimeout(timeout);
     timeout = setTimeout(() => {
       check_subdomain_existance(value);
-    }, 10);
+    }, 300);
 
   });
 
   function check_subdomain_existance(value){
-    axios.get(`/dashboard/api/profile/checksubdomain/${value}`)
+    axios.get(`/dashboard/api/profile/checksubdomain`, {
+      params: { subdomain: value }
+    })
     .then(response => {
       if (response.data.subdomain_empty) {
         status.innerHTML = `<span class="text-danger fw-semibold"> ${response.data.message}</span>`;

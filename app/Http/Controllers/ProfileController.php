@@ -6,7 +6,8 @@ use App\Models\Client;
 use App\Models\Photographer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Yajra\DataTables\Facades\DataTables;
+use Illuminate\Support\Facades\Validator;
+
 
 
 class ProfileController extends Controller
@@ -56,15 +57,36 @@ class ProfileController extends Controller
         
     }
 
-    public function checksubdomain($subdomain = null){
-        if(!$subdomain){
+    public function checksubdomain(Request $request)
+    {
+        $subdomain = $request->query('subdomain');
+        
+        if (!$subdomain) {
             return response()->json([
                 'subdomain_empty' => true,
                 'message' => 'Please fill your subdomain.'
             ]);
         }
+
+        // Reject if contains slashes or spaces
+        if (preg_match('/[^A-Za-z0-9-]/', $subdomain)) {
+            return response()->json([
+                'invalid_format' => true,
+                'message' => 'Invalid subdomain format. Only letters, numbers, and hyphens are allowed. No spaces, slashes, or special characters.'
+            ]);
+        }
+
+        // Check if it starts or ends with a hyphen
+        if (str_starts_with($subdomain, '-') || str_ends_with($subdomain, '-')) {
+            return response()->json([
+                'invalid_format' => true,
+                'message' => 'Subdomain cannot start or end with a hyphen.'
+            ]);
+        }
+
+        // Check if subdomain already exists
         $exists = Photographer::where('subdomain', $subdomain)->exists();
-         if ($exists) {
+        if ($exists) {
             return response()->json([
                 'available' => false,
                 'message' => 'Taken, please try another.'
@@ -76,4 +98,5 @@ class ProfileController extends Controller
             ]);
         }
     }
+
 }
