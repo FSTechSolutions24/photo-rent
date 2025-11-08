@@ -42,7 +42,7 @@ Route::middleware(['auth', 'photographer'])->prefix('dashboard')->name('dashboar
     Route::resource('galleries.folders', FolderController::class);
 
     // Photos (nested under gallery)
-    Route::post('galleries/{gallery}/photos', [MediaController::class, 'store'])->name('photos.store');
+    Route::post('galleries/{gallery}/photos', [MediaController::class, 'store'])->name('photos.store');        
 
 });
 
@@ -52,6 +52,7 @@ Route::middleware(['auth', 'photographer'])->group(function () {
 
 Route::middleware(['auth'])->prefix('dashboard')->name('dashboard.')->group(function () {
     Route::resource('profile', ProfileController::class);
+    Route::get('/api/profile/checksubdomain/{subdomain}', [ProfileController::class, 'checksubdomain'])->name('checksubdomain');
 });
 
 

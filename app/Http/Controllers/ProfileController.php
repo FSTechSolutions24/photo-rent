@@ -3,6 +3,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\Client;
+use App\Models\Photographer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Yajra\DataTables\Facades\DataTables;
@@ -53,5 +54,20 @@ class ProfileController extends Controller
     private function authorizeClient(Client $client)
     {
         
+    }
+
+    public function checksubdomain($subdomain){
+        $exists = Photographer::where('subdomain', $subdomain)->exists();
+         if ($exists) {
+            return response()->json([
+                'available' => false,
+                'message' => 'Taken, please try another.'
+            ]);
+        } else {
+            return response()->json([
+                'available' => true,
+                'message' => 'Available!'
+            ]);
+        }
     }
 }
