@@ -116,8 +116,6 @@
     // Update "tab title" dynamically
     tabTitle.textContent = value ? `${value}.yourdomain.com` : "yourdomain.com";
 
-    if (!value) return;
-
     status.innerHTML = `
       <div class="spinner-border text-primary" role="status"></div>
       <span>Checking availability...</span>
@@ -126,13 +124,16 @@
     clearTimeout(timeout);
     timeout = setTimeout(() => {
       check_subdomain_existance(value);
-    }, 300);
+    }, 10);
 
   });
 
   function check_subdomain_existance(value){
     axios.get(`/dashboard/api/profile/checksubdomain/${value}`)
     .then(response => {
+      if (response.data.subdomain_empty) {
+        status.innerHTML = `<span class="text-danger fw-semibold"> ${response.data.message}</span>`;
+      }
       if (response.data.available) {
         status.innerHTML = `<span class="text-success fw-semibold"> ${response.data.message}</span>`;
       } else {

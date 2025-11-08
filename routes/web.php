@@ -52,7 +52,7 @@ Route::middleware(['auth', 'photographer'])->group(function () {
 
 Route::middleware(['auth'])->prefix('dashboard')->name('dashboard.')->group(function () {
     Route::resource('profile', ProfileController::class);
-    Route::get('/api/profile/checksubdomain/{subdomain}', [ProfileController::class, 'checksubdomain'])->name('checksubdomain');
+    Route::get('/api/profile/checksubdomain/{subdomain?}', [ProfileController::class, 'checksubdomain'])->name('checksubdomain');
 });
 
 

@@ -56,7 +56,13 @@ class ProfileController extends Controller
         
     }
 
-    public function checksubdomain($subdomain){
+    public function checksubdomain($subdomain = null){
+        if(!$subdomain){
+            return response()->json([
+                'subdomain_empty' => true,
+                'message' => 'Please fill your subdomain.'
+            ]);
+        }
         $exists = Photographer::where('subdomain', $subdomain)->exists();
          if ($exists) {
             return response()->json([
