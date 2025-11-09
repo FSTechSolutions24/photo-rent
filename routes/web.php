@@ -1,11 +1,13 @@
 <?php
 
+use App\Models\SubscriptionPlan;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\MediaController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\FolderController;
 use App\Http\Controllers\GalleryController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\SubscriptionPlanController;
 
 /*
 |--------------------------------------------------------------------------
@@ -58,6 +60,13 @@ Route::middleware(['auth'])->prefix('dashboard')->name('dashboard.')->group(func
 
 Route::domain('{photographer_subdomain}.' . env('APP_DOMAIN'))->group(function () {
     Route::match(['get', 'post'], '/{client_name}/{gallery_slug}', [GalleryController::class, 'show'])->name('gallery.show');
+});
+
+
+
+Route::middleware(['superadmin'])->prefix('superadmin')->name('superadmin.')->group(function () {
+    Route::get('plans/data', [SubscriptionPlanController::class, 'getData'])->name('plans.data');
+    Route::resource('plans', SubscriptionPlanController::class);
 });
 
 

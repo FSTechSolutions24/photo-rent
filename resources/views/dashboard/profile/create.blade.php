@@ -3,98 +3,102 @@
 @section('content')
 
 <div class="container">
-    <div class="pricing-section">
-      <h1>Choose Your Plan</h1>
-      <p>Simple, transparent pricing to help you grow your portfolio.</p>
-    </div>
+  <div class="pricing-section">
+    <h1>Choose Your Plan</h1>
+    <p>Simple, transparent pricing to help you grow your portfolio.</p>
+  </div>
 
-    <div class="row justify-content-center g-4">
-      <!-- Basic Plan -->
-      <div class="col-md-4">
-        <div class="card pricing-card">
-          <div class="plan-header">
-            <div class="plan-name">Starter</div>
-            <div class="plan-price">$9<span class="plan-duration">/mo</span></div>
-          </div>
-          <ul class="plan-features">
-            <li>1 Portfolio Website</li>
-            <li>5GB Storage</li>
-            <li>Basic Analytics</li>
-            <li>Email Support</li>
-          </ul>
-          <button class="btn plan-btn">Select Plan</button>
+  <div class="row justify-content-center g-4">
+    <!-- Basic Plan -->
+    <div class="col-md-4">
+      <div class="card pricing-card">
+        <div class="plan-header">
+          <div class="plan-name">Starter</div>
+          <div class="plan-price">$9<span class="plan-duration">/mo</span></div>
         </div>
-      </div>
-
-      <!-- Recommended Plan -->
-      <div class="col-md-4">
-        <div class="card pricing-card recommended">
-          <div class="badge-recommended">Most Popular</div>
-          <div class="plan-header">
-            <div class="plan-name">Pro</div>
-            <div class="plan-price">$19<span class="plan-duration">/mo</span></div>
-          </div>
-          <ul class="plan-features">
-            <li>5 Portfolio Websites</li>
-            <li>25GB Storage</li>
-            <li>Advanced Analytics</li>
-            <li>Priority Support</li>
-            <li>Custom Domain</li>
-          </ul>
-          <button class="btn plan-btn">Select Plan</button>
-        </div>
-      </div>
-
-      <!-- Premium Plan -->
-      <div class="col-md-4">
-        <div class="card pricing-card">
-          <div class="plan-header">
-            <div class="plan-name">Enterprise</div>
-            <div class="plan-price">$49<span class="plan-duration">/mo</span></div>
-          </div>
-          <ul class="plan-features">
-            <li>Unlimited Portfolios</li>
-            <li>100GB Storage</li>
-            <li>Team Collaboration</li>
-            <li>Custom Integrations</li>
-            <li>Dedicated Support</li>
-          </ul>
-          <button class="btn plan-btn">Select Plan</button>
-        </div>
+        <ul class="plan-features">
+          <li>1 Portfolio Website</li>
+          <li>5GB Storage</li>
+          <li>Basic Analytics</li>
+          <li>Email Support</li>
+        </ul>
+        <button class="btn plan-btn">Select Plan</button>
       </div>
     </div>
+
+    <!-- Recommended Plan -->
+    <div class="col-md-4">
+      <div class="card pricing-card recommended">
+        <div class="badge-recommended">Most Popular</div>
+        <div class="plan-header">
+          <div class="plan-name">Pro</div>
+          <div class="plan-price">$19<span class="plan-duration">/mo</span></div>
+        </div>
+        <ul class="plan-features">
+          <li>5 Portfolio Websites</li>
+          <li>25GB Storage</li>
+          <li>Advanced Analytics</li>
+          <li>Priority Support</li>
+          <li>Custom Domain</li>
+        </ul>
+        <button class="btn plan-btn">Select Plan</button>
+      </div>
+    </div>
+
+    <!-- Premium Plan -->
+    <div class="col-md-4">
+      <div class="card pricing-card">
+        <div class="plan-header">
+          <div class="plan-name">Enterprise</div>
+          <div class="plan-price">$49<span class="plan-duration">/mo</span></div>
+        </div>
+        <ul class="plan-features">
+          <li>Unlimited Portfolios</li>
+          <li>100GB Storage</li>
+          <li>Team Collaboration</li>
+          <li>Custom Integrations</li>
+          <li>Dedicated Support</li>
+        </ul>
+        <button class="btn plan-btn">Select Plan</button>
+      </div>
+    </div>
+  </div>
 </div>
   
 <br><br>
+
 <div class="container">
-    <div class="browser-wrapper">
+  <div class="browser-wrapper">
     <div class="browser-header">
-        <div class="browser-dots">
-        <span class="red"></span>
-        <span class="yellow"></span>
-        <span class="green"></span>
-        </div>
-        <div class="browser-tab" id="tabTitle">yourdomain.com</div>
+      <div class="browser-dots">
+      <span class="red"></span>
+      <span class="yellow"></span>
+      <span class="green"></span>
+      </div>
+      <div class="browser-tab" id="tabTitle">yourdomain.com</div>
     </div>
-    
+  
     <div class="browser-body">
-        <h5 class="mb-3 fw-semibold text-secondary">
-            Claim your portfolio link
-        </h5>
-    
-        <div class="domain-input">
-            <input id="subdomain-input" type="text" placeholder="yourname" />
-            <span>.yourdomain.com</span>
-        </div>
-    
-        <div id="status"></div>
-    
-        <button id="create-btn" class="btn btn-checker" disabled>
-            Create Portfolio
-        </button>
+      <h5 class="mb-3 fw-semibold text-secondary">
+        Claim your portfolio link
+      </h5>
+
+      <div class="domain-input">
+        <input id="subdomain-input" type="text" placeholder="yourname" />
+        <span>.yourdomain.com</span>
+      </div>
+
+      <div id="status"></div>
     </div>
-    </div>
+  </div>
 </div>
+
+<div class="container">
+  <button id="create-btn" class="btn btn-checker" disabled>
+    Create Portfolio
+  </button>
+</div>
+
  
 <br><br><br><br>
   

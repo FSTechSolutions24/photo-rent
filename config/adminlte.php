@@ -370,6 +370,23 @@ return [
         //     ],
         // ],
         [
+            'text' => 'plans',
+            'icon' => 'fas fa-users',
+            'can' => 'is-superadmin',
+            'submenu' => [
+                [
+                    'text' => 'add_plan',
+                    'url' => 'superadmin/plans/create',
+                    'icon'=>'fas fa-plus'
+                ],                
+                [
+                    'text' => 'view_plans',
+                    'url' => 'superadmin/plans',
+                    'icon'=>'fas fa-eye'
+                ],                
+            ],
+        ],
+        [
             'text' => 'clients',
             'icon' => 'fas fa-users',
             'can' => 'has-photographer',
