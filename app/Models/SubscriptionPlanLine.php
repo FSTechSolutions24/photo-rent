@@ -9,6 +9,8 @@ class SubscriptionPlanLine extends Model
 {
     use HasFactory;
 
+    protected $fillable = ['subscription_plan_id', 'feature_name', 'description', 'is_included'];
+
     public function plan()
     {
         return $this->belongsTo(SubscriptionPlan::class);

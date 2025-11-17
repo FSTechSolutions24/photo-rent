@@ -5,11 +5,15 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use App\Models\SubscriptionPlan;
+use App\Models\SubscriptionPlanLine;
 use Illuminate\Support\Facades\Auth;
 use Yajra\DataTables\Facades\DataTables;
+use App\Traits\HelperTrait;
 
 class SubscriptionPlanController extends Controller
 {
+    use HelperTrait;
+
     public function index()
     {
         return view('superadmin.plans.index');
@@ -22,10 +26,19 @@ class SubscriptionPlanController extends Controller
 
     public function store(Request $request)
     {
+        $data = ($request->all());
+        $items_array = json_decode($data['items'], true);     
         $data = $this->validatePlan($request);
 
         $data['photographer_id'] = Auth::id();
-        SubscriptionPlan::create($data);
+        $id = SubscriptionPlan::create($data)->id;
+
+        $this->storeDynamicTableRecords(
+            SubscriptionPlanLine::class,
+            'subscription_plan_id',
+            $id,
+            $items_array // decoded JSON array
+        );
 
         return redirect()->route('superadmin.plans.index')->with('success', 'Plan created successfully.');
     }

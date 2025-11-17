@@ -502,6 +502,16 @@ return [
                 ],
             ],
         ],
+        // 'AppendGrid' => [
+        //     'active' => false,
+        //     'files' => [
+        //         [
+        //             'type' => 'js',
+        //             'asset' => false,
+        //             'location' => '',
+        //         ],
+        //     ],
+        // ],
         'Sweetalert2' => [
             'active' => true,
             'files' => [
@@ -544,6 +554,11 @@ return [
                     'type' => 'js',
                     'asset' => true,
                     'location' => 'js/custom.js',
+                ],
+                [
+                    'type' => 'js',
+                    'asset' => true,
+                    'location' => 'https://cdn.jsdelivr.net/npm/jquery.appendgrid@2.1.1/dist/AppendGrid.min.js',
                 ],
             ],
         ],

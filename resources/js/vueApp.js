@@ -1,5 +1,6 @@
 import DropzoneUploader from './components/DropzoneUploader.vue';
 import MediaTable from './components/MediaTable.vue';
+import DynamicTable from './components/DynamicTable.vue';
 
 export default function registerVueApp(app) {
     app.mixin({
@@ -24,6 +25,7 @@ export default function registerVueApp(app) {
     // Register the Dropzone component globally
     app.component('dropzone-uploader', DropzoneUploader);
     app.component('media-table', MediaTable);
+    app.component('dynamic-table', DynamicTable);
 
     console.log('✅ Vue shared mixin and DropzoneUploader registered successfully');
 }
