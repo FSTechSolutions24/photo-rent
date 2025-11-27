@@ -24,7 +24,7 @@
 
 @section('js')
     <script>
-        var planLines = @json($plan->lines->toArray());
+        var planLines = @json(old('lines', $plan->lines ?? []));
 
         $(document).ready(function(){
             var myAppendGrid = new AppendGrid({
@@ -44,8 +44,6 @@
                 initRows: 0
             });
 
-
-
             // Convert planLines into the required array of objects
             var rows = planLines.map(function (line) {
                 return {
@@ -57,8 +55,6 @@
 
             // Append all rows at once
             myAppendGrid.appendRow(rows);
-
-
 
             // When form is submitted → collect the grid data
             $("form").on("submit", function(e) {
