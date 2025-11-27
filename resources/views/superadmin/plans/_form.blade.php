@@ -24,6 +24,8 @@
 
 @section('js')
     <script>
+        var planLines = @json($plan->lines->toArray());
+
         $(document).ready(function(){
             var myAppendGrid = new AppendGrid({
                 element: "tblAppendGrid",
@@ -39,12 +41,24 @@
                         ctrlOptions: { on: "1", off: "0" }
                     }
                 ],
-                initData: [
-                    { feature_name: "Foo Data 1", description: "Bar Data 1", is_included: 1 },
-                    { feature_name: "Foo Data 2", description: "Bar Data 3", is_included: 0 },
-                ],
                 initRows: 0
             });
+
+
+
+            // Convert planLines into the required array of objects
+            var rows = planLines.map(function (line) {
+                return {
+                    feature_name: line.feature_name || "",
+                    description: line.description || "",
+                    is_included: line.is_included == 1 ? 1 : 0
+                };
+            });
+
+            // Append all rows at once
+            myAppendGrid.appendRow(rows);
+
+
 
             // When form is submitted → collect the grid data
             $("form").on("submit", function(e) {

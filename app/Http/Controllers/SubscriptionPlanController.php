@@ -33,18 +33,13 @@ class SubscriptionPlanController extends Controller
         $data['photographer_id'] = Auth::id();
         $id = SubscriptionPlan::create($data)->id;
 
-        $this->storeDynamicTableRecords(
-            SubscriptionPlanLine::class,
-            'subscription_plan_id',
-            $id,
-            $items_array // decoded JSON array
-        );
+        $this->storeDynamicTableRecords(SubscriptionPlanLine::class,'subscription_plan_id',$id,$items_array);
 
         return redirect()->route('superadmin.plans.index')->with('success', 'Plan created successfully.');
     }
 
     public function edit($id){
-        $plan = SubscriptionPlan::findOrFail($id);
+        $plan = SubscriptionPlan::with('lines')->findOrFail($id);
         return view('superadmin.plans.edit', compact('plan'));   
     }
 
@@ -53,6 +48,12 @@ class SubscriptionPlanController extends Controller
         $data = $this->validatePlan($request, $plan->id);
 
         $plan->update($data);
+
+        $data = ($request->all());
+        
+        $items_array = json_decode($data['items'], true);    
+
+        $this->storeDynamicTableRecords(SubscriptionPlanLine::class,'subscription_plan_id',$plan->id,$items_array);
 
         return redirect()->route('superadmin.plans.index')->with('success', 'Plan updated successfully.');
     }
