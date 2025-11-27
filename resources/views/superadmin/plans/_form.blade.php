@@ -15,7 +15,23 @@
         @error('price')
             <small class="text-danger">{{ $message }}</small>
         @enderror
+    </div>
 
+    <div class="mb-3 d-flex align-items-center">
+        @php
+            $checked = old('most_popular', $plan->most_popular ?? false);
+        @endphp
+
+        <input type="hidden" name="most_popular" value="0">
+        <input type="checkbox" name="most_popular" value="1" class="mr-2" {{ $checked ? 'checked' : '' }} >
+        <label class="form-label mb-0">Most Popular</label>
+
+        @error('most_popular')
+            <small class="text-danger d-block">{{ $message }}</small>
+        @enderror
+    </div>
+
+    <div class="mt-3">
         <br>
         <table id="tblAppendGrid"></table>    
         <input type="hidden" name="items" id="appendGridData">

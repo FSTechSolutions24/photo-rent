@@ -50,7 +50,7 @@ class SubscriptionPlanController extends Controller
         $plan->update($data);
 
         $data = ($request->all());
-        
+
         $items_array = json_decode($data['items'], true);    
 
         $this->storeDynamicTableRecords(SubscriptionPlanLine::class,'subscription_plan_id',$plan->id,$items_array);
@@ -79,6 +79,7 @@ class SubscriptionPlanController extends Controller
         return $request->validate([
             'name' => ['required','string','max:255','min:3'],
             'price' => ['required', 'numeric', 'min:0', 'regex:/^\d+(\.\d{1,2})?$/'],
+            'most_popular' => ['nullable', 'in:0,1']
         ]);
     }
 

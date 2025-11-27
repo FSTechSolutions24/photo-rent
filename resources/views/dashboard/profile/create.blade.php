@@ -9,59 +9,28 @@
   </div>
 
   <div class="row justify-content-center g-4">
-    <!-- Basic Plan -->
-    <div class="col-md-4">
-      <div class="card pricing-card">
-        <div class="plan-header">
-          <div class="plan-name">Starter</div>
-          <div class="plan-price">$9<span class="plan-duration">/mo</span></div>
-        </div>
-        <ul class="plan-features">
-          <li>1 Portfolio Website</li>
-          <li>5GB Storage</li>
-          <li>Basic Analytics</li>
-          <li>Email Support</li>
-        </ul>
-        <button class="btn plan-btn">Select Plan</button>
-      </div>
-    </div>
 
     <!-- Recommended Plan -->
-    <div class="col-md-4">
-      <div class="card pricing-card recommended">
-        <div class="badge-recommended">Most Popular</div>
-        <div class="plan-header">
-          <div class="plan-name">Pro</div>
-          <div class="plan-price">$19<span class="plan-duration">/mo</span></div>
+    @foreach ($plans as $plan)
+      <div class="col-md-4">
+        <div class="card pricing-card {{ $plan->most_popular ? 'recommended' : '' }}">
+          @if($plan->most_popular)
+            <div class="badge-recommended">Most Popular</div>
+          @endif
+          <div class="plan-header">
+            <div class="plan-name">{{ $plan->name }}</div>
+            <div class="plan-price">${{ $plan->price }}<span class="plan-duration">/mo</span></div>
+          </div>
+          <ul class="plan-features">
+            @foreach ($plan->lines as $line)
+              <li>{{ $line->feature_name }}</li>
+            @endforeach
+          </ul>
+          <button class="btn plan-btn">Select Plan</button>
         </div>
-        <ul class="plan-features">
-          <li>5 Portfolio Websites</li>
-          <li>25GB Storage</li>
-          <li>Advanced Analytics</li>
-          <li>Priority Support</li>
-          <li>Custom Domain</li>
-        </ul>
-        <button class="btn plan-btn">Select Plan</button>
       </div>
-    </div>
-
-    <!-- Premium Plan -->
-    <div class="col-md-4">
-      <div class="card pricing-card">
-        <div class="plan-header">
-          <div class="plan-name">Enterprise</div>
-          <div class="plan-price">$49<span class="plan-duration">/mo</span></div>
-        </div>
-        <ul class="plan-features">
-          <li>Unlimited Portfolios</li>
-          <li>100GB Storage</li>
-          <li>Team Collaboration</li>
-          <li>Custom Integrations</li>
-          <li>Dedicated Support</li>
-        </ul>
-        <button class="btn plan-btn">Select Plan</button>
-      </div>
-    </div>
+    @endforeach
+    
   </div>
 </div>
   

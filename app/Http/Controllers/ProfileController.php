@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Models\Client;
 use App\Models\Photographer;
+use App\Models\SubscriptionPlan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
@@ -26,7 +27,9 @@ class ProfileController extends Controller
             return redirect()->route('dashboard'); // or 'dashboard.index' depending on your route name
         }
 
-        return view('dashboard.profile.create');
+        $plans = SubscriptionPlan::with('lines')->get();
+
+        return view('dashboard.profile.create', compact('plans'));
     }
 
     public function store(Request $request)
