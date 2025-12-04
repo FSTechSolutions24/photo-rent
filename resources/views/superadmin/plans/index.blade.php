@@ -12,6 +12,7 @@
           <th scope="col">#</th>
           <th scope="col">Name</th>          
           <th scope="col">Price</th>
+          <th scope="col">Storage (GB)</th>
         </tr>
       </thead>
       <tbody>        
@@ -33,6 +34,7 @@
             {data:  'id'},
             { data: 'name'},
             { data: 'price'},
+            { data: 'storage_gb'},
           ]
         })
       })

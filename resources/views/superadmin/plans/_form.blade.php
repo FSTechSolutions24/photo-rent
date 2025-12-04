@@ -10,6 +10,14 @@
     </div>
 
     <div class="mb-3">
+        <label class="form-label">Storage (GB): <span class="required_start">*</span></label>
+        <input type="text" name="storage_gb" value="{{ old('storage_gb', $plan->storage_gb ?? '') }}" class="input form-control" required autocomplete="false">
+        @error('storage_gb')
+            <small class="text-danger">{{ $message }}</small>
+        @enderror
+    </div>
+
+    <div class="mb-3">
         <label class="form-label">Plan Price: <span class="required_start">*</span></label>
         <input type="text" name="price" value="{{ old('price', $plan->price ?? '') }}" class="input form-control" required autocomplete="false">
         @error('price')

@@ -79,7 +79,8 @@ class SubscriptionPlanController extends Controller
         return $request->validate([
             'name' => ['required','string','max:255','min:3'],
             'price' => ['required', 'numeric', 'min:0', 'regex:/^\d+(\.\d{1,2})?$/'],
-            'most_popular' => ['nullable', 'in:0,1']
+            'most_popular' => ['nullable', 'in:0,1'],
+            'storage_gb' => ['required', 'integer', 'min:0'],
         ]);
     }
 

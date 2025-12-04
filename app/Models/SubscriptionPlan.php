@@ -9,7 +9,7 @@ class SubscriptionPlan extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'price', 'billing_cycle', 'is_popular', 'available_from', 'available_to', 'most_popular'];
+    protected $fillable = ['name', 'price', 'billing_cycle', 'is_popular', 'available_from', 'available_to', 'most_popular', 'storage_gb'];
 
     public function lines()
     {
