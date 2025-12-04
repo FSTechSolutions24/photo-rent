@@ -26,7 +26,7 @@
               <li>{{ $line->feature_name }}</li>
             @endforeach
           </ul>
-          <button class="btn plan-btn">Select Plan</button>
+          <button class="btn plan-btn select_plan" data-id="{{ $plan->id }}">Select Plan</button>
         </div>
       </div>
     @endforeach
@@ -68,12 +68,17 @@
   </button>
 </div>
 
- 
 <br><br><br><br>
   
 @section('js')
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script>
+
+  window.selectedPlan = '';
+  $('.select_plan').click(function(){
+    window.selectedPlan = $(this).data('id');
+    check_profile_creation();
+  })
 
   const input = document.getElementById("subdomain-input");
   const status = document.getElementById("status");
@@ -101,6 +106,7 @@
 
   });
 
+  window.validSubdomain = false;
   function check_subdomain_existance(value){
     axios.get(`/dashboard/api/profile/checksubdomain`, {
       params: { subdomain: value }
@@ -108,16 +114,30 @@
     .then(response => {
       if (response.data.subdomain_empty) {
         status.innerHTML = `<span class="text-danger fw-semibold"> ${response.data.message}</span>`;
+        window.validSubdomain = false;
+        check_profile_creation();
       }
       if (response.data.available) {
         status.innerHTML = `<span class="text-success fw-semibold"> ${response.data.message}</span>`;
+        window.validSubdomain = true;
+        check_profile_creation();
       } else {
         status.innerHTML = `<span class="text-danger fw-semibold"> ${response.data.message}</span>`;
+        window.validSubdomain = false;
+        check_profile_creation();
       }
     })
     .catch(error => {
       window.toastr.error('Failed to check subdomain. ' + error);
+      window.validSubdomain = false;
+      check_profile_creation();
     });
+  }
+
+  function check_profile_creation(){
+    if(window.validSubdomain == true && window.selectedPlan != ''){
+      $('#create-btn').prop('disabled', false);
+    }
   }
 
 </script>
