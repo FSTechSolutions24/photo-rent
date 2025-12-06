@@ -31,6 +31,8 @@
         window.view_reports =  $('.table').DataTable({
           processing: true,
           serverSide: true,
+          scrollX: true,            // ➜ enables horizontal scroll
+          autoWidth: false,         // ➜ prevents auto-expanding beyond parent
           ajax: "{{ route('dashboard.galleries.data') }}",
           columns: [
             {data:  'actions'},

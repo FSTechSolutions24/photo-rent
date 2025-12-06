@@ -26,9 +26,11 @@
 @section('js')
     <script> 
       $(document).ready(function(){            
-        window.view_reports =   $('.table').DataTable({
+        window.view_reports = $('.table').DataTable({
           processing: true,
           serverSide: true,
+          scrollX: true,            // ➜ enables horizontal scroll
+          autoWidth: false,         // ➜ prevents auto-expanding beyond parent
           ajax: "{{ route('dashboard.clients.data') }}",
           columns: [
             {data:  'actions'},
