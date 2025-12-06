@@ -144,6 +144,22 @@
     }
   }
 
+
+  $(document).on('click','#create-btn',function(){
+
+    axios.get(`/dashboard/api/profile/createphotographerprofile`, {
+      params: { 
+        selectedPlan: window.selectedPlan, 
+        subdomain: $('#subdomain-input').val(), 
+      }
+    })
+    .then(response => {
+    })
+    .catch(error => {
+    });
+
+  })
+
 </script>
 @endsection
 

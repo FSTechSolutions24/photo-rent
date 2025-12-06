@@ -102,4 +102,9 @@ class ProfileController extends Controller
         }
     }
 
+    public function createphotographerprofile(Request $request)
+    {
+        $subdomain = $request->query('subdomain');
+    }
+
 }
