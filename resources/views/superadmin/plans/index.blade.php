@@ -29,7 +29,7 @@
           processing: true,
           serverSide: true,
           scrollX: true,            // ➜ enables horizontal scroll
-          utoWidth: false,         // ➜ prevents auto-expanding beyond parent
+          autoWidth: false,         // ➜ prevents auto-expanding beyond parent
           ajax: "{{ route('superadmin.plans.data') }}",
           columns: [
             {data:  'actions'},

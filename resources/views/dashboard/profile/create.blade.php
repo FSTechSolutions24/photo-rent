@@ -77,6 +77,10 @@
   window.selectedPlan = '';
   $('.select_plan').click(function(){
     window.selectedPlan = $(this).data('id');
+    $('.pricing-card').removeClass('selected-plan');
+    $(this).parent('.pricing-card').addClass('selected-plan');
+    $('.pricing-card').find('.select_plan').prop('disabled', false);
+    $(this).parent('.pricing-card').find('.select_plan').prop('disabled', true);
     check_profile_creation();
   })
 
@@ -407,6 +411,11 @@
       margin-bottom: 2rem;
     }
   }
+
+  .selected-plan {
+    background: #dce2ff;
+  }
+
 </style>
 
 @stop
