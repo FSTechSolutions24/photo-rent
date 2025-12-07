@@ -154,6 +154,9 @@
       }
     })
     .then(response => {
+      if(response.data.success) {
+        window.location.href = '/dashboard';
+      }
     })
     .catch(error => {
     });

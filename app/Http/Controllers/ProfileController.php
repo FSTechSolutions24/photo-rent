@@ -104,7 +104,22 @@ class ProfileController extends Controller
 
     public function createphotographerprofile(Request $request)
     {
+
         $subdomain = $request->query('subdomain');
+        $selectedPlan = $request->query('selectedPlan');
+
+        $plan = SubscriptionPlan::where('id', $selectedPlan)->firstOrFail();
+
+        $photographer = Photographer::create([
+            'user_id' => Auth::user()->id,
+            'storage_limit' => $plan->storage_gb,
+            'subdomain' => $subdomain,
+        ]);
+
+        return response()->json([
+            'success' => true,
+        ]);
+
     }
 
 }
