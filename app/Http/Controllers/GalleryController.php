@@ -152,7 +152,7 @@ class GalleryController extends Controller
     {
         $data = $this->validateGallery($request);
 
-        $data['photographer_id'] = Auth::id();
+        $data['photographer_id'] = Photographer::where('user_id', Auth::id())->first()->id;
 
         $data = $this->prepare_gallery_data($data);
         

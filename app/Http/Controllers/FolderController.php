@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Media;
 use App\Models\Folder;
 use App\Models\Gallery;
+use App\Models\Photographer;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
@@ -108,7 +109,8 @@ class FolderController extends Controller
 
     private function authorizeGallery(Gallery $gallery)
     {
-        abort_if($gallery->client->photographer_id !== Auth::id(), 403);
+        $photographer_id = Photographer::where('user_id', Auth::id())->first()->id;
+        abort_if(!$photographer_id, 403);
     }
 
     public function destroy(Gallery $gallery, Folder $folder)

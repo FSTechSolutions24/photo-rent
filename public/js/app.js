@@ -62798,6 +62798,23 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 
 /***/ }),
 
+/***/ "./node_modules/mitt/dist/mitt.mjs":
+/*!*****************************************!*\
+  !*** ./node_modules/mitt/dist/mitt.mjs ***!
+  \*****************************************/
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony default export */ function __WEBPACK_DEFAULT_EXPORT__(n){return{all:n=n||new Map,on:function(t,e){var i=n.get(t);i?i.push(e):n.set(t,[e])},off:function(t,e){var i=n.get(t);i&&(e?i.splice(i.indexOf(e)>>>0,1):n.set(t,[]))},emit:function(t,e){var i=n.get(t);i&&i.slice().map(function(n){n(e)}),(i=n.get("*"))&&i.slice().map(function(n){n(t,e)})}}}
+//# sourceMappingURL=mitt.mjs.map
+
+
+/***/ }),
+
 /***/ "./node_modules/process/browser.js":
 /*!*****************************************!*\
   !*** ./node_modules/process/browser.js ***!
@@ -73825,7 +73842,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _vueApp__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./vueApp */ "./resources/js/vueApp.js");
 /* harmony import */ var _datatableJS__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./datatableJS */ "./resources/js/datatableJS.js");
 /* harmony import */ var _datatableJS__WEBPACK_IMPORTED_MODULE_7___default = /*#__PURE__*/__webpack_require__.n(_datatableJS__WEBPACK_IMPORTED_MODULE_7__);
-Object(function webpackMissingModule() { var e = new Error("Cannot find module 'mitt'"); e.code = 'MODULE_NOT_FOUND'; throw e; }());
+/* harmony import */ var mitt__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! mitt */ "./node_modules/mitt/dist/mitt.mjs");
 
 
 
@@ -74360,9 +74377,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-Object(function webpackMissingModule() { var e = new Error("Cannot find module 'mitt'"); e.code = 'MODULE_NOT_FOUND'; throw e; }());
+/* harmony import */ var mitt__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! mitt */ "./node_modules/mitt/dist/mitt.mjs");
 
-var emitter = Object(function webpackMissingModule() { var e = new Error("Cannot find module 'mitt'"); e.code = 'MODULE_NOT_FOUND'; throw e; }())();
+var emitter = (0,mitt__WEBPACK_IMPORTED_MODULE_0__["default"])();
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (emitter);
 
 /***/ }),
