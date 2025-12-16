@@ -106,7 +106,6 @@ class GalleryController extends Controller
         ->make(true);
 
     }
-
     
     public function edit($id){
         $gallery = Gallery::findOrFail($id);
