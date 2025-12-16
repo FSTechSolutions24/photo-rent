@@ -2,11 +2,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Client;
+use App\Models\Photographer;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Yajra\DataTables\Facades\DataTables;
-use Illuminate\Validation\Rule;
 
 class ClientController extends Controller
 {
@@ -45,7 +46,7 @@ class ClientController extends Controller
     {
         $data = $this->validateClient($request);
 
-        $data['photographer_id'] = Auth::id();
+        $data['photographer_id'] = Photographer::where('user_id', Auth::id())->first()->id;
         Client::create($data);
 
         return redirect()->route('dashboard.clients.index')->with('success', 'Client created successfully.');

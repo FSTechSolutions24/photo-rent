@@ -110,13 +110,15 @@ class GalleryController extends Controller
     
     public function edit($id){
         $gallery = Gallery::findOrFail($id);
-        $clients = Client::where('photographer_id', Auth::id())->get();
+        $photographer_id = Photographer::where('user_id', Auth::id())->first()->id;
+        $clients = Client::where('photographer_id', $photographer_id)->get();
         $gallery->client_password = Crypt::decryptString($gallery->client_password);
         $gallery->guest_password = Crypt::decryptString($gallery->guest_password);
         return view('dashboard.galleries.edit', compact('gallery','clients'));   
     }
 
     protected function validateGallery(Request $request, $id = null){
+        $photographer_id = Photographer::where('user_id', Auth::id())->first()->id;
         return $request->validate([
             'name' => 'required|string|max:255',
             'client_password' => ['required', 'string', 'min:6', 'different:guest_password'],
@@ -125,14 +127,15 @@ class GalleryController extends Controller
             'client_id' => [
                 'nullable',
                 'integer',
-                Rule::exists('clients', 'id')->where('photographer_id', Auth::id()),
+                Rule::exists('clients', 'id')->where('photographer_id', $photographer_id),
             ],
         ]);
     }
 
     public function create()
     {
-        $clients = Client::where('photographer_id', Auth::id())->get();
+        $photographer_id = Photographer::where('user_id', Auth::id())->first()->id;
+        $clients = Client::where('photographer_id', $photographer_id)->get();
         return view('dashboard.galleries.create', compact('clients'));
     }
 
