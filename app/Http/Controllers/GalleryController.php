@@ -110,8 +110,7 @@ class GalleryController extends Controller
     
     public function edit($id){
         $gallery = Gallery::findOrFail($id);
-        $photographer_id = Photographer::where('user_id', Auth::id())->first()->id;
-        $clients = Client::where('photographer_id', $photographer_id)->get();
+        $clients = auth()->user()->photographer->clients;
         $gallery->client_password = Crypt::decryptString($gallery->client_password);
         $gallery->guest_password = Crypt::decryptString($gallery->guest_password);
         return view('dashboard.galleries.edit', compact('gallery','clients'));   
@@ -134,8 +133,7 @@ class GalleryController extends Controller
 
     public function create()
     {
-        $photographer_id = Photographer::where('user_id', Auth::id())->first()->id;
-        $clients = Client::where('photographer_id', $photographer_id)->get();
+        $clients = auth()->user()->photographer->clients;
         return view('dashboard.galleries.create', compact('clients'));
     }
 
