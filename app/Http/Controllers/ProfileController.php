@@ -112,7 +112,7 @@ class ProfileController extends Controller
 
         $photographer = Photographer::create([
             'user_id' => Auth::user()->id,
-            'storage_limit' => $plan->storage_gb,
+            'plan_storage' => ($plan->storage_gb * 1024 * 1024 * 1024),
             'subdomain' => $subdomain,
         ]);
 
