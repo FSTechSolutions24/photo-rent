@@ -27538,10 +27538,10 @@ __webpack_require__.r(__webpack_exports__);
         window.view_reports = $('.table').DataTable({
           processing: true,
           serverSide: true,
-          responsive: true,
-          autoWidth: false,
           scrollX: true,
-          // optional, if you have many columns
+          // ➜ enables horizontal scroll
+          autoWidth: false,
+          // ➜ prevents auto-expanding beyond parent
           ajax: {
             url: _this.getApiUrl(),
             type: 'POST',

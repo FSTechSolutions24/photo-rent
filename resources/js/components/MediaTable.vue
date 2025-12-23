@@ -76,9 +76,8 @@ export default {
                 window.view_reports = $('.table').DataTable({
                     processing: true,
                     serverSide: true,
-                    responsive: true,
-                    autoWidth: false,
-                    scrollX: true, // optional, if you have many columns
+                    scrollX: true,            // ➜ enables horizontal scroll
+                    autoWidth: false,         // ➜ prevents auto-expanding beyond parent
                     ajax: {
                         url: this.getApiUrl(),
                         type: 'POST',
