@@ -96,7 +96,7 @@ class FolderController extends Controller
     }
 
     function save_media_record($galleryId, $folderId, $storedPath, $file){
-        return Media::create([
+        $media = Media::create([
             'gallery_id' => $galleryId,
             'folder_id' => $folderId,
             'name' => $file->getClientOriginalName(),
@@ -105,6 +105,24 @@ class FolderController extends Controller
             'disk' => 'local',
             'mime_type' => $file->getMimeType(),
         ]);
+
+        if($media){
+            $this->deduct_from_available_storage($file->getSize());
+        }
+    }
+
+    function deduct_from_available_storage($size){
+        $photographer = Photographer::where('user_id', Auth::id())->first();
+
+        if (! $photographer) {
+            return false;
+        }
+
+        $photographer->available_storage = max(0, $photographer->available_storage - $size);
+
+        $photographer->save();
+
+        return true;
     }
 
     private function authorizeGallery(Gallery $gallery)
