@@ -32,9 +32,34 @@
             }
             emitter.on('folder-selected-action', this.handleFolderAction);
             emitter.on('media-uploaded', this.reloadTable);
+            window.deleteMedia = this.deleteMedia;
         },
 
         methods: {
+            deleteMedia(id) {
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: 'This media will be deleted!',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Yes, delete it!',
+                    cancelButtonText: 'Cancel',
+                }).then(result => {
+                    if (!result.isConfirmed) return;
+                    axios.delete(`/dashboard/media/${this.galleryId}/delete`, {data: {id}})
+                    .then(response => {
+                        if (response.data.success) {
+                            Swal.fire('Deleted!', response.data.message, 'success');
+                            this.reloadTable();
+                        }
+                    })
+                    .catch(error => {
+                        Swal.fire('Error', error.response?.data?.message || 'Something went wrong', 'error');
+                    });
+                });
+            },
             reloadTable(){
                 // Otherwise safely reload from the new folder
                 const table = window.view_reports;
@@ -102,13 +127,6 @@
         }
     };
 
-    $(document).on('click','.delete_media',()=>{
-        alert($(this).data('id'));
-    })
-    
-</script>
-
-<script>
 </script>
 
 
