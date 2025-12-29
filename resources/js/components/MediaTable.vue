@@ -19,89 +19,98 @@
 
 <script>
 
-// import Dropzone from 'dropzone';
-// import 'dropzone/dist/dropzone.css';
-import emitter from '../eventBus'; // Adjust path as needed
+    // import Dropzone from 'dropzone';
+    // import 'dropzone/dist/dropzone.css';
+    import emitter from '../eventBus'; // Adjust path as needed
 
-export default {
-    props: ['galleryId', 'currentFolderId'],
+    export default {
+        props: ['galleryId', 'currentFolderId'],
 
-    mounted() {
-        if (this.currentFolderId && this.currentFolderId > 0) {
-            this.initDataTable();
-        }
-        emitter.on('folder-selected-action', this.handleFolderAction);
-        emitter.on('media-uploaded', this.reloadTable);
-    },
-
-    methods: {
-        reloadTable(){
-            // Otherwise safely reload from the new folder
-            const table = window.view_reports;
-            const url = this.getApiUrl();
-            if (url) {
-                table.ajax.url(url);
-                table.ajax.reload(null, false);
-            } else {
-                console.warn('No valid URL found — reload skipped.');
-            }
-        },
-        getApiUrl() {
-            // dynamically build the correct route inside Vue
-            return `/dashboard/api/galleries/${this.galleryId}/folders/${this.currentFolderId}/media`;
-        },
-        handleFolderAction(folder) {
-            this.currentFolderId = folder.id;
-
-            // Stop if invalid folder
-            if (!this.currentFolderId || this.currentFolderId <= 0) {
-                console.warn('No valid folder selected — skipping reload.');
-                return;
-            }
-
-            // If table doesn't exist yet, initialize it
-            if (!window.view_reports) {
+        mounted() {
+            if (this.currentFolderId && this.currentFolderId > 0) {
                 this.initDataTable();
-                return;
             }
+            emitter.on('folder-selected-action', this.handleFolderAction);
+            emitter.on('media-uploaded', this.reloadTable);
+        },
 
-            this.reloadTable();
-        },
-        initDataTable() {
-            $(document).ready(() => {
-                window.view_reports = $('.table').DataTable({
-                    processing: true,
-                    serverSide: true,
-                    scrollX: true,            // ➜ enables horizontal scroll
-                    autoWidth: false,         // ➜ prevents auto-expanding beyond parent
-                    ajax: {
-                        url: this.getApiUrl(),
-                        type: 'POST',
-                        data: (d) => {
-                            d._token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-                            d.folder_id = this.currentFolderId;
-                            d.gallery_id = this.galleryId;
+        methods: {
+            reloadTable(){
+                // Otherwise safely reload from the new folder
+                const table = window.view_reports;
+                const url = this.getApiUrl();
+                if (url) {
+                    table.ajax.url(url);
+                    table.ajax.reload(null, false);
+                } else {
+                    console.warn('No valid URL found — reload skipped.');
+                }
+            },
+            getApiUrl() {
+                // dynamically build the correct route inside Vue
+                return `/dashboard/api/galleries/${this.galleryId}/folders/${this.currentFolderId}/media`;
+            },
+            handleFolderAction(folder) {
+                this.currentFolderId = folder.id;
+
+                // Stop if invalid folder
+                if (!this.currentFolderId || this.currentFolderId <= 0) {
+                    console.warn('No valid folder selected — skipping reload.');
+                    return;
+                }
+
+                // If table doesn't exist yet, initialize it
+                if (!window.view_reports) {
+                    this.initDataTable();
+                    return;
+                }
+
+                this.reloadTable();
+            },
+            initDataTable() {
+                $(document).ready(() => {
+                    window.view_reports = $('.table').DataTable({
+                        processing: true,
+                        serverSide: true,
+                        scrollX: true,            // ➜ enables horizontal scroll
+                        autoWidth: false,         // ➜ prevents auto-expanding beyond parent
+                        ajax: {
+                            url: this.getApiUrl(),
+                            type: 'POST',
+                            data: (d) => {
+                                d._token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+                                d.folder_id = this.currentFolderId;
+                                d.gallery_id = this.galleryId;
+                            },
                         },
-                    },
-                    columnDefs: [
-                        { orderable: false, targets: 1 }
-                    ],
-                    columns: [
-                        { data: 'id' },
-                        { data: 'multiselect' },
-                        { data: 'thumbnail' },
-                        { data: 'name' },
-                        { data: 'disk' },
-                        { data: 'size' },
-                        { data: 'created_at' },
-                        { data: 'delete' },
-                    ],
+                        columnDefs: [
+                            { orderable: false, targets: 1 }
+                        ],
+                        columns: [
+                            { data: 'id' },
+                            { data: 'multiselect' },
+                            { data: 'thumbnail' },
+                            { data: 'name' },
+                            { data: 'disk' },
+                            { data: 'size' },
+                            { data: 'created_at' },
+                            { data: 'delete' },
+                        ],
+                    });
                 });
-            });
-        },
-    }
-};
+            },
+        }
+    };
+
+    $(document).on('click','.delete_media',()=>{
+        alert($(this).data('id'));
+    })
+    
 </script>
+
+<script>
+</script>
+
 
 
 <style>

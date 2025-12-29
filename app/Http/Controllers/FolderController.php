@@ -185,7 +185,7 @@ class FolderController extends Controller
             return '<div class="thumbnail-holder"><img class="img-fluid" src="'.$url.'" width="80"></div>';
         })
         ->addColumn('delete', function($model){
-            return '<button class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></button>';
+            return '<button data-id="'.$model->id.'" class="btn btn-sm btn-outline-danger delete_media"><i class="fas fa-trash"></i></button>';
         })
         ->addIndexColumn()
         ->rawColumns(['thumbnail','multiselect','delete'])
