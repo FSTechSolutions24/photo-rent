@@ -184,8 +184,11 @@ class FolderController extends Controller
             $url = Storage::url($model->path);
             return '<div class="thumbnail-holder"><img class="img-fluid" src="'.$url.'" width="80"></div>';
         })
+        ->addColumn('delete', function($model){
+            return '<button class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></button>';
+        })
         ->addIndexColumn()
-        ->rawColumns(['thumbnail','multiselect'])
+        ->rawColumns(['thumbnail','multiselect','delete'])
         ->make(true);
     }
 

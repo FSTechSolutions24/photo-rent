@@ -27569,6 +27569,8 @@ __webpack_require__.r(__webpack_exports__);
             data: 'size'
           }, {
             data: 'created_at'
+          }, {
+            data: 'delete'
           }]
         });
       });
@@ -27887,7 +27889,9 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     scope: "col"
   }, "Size"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", {
     scope: "col"
-  }, "Created")])], -1 /* CACHED */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tbody", null, null, -1 /* CACHED */)])));
+  }, "Created"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", {
+    scope: "col"
+  }, "Delete")])], -1 /* CACHED */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tbody", null, null, -1 /* CACHED */)])));
 }
 
 /***/ }),

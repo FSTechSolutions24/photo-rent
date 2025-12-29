@@ -1,6 +1,4 @@
-
 <template>
-
     <table class="table">
         <thead>
             <tr>
@@ -11,12 +9,12 @@
                 <th scope="col">Disk</th>
                 <th scope="col">Size</th>            
                 <th scope="col">Created</th>            
+                <th scope="col">Delete</th>            
             </tr>
         </thead>
         <tbody>                  
         </tbody>
     </table>
-
 </template>
 
 <script>
@@ -29,7 +27,6 @@ export default {
     props: ['galleryId', 'currentFolderId'],
 
     mounted() {
-
         if (this.currentFolderId && this.currentFolderId > 0) {
             this.initDataTable();
         }
@@ -42,7 +39,6 @@ export default {
             // Otherwise safely reload from the new folder
             const table = window.view_reports;
             const url = this.getApiUrl();
-
             if (url) {
                 table.ajax.url(url);
                 table.ajax.reload(null, false);
@@ -98,6 +94,7 @@ export default {
                         { data: 'disk' },
                         { data: 'size' },
                         { data: 'created_at' },
+                        { data: 'delete' },
                     ],
                 });
             });
