@@ -1,6 +1,6 @@
 <template>
     <div class="ibox float-e-margins">
-        <div class="ibox-content" style="padding-left: 0 !important;">
+        <div class="ibox-content mb-3" style="padding-left: 0 !important;">
             <div class="file-manager" style="padding-left: 15px;">                            
                 <div class="hr-line-dashed"></div>
                 

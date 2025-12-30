@@ -39,7 +39,7 @@
                 
                 {{-- table --}}
                 <br>          
-                <media-table :gallery-id="{{ $gallery->id }}" :current-folder-id="currentFolderId"></media-table>
+                <media-table v-show="currentFolderId" :gallery-id="{{ $gallery->id }}" :current-folder-id="currentFolderId"></media-table>
 
 
             </div>

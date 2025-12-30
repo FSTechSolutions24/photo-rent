@@ -27696,7 +27696,7 @@ var _hoisted_1 = {
   "class": "ibox float-e-margins"
 };
 var _hoisted_2 = {
-  "class": "ibox-content",
+  "class": "ibox-content mb-3",
   style: {
     "padding-left": "0 !important"
   }
