@@ -420,6 +420,23 @@ return [
                 ],                
             ],
         ],
+        [
+            'text' => 'Session',
+            'icon' => 'fas fa-camera',
+            'can' => 'has-photographer',
+            'submenu' => [
+                [
+                    'text' => 'add_session',
+                    'url' => 'dashboard/sessions/create',
+                    'icon'=>'fas fa-plus'
+                ],                
+                [
+                    'text' => 'view_sessions',
+                    'url' => 'dashboard/sessions',
+                    'icon'=>'fas fa-eye'
+                ],                
+            ],
+        ],
     ],
 
     /*

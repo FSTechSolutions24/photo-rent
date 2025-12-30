@@ -9,22 +9,6 @@
 </div>
 
 <div class="mb-3">
-    <label>Client:</label>
-    <select name="client_id" class="form-control select2" value="{{ old('client_id', $gallery->client_id ?? '') }}">
-        <option value=""></option>
-        @foreach ($clients as $client)
-            <option value="{{ $client->id }}"
-                {{ (old('client_id', $gallery->client_id ?? '') == $client->id) ? 'selected' : '' }}>
-                {{ $client->name }}
-            </option>
-        @endforeach
-    </select>
-    @error('client_id')
-        <small class="text-danger">{{ $message }}</small>
-    @enderror
-</div>
-
-<div class="mb-3">
     <label>Thumbnail:</label>
     <input type="file" name="thumbnail_path" id="thumbnail_path" class="input form-control" value="{{ old('phone', $gallery->phone ?? '') }}">
 
@@ -58,6 +42,18 @@
     @enderror
 </div>
 
+<div class="mb-3 form-check d-flex align-items-center">
+
+    <input type="hidden" name="is_public" value="0">
+
+    <input type="checkbox" name="is_public" value="1" id="is_public" class="form-check-input me-2" {{ old('is_public', $gallery->is_public ?? 0) == 1 ? 'checked' : '' }}>
+
+    <label for="is_public" class="form-check-label mt-1 ml-1">Is Public</label>
+
+    @error('is_public')
+        <small class="text-danger d-block">{{ $message }}</small>
+    @enderror
+</div>
 
 <script>
     document.getElementById('thumbnail_path').addEventListener('change', function(event) {

@@ -22,4 +22,6 @@ return [
     'clients'=>'Client',
     'add_gallery'=>'Add Gallery',
     'view_galleries'=>'View Galleries',
+    'add_session'=>'Add Session',
+    'view_sessions'=>'View Sessions',
 ];

@@ -10,8 +10,8 @@
                 <tr>
                     <th>Actions</th>
                     <th>#</th>
-                    <th>Client</th>
                     <th>Gallery Name</th>                
+                    <th>Is public</th>                
                 </tr>
             </thead>
             <tbody>            
@@ -37,8 +37,8 @@
           columns: [
             {data:  'actions'},
             {data:  'id'},
-            {data:  'client_name'},
             {data:  'name'},
+            {data:  'is_public'},
           ]
         })
       })

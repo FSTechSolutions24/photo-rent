@@ -12,7 +12,6 @@ class Photographer extends Model
 
     protected $fillable = ['user_id', 'subdomain', 'plan_storage', 'available_storage'];
 
-
     public function user()
     {
         return $this->belongsTo(User::class);
@@ -26,5 +25,10 @@ class Photographer extends Model
     public function galleries()
     {
         return $this->hasMany(Gallery::class);
+    }
+
+    public function sessions()
+    {
+        return $this->hasMany(Session::class);
     }
 }

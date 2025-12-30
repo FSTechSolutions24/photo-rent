@@ -2,18 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Client;
+use Carbon\Carbon;
 use App\Models\Gallery;
-use Illuminate\Support\Str;
+use App\Models\Session;
 use App\Models\Photographer;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
-use Yajra\DataTables\Facades\DataTables;
-use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Yajra\DataTables\Facades\DataTables;
 
-class GalleryController extends Controller
+class SessionController extends Controller
 {
     //
     public function show(Request $request, $photographer_subdomain, $client_name, $gallery_slug)
@@ -68,37 +67,31 @@ class GalleryController extends Controller
     }
 
     public function index(){
-        return view('dashboard.galleries.index');
+        return view('dashboard.sessions.index');
     }
 
     public function getData(){
     
         $photographer = Auth::user()->photographer;
-        $galleries = $photographer
-            ? $photographer->galleries()->with('client')->get()
-            : collect();
+        $sessions = $photographer ? $photographer->sessions()->with('client')->get() : collect();
 
-        return DataTables::of($galleries)
-        ->addColumn('is_public', function ($model) {
-            return $model->is_public == '1' ? 'Yes' : 'No';
-        })
+        return DataTables::of($sessions)
         ->addColumn('actions', function ($model) {
 
-            $editUrl = route('dashboard.galleries.edit', $model->id);
+            $editUrl = route('dashboard.sessions.edit', $model->id);
 
             $buffer = '<a href="'.$editUrl.'" class="btn btn-sm btn-outline-primary">
                 <i class="fas fa-edit"></i>
             </a>';
-
-            $folderUrl = route('dashboard.galleries.folders.index', [
-                'gallery' => $model->id,
-            ]);
-
-            $buffer .= '<a href="'.$folderUrl.'" class="btn btn-sm btn-outline-success" style="margin-left: 10px;">
-                <i class="fas fa-cogs"></i>
-            </a>';
             
             return $buffer;
+        })
+        // Add a client_name column instead of overriding client_id
+        ->editColumn('date', function ($model) {
+            return Carbon::parse($model->date)->format('d/m/Y H:i');
+        })
+        ->addColumn('client_name', function ($model) {
+            return $model->client ? $model->client->name : '-';
         })
         ->addIndexColumn()
         ->rawColumns(['actions'])
@@ -107,54 +100,53 @@ class GalleryController extends Controller
     }
     
     public function edit($id){
-        $gallery = Gallery::findOrFail($id);
+        $session = Session::findOrFail($id);
         $clients = auth()->user()->photographer->clients;
-        $gallery->client_password = Crypt::decryptString($gallery->client_password);
-        $gallery->guest_password = Crypt::decryptString($gallery->guest_password);
-        return view('dashboard.galleries.edit', compact('gallery','clients'));   
+        return view('dashboard.sessions.edit', compact('session','clients'));   
     }
 
-    protected function validateGallery(Request $request, $id = null){
+    protected function validateSession(Request $request, $id = null){
+        $photographer_id = Photographer::where('user_id', Auth::id())->first()->id;
         return $request->validate([
             'name' => 'required|string|max:255',
-            'client_password' => ['required', 'string', 'min:6', 'different:guest_password'],
-            'guest_password' => ['required', 'string', 'min:6', 'different:client_password'],
-            'thumbnail' => 'nullable|image|max:2048',
-            'is_public' => ['nullable', 'in:0,1'],
+            'phone' => [
+                'required',
+                'regex:/^(?:\+20|0)?1[0125][0-9]{8}$/',
+                Rule::unique('clients', 'phone')->where('photographer_id', Auth::id())->ignore($id, 'id'),
+            ],
+            'date' => ['required', 'date_format:Y-m-d H:i:s'],
+            'client_id' => [
+                'nullable',
+                'integer',
+                Rule::exists('clients', 'id')->where('photographer_id', $photographer_id),
+            ],
+            'total_amount' => ['nullable','numeric','regex:/^\d+(\.\d{1,2})?$/'],
         ]);
     }
 
     public function create()
     {
         $clients = auth()->user()->photographer->clients;
-        return view('dashboard.galleries.create', compact('clients'));
+        return view('dashboard.sessions.create', compact('clients'));
     }
 
-    public function update(Request $request, Gallery $gallery){
-        $data = $this->validateGallery($request);
+    public function update(Request $request, Session $session){
+        $data = $this->validateSession($request);
 
-        $data = $this->prepare_gallery_data($data);
-
-        $gallery->update($data);
+        $session->update($data);
         
-        $this->update_gallery_thumbnail($request, $gallery);
-
-        return redirect()->route('dashboard.galleries.index')->with('success', 'Client updated successfully.');
+        return redirect()->route('dashboard.sessions.index')->with('success', 'Session updated successfully.');
     }
 
     public function store(Request $request)
     {
-        $data = $this->validateGallery($request);
+        $data = $this->validateSession($request);
 
         $data['photographer_id'] = Photographer::where('user_id', Auth::id())->first()->id;
-
-        $data = $this->prepare_gallery_data($data);
         
-        $gallery = Gallery::create($data);
+        Session::create($data);
 
-        $this->update_gallery_thumbnail($request, $gallery);
-
-        return redirect()->route('dashboard.galleries.index')->with('success', 'Gallery created successfully.');
+        return redirect()->route('dashboard.sessions.index', $data['client_id'])->with('success', 'Session created successfully.');
     }
 
     public function update_gallery_thumbnail(Request $request, $gallery){
@@ -174,18 +166,4 @@ class GalleryController extends Controller
         }
     }
 
-    public function prepare_gallery_data(array $data){
-
-        // Prepare other fields
-        $data['slug'] = Str::slug($data['name']) ?: Str::random(8);
-        $data['client_password'] = Crypt::encryptString($data['client_password']);
-        $data['guest_password'] = Crypt::encryptString($data['guest_password']);
-
-        return $data;
-    }
-
-    private function authorizeClient(Client $client)
-    {
-        abort_if($client->photographer_id !== Auth::id(), 403);
-    }
 }

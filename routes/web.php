@@ -7,6 +7,7 @@ use App\Http\Controllers\ClientController;
 use App\Http\Controllers\FolderController;
 use App\Http\Controllers\GalleryController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\SessionController;
 use App\Http\Controllers\SubscriptionPlanController;
 
 /*
@@ -36,6 +37,10 @@ Route::middleware(['auth', 'photographer'])->prefix('dashboard')->name('dashboar
     // Galleries (nested under client)
     Route::get('galleries/data', [GalleryController::class, 'getData'])->name('galleries.data');
     Route::resource('galleries', GalleryController::class);
+    
+    // Session
+    Route::get('sessions/data', [SessionController::class, 'getData'])->name('sessions.data');
+    Route::resource('sessions', SessionController::class);
 
     // Folders (nested under gallery)
     Route::post('/api/galleries/{gallery}/folders/{folder}/media', [FolderController::class, 'listJsonMedia'])->name('api.galleries.folders.media');
