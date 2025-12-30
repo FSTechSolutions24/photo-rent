@@ -17,53 +17,7 @@ class SessionController extends Controller
     //
     public function show(Request $request, $photographer_subdomain, $client_name, $gallery_slug)
     {
-        // 1️⃣ Fetch photographer by subdomain
-        $photographer = Photographer::where('subdomain', $photographer_subdomain)->firstOrFail();
 
-        // 2️⃣ Find the client under this photographer
-        $client = $photographer->clients()->where('name', $client_name)->firstOrFail();
-
-        // 3️⃣ Get the gallery with folders and images
-        $gallery = $client->galleries()
-            ->where('slug', $gallery_slug)
-            ->with(['folders.media', 'media'])
-            ->firstOrFail();
-
-        // 4️⃣ Password protection logic
-        $sessionKey = 'access_granted_' . $gallery->id;
-
-        // If access is not already granted
-        if (!session($sessionKey)) {
-
-            // Handle password form submission (POST)
-            if ($request->isMethod('post')) {
-
-                $request->validate([
-                    'password' => 'required|string'
-                ]);
-
-                // Check password match (assuming $gallery->password is hashed)
-                // if (!Hash::check($request->password, $gallery->password)) {
-                //     return back()->withErrors(['password' => 'Incorrect password.'])->withInput();
-                // }
-
-                // $password = Crypt::decryptString($gallery->client_password);
-
-                if (($request->password != $gallery->password)) {
-                    return back()->withErrors(['password' => 'Incorrect password.'])->withInput();
-                }
-
-                // Password correct → grant access
-                session([$sessionKey => true]);
-
-            } else {
-                // No access yet → show password page
-                return view('dashboard.galleries.password', compact('gallery', 'photographer', 'client'));
-            }
-        }
-
-        // 5️⃣ Access granted → show gallery
-        return view('dashboard.galleries.show', compact('gallery', 'photographer', 'client'));
     }
 
     public function index(){
@@ -147,23 +101,6 @@ class SessionController extends Controller
         Session::create($data);
 
         return redirect()->route('dashboard.sessions.index', $data['client_id'])->with('success', 'Session created successfully.');
-    }
-
-    public function update_gallery_thumbnail(Request $request, $gallery){
-        // Handle thumbnail upload
-        if ($request->hasFile('thumbnail_path')) {
-
-            // 1. Delete old thumbnail if it exists
-            if ($gallery->thumbnail_path && Storage::disk('public')->exists($gallery->thumbnail_path)) {
-                Storage::disk('public')->delete($gallery->thumbnail_path);
-            }
-
-            // Store file locally under /storage/app/thumbnails/{gallery_id}
-            $thumbnailPath = $request->file('thumbnail_path')->store("galleries/{$gallery->id}/thumbnail", 'public'); // 'local' can later be changed to 's3' or 'wasabi'
-            // Update the gallery model
-            $gallery->thumbnail_path = $thumbnailPath;
-            $gallery->save();
-        }
     }
 
 }
