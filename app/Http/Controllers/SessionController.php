@@ -6,15 +6,18 @@ use Carbon\Carbon;
 use App\Models\Gallery;
 use App\Models\Session;
 use App\Models\Photographer;
+use App\Models\SessionFinance;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Yajra\DataTables\Facades\DataTables;
+use App\Traits\HelperTrait;
 
 class SessionController extends Controller
 {
-    //
+    use HelperTrait;
+
     public function show(Request $request, $photographer_subdomain, $client_name, $gallery_slug)
     {
 
@@ -54,8 +57,9 @@ class SessionController extends Controller
     }
     
     public function edit($id){
-        $session = Session::findOrFail($id);
+        $session = Session::with('finance')->findOrFail($id);
         $clients = auth()->user()->photographer->clients;
+        
         return view('dashboard.sessions.edit', compact('session','clients'));   
     }
 
@@ -88,6 +92,12 @@ class SessionController extends Controller
         $data = $this->validateSession($request);
 
         $session->update($data);
+
+        $data = ($request->all());
+
+        $items_array = json_decode($data['items'], true); 
+
+        $this->storeDynamicTableRecords(SessionFinance::class,'session_id',$session->id,$items_array);
         
         return redirect()->route('dashboard.sessions.index')->with('success', 'Session updated successfully.');
     }

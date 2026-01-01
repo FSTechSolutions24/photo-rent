@@ -2,8 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\SessionFinance;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Session extends Model
 {
@@ -14,5 +15,10 @@ class Session extends Model
     public function client()
     {
         return $this->belongsTo(Client::class);
+    }
+
+    public function finance()
+    {
+        return $this->hasMany(SessionFinance::class);
     }
 }

@@ -39,7 +39,7 @@
         @enderror
     </div>
 
-    <div class="mt-3">
+    <div class="mt-3 table-responsive">
         <br>
         <table id="tblAppendGrid"></table>    
         <input type="hidden" name="items" id="appendGridData">
@@ -56,8 +56,20 @@
                 uiFramework: "bootstrap4",
                 iconFramework: "fontawesome5",
                 columns: [
-                    { name: "feature_name", display: "Feature Name" },
-                    { name: "description", display: "Description" },
+                    { 
+                        name: "feature_name", 
+                        display: "Feature Name",
+                        ctrlCss: {
+                            "min-width": "120px"
+                        }
+                    },
+                    { 
+                        name: "description", 
+                        display: "Description",
+                        ctrlCss: {
+                            "min-width": "120px"
+                        } 
+                    },
                     {
                         name: "is_included",
                         display: "Status",
