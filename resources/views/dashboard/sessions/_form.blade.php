@@ -65,6 +65,18 @@
                 uiFramework: "bootstrap4",
                 iconFramework: "fontawesome5",
                 columns: [
+                    {
+                        name: "credit_debit",
+                        display: "Credit / Debit",
+                        type: "select",
+                        ctrlOptions: {
+                            credit: "Credit",
+                            debit: "Debit"
+                        },
+                        ctrlCss: {
+                            "min-width": "120px"
+                        }
+                    },
                     { 
                         name: "name", 
                         display: "Name",
@@ -82,19 +94,7 @@
                         ctrlCss: {
                             "min-width": "120px"
                         }
-                    },
-                    {
-                        name: "credit_debit",
-                        display: "Credit / Debit",
-                        type: "select",
-                        ctrlOptions: {
-                            credit: "Credit",
-                            debit: "Debit"
-                        },
-                        ctrlCss: {
-                            "min-width": "120px"
-                        }
-                    },
+                    },                    
                     {
                         name: "date",
                         display: "Date", 
