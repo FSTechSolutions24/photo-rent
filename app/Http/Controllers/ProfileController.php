@@ -122,4 +122,8 @@ class ProfileController extends Controller
 
     }
 
+    public function profile_settings(){
+        return view('dashboard.profile.settings');
+    }
+
 }

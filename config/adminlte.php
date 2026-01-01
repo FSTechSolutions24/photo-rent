@@ -331,7 +331,7 @@ return [
         // ['header' => 'account_settings'],
         [
             'text' => 'profile',
-            'url' => 'dashboard/profile/create',
+            'url' => 'photographer/profile/settings',
             'icon' => 'fas fa-fw fa-user',
         ],
         [

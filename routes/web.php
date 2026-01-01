@@ -26,8 +26,9 @@ Route::get('/', function () {
 });
 
 
-
-
+Route::middleware(['auth', 'photographer'])->prefix('photographer')->name('photographer.')->group(function () {
+    Route::get('profile/settings', [ProfileController::class, 'profile_settings'])->name('profile.settings');
+});
 
 Route::middleware(['auth', 'photographer'])->prefix('dashboard')->name('dashboard.')->group(function () {
     // Clients
