@@ -437,6 +437,23 @@ return [
                 ],                
             ],
         ],
+        [
+            'text' => 'Scheduling',
+            'icon' => 'far fa-calendar-alt',
+            'can' => 'has-photographer',
+            'submenu' => [
+                [
+                    'text' => 'calendar',
+                    'url' => 'photographer/appointments',
+                    'icon'=> 'far fa-calendar-check'
+                ],                
+                [
+                    'text' => 'book_appointment',
+                    'url' => 'photographer/appointments/create',
+                    'icon'=>'far fa-calendar-plus'
+                ],                
+            ],
+        ],
     ],
 
     /*

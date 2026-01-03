@@ -8,6 +8,7 @@ use App\Http\Controllers\FolderController;
 use App\Http\Controllers\GalleryController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SessionController;
+use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\SubscriptionPlanController;
 
 /*
@@ -25,9 +26,10 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-
 Route::middleware(['auth', 'photographer'])->prefix('photographer')->name('photographer.')->group(function () {
     Route::get('profile/settings', [ProfileController::class, 'profile_settings'])->name('profile.settings');
+    Route::get('calendar/preview', [ProfileController::class, 'calendar'])->name('my.calendar');
+    Route::resource('appointments', AppointmentController::class);
 });
 
 Route::middleware(['auth', 'photographer'])->prefix('dashboard')->name('dashboard.')->group(function () {

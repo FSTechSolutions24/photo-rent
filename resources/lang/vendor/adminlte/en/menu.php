@@ -21,6 +21,8 @@ return [
     'add_client'=>'Add Client',
     'clients'=>'Client',
     'add_gallery'=>'Add Gallery',
+    'calendar'=>'Calendar',
+    'book_appointment'=>'Book Appointment',
     'view_galleries'=>'View Galleries',
     'add_session'=>'Add Session',
     'view_sessions'=>'View Sessions',
