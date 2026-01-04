@@ -40007,6 +40007,11 @@ __webpack_require__.r(__webpack_exports__);
       this.$emit('folder-selected', folder);
       _eventBus__WEBPACK_IMPORTED_MODULE_0__["default"].emit('folder-selected-action', folder);
     },
+    unSelectFolder: function unSelectFolder() {
+      this.selectedFolderId = null;
+      // this.$emit('folder-selected', folder);
+      // emitter.emit('folder-selected-action', folder);
+    },
     deleteFolder: function deleteFolder(folder) {
       var _this3 = this;
       Swal.fire({
@@ -40025,6 +40030,8 @@ __webpack_require__.r(__webpack_exports__);
             _this3.folders = _this3.folders.filter(function (f) {
               return f.id !== folder.id;
             });
+            folder.id = -99999;
+            _this3.unSelectFolder();
             $('#folderModal').modal('hide');
           })["catch"](function (error) {
             Swal.fire('Error', 'Something went wrong while deleting.', 'error');

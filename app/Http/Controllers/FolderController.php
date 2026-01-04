@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Media;
 use App\Models\Folder;
 use App\Models\Gallery;
+use App\Traits\HelperTrait;
 use App\Models\Photographer;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -15,6 +16,7 @@ use Yajra\DataTables\Facades\DataTables;
 class FolderController extends Controller
 {
 
+    use HelperTrait;
     public function store(Request $request, Gallery $gallery)
     {
         $this->authorizeGallery($gallery);
@@ -145,17 +147,47 @@ class FolderController extends Controller
         if (Storage::disk('public')->exists($folderPath)) {
             Storage::disk('public')->deleteDirectory($folderPath);
         }
- 
-        // NEED TO DELETED FROM MEDIA TABLE
- 
+        
+        // Delete linked media records
+        $this->delete_folder_media($gallery->id, $folder->id);
+        
         // Delete DB record
         $folder->delete();
-
-        // Delete linked media records
-        Media::where('gallery_id', $gallery->id)->where('folder_id', $folder->id)->delete();
  
         return response()->json(['message' => 'Folder and its contents deleted successfully']);
     }
+
+    public function delete_folder_media($gallery_id, $folder_id)
+    {
+        $photographer = Photographer::where('user_id', Auth::id())->first();
+
+        if (! $photographer) {
+            return false;
+        }
+
+        $media = Media::where('gallery_id', $gallery_id)->where('folder_id', $folder_id)->get();
+
+        $totalSize = 0;
+
+        foreach ($media as $single_media) {
+
+            $mediaPath = $single_media->path;
+
+            if (Storage::disk('public')->exists($mediaPath)) {
+                Storage::disk('public')->delete($mediaPath);
+            }
+
+            $totalSize += $single_media->size;
+
+            $single_media->delete();
+        }
+
+        $photographer->available_storage += $totalSize;
+        $photographer->save();
+
+        return true;
+    }
+
 
     public function listJsonMedia($galleryId, $folderId)
     {
