@@ -14,6 +14,7 @@ export default {
     mounted() {
         this.initDropzone();
         emitter.on('folder-selected-action', this.handleFolderAction);
+        emitter.on('folder-unselected-action', this.handleUnSelectFolderAction);
     },
 
     methods: {
@@ -27,6 +28,11 @@ export default {
                 this.dropzone.disable();
                 if (messageElement) messageElement.innerHTML = ' <i class="fas fa-ban dropzone-icon"></i> Please select a folder before uploading';
             }
+        },
+        handleUnSelectFolderAction(){
+            this.dropzone.disable();
+            const messageElement = this.$refs.dropzone.querySelector('.dz-message');
+            messageElement.innerHTML = ' <i class="fas fa-ban dropzone-icon"></i> Please select a folder before uploading';
         },
         initDropzone() {
             Dropzone.autoDiscover = false;

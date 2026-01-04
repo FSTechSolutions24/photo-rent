@@ -31,6 +31,7 @@
                 this.initDataTable();
             }
             emitter.on('folder-selected-action', this.handleFolderAction);
+            emitter.on('folder-unselected-action', this.handleUnSelectFolderAction);
             emitter.on('media-uploaded', this.reloadTable);
             window.deleteMedia = this.deleteMedia;
         },
@@ -74,6 +75,11 @@
             getApiUrl() {
                 // dynamically build the correct route inside Vue
                 return `/dashboard/api/galleries/${this.galleryId}/folders/${this.currentFolderId}/media`;
+            },
+            handleUnSelectFolderAction() {
+                this.selectedFolderId = null;
+                this.currentFolderId = null;
+                this.currentFolderName = null;
             },
             handleFolderAction(folder) {
                 this.currentFolderId = folder.id;
