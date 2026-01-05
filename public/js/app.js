@@ -39722,6 +39722,7 @@ __webpack_require__.r(__webpack_exports__);
   mounted: function mounted() {
     this.initDropzone();
     _eventBus__WEBPACK_IMPORTED_MODULE_2__["default"].on('folder-selected-action', this.handleFolderAction);
+    _eventBus__WEBPACK_IMPORTED_MODULE_2__["default"].on('folder-unselected-action', this.handleUnSelectFolderAction);
   },
   methods: {
     handleFolderAction: function handleFolderAction(folder) {
@@ -39734,6 +39735,11 @@ __webpack_require__.r(__webpack_exports__);
         this.dropzone.disable();
         if (messageElement) messageElement.innerHTML = ' <i class="fas fa-ban dropzone-icon"></i> Please select a folder before uploading';
       }
+    },
+    handleUnSelectFolderAction: function handleUnSelectFolderAction() {
+      this.dropzone.disable();
+      var messageElement = this.$refs.dropzone.querySelector('.dz-message');
+      messageElement.innerHTML = ' <i class="fas fa-ban dropzone-icon"></i> Please select a folder before uploading';
     },
     initDropzone: function initDropzone() {
       var _this$currentFolderId,
@@ -40044,6 +40050,12 @@ __webpack_require__.r(__webpack_exports__);
       this.$emit('folder-selected', folder);
       _eventBus__WEBPACK_IMPORTED_MODULE_0__["default"].emit('folder-selected-action', folder);
     },
+    unSelectFolder: function unSelectFolder() {
+      this.selectedFolderId = null;
+      this.currentFolderId = null;
+      this.currentFolderName = null;
+      _eventBus__WEBPACK_IMPORTED_MODULE_0__["default"].emit('folder-unselected-action');
+    },
     deleteFolder: function deleteFolder(folder) {
       var _this3 = this;
       Swal.fire({
@@ -40062,6 +40074,7 @@ __webpack_require__.r(__webpack_exports__);
             _this3.folders = _this3.folders.filter(function (f) {
               return f.id !== folder.id;
             });
+            _this3.unSelectFolder();
             $('#folderModal').modal('hide');
           })["catch"](function (error) {
             Swal.fire('Error', 'Something went wrong while deleting.', 'error');
@@ -40098,6 +40111,7 @@ __webpack_require__.r(__webpack_exports__);
       this.initDataTable();
     }
     _eventBus__WEBPACK_IMPORTED_MODULE_0__["default"].on('folder-selected-action', this.handleFolderAction);
+    _eventBus__WEBPACK_IMPORTED_MODULE_0__["default"].on('folder-unselected-action', this.handleUnSelectFolderAction);
     _eventBus__WEBPACK_IMPORTED_MODULE_0__["default"].on('media-uploaded', this.reloadTable);
     window.deleteMedia = this.deleteMedia;
   },
@@ -40144,6 +40158,11 @@ __webpack_require__.r(__webpack_exports__);
     getApiUrl: function getApiUrl() {
       // dynamically build the correct route inside Vue
       return "/dashboard/api/galleries/".concat(this.galleryId, "/folders/").concat(this.currentFolderId, "/media");
+    },
+    handleUnSelectFolderAction: function handleUnSelectFolderAction() {
+      this.selectedFolderId = null;
+      this.currentFolderId = null;
+      this.currentFolderName = null;
     },
     handleFolderAction: function handleFolderAction(folder) {
       this.currentFolderId = folder.id;
@@ -87232,9 +87251,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _components_MediaTable_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./components/MediaTable.vue */ "./resources/js/components/MediaTable.vue");
 /* harmony import */ var _components_Calendar_vue__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./components/Calendar.vue */ "./resources/js/components/Calendar.vue");
 /* harmony import */ var _components_DynamicTable_vue__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./components/DynamicTable.vue */ "./resources/js/components/DynamicTable.vue");
+/* harmony import */ var _eventBus__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./eventBus */ "./resources/js/eventBus.js");
 
 
 
+
+ // Adjust path as needed
 
 function registerVueApp(app) {
   app.mixin({
@@ -87245,6 +87267,9 @@ function registerVueApp(app) {
         sidebarCollapsed: false
       };
     },
+    mounted: function mounted() {
+      _eventBus__WEBPACK_IMPORTED_MODULE_4__["default"].on('folder-unselected-action', this.handleUnSelectFolderAction);
+    },
     methods: {
       setCurrentFolder: function setCurrentFolder(folder) {
         this.currentFolderId = folder.id;
@@ -87252,6 +87277,11 @@ function registerVueApp(app) {
       },
       toggleSidebar: function toggleSidebar() {
         this.sidebarCollapsed = !this.sidebarCollapsed;
+      },
+      handleUnSelectFolderAction: function handleUnSelectFolderAction() {
+        this.selectedFolderId = null;
+        this.currentFolderId = null;
+        this.currentFolderName = null;
       }
     }
   });

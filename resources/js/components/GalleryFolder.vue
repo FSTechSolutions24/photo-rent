@@ -215,6 +215,12 @@ export default {
             this.$emit('folder-selected', folder);
             emitter.emit('folder-selected-action', folder);
         },
+        unSelectFolder() {
+            this.selectedFolderId = null;
+            this.currentFolderId = null;
+            this.currentFolderName = null;
+            emitter.emit('folder-unselected-action');
+        },
         deleteFolder(folder){
             Swal.fire({
                 title: 'Are you sure?',
@@ -231,6 +237,7 @@ export default {
                     .then(response => {
                         Swal.fire('Deleted!', 'The folder has been deleted.', 'success');
                         this.folders = this.folders.filter(f => f.id !== folder.id);
+                        this.unSelectFolder();
                         $('#folderModal').modal('hide');
                     })
                     .catch(error => {

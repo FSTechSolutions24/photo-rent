@@ -86,12 +86,12 @@ class AppointmentController extends Controller
             ],
             'start_time' => [
                 'required',
-                'date_format:H:i:s', // ensures time format like 14:30:00
+                'date_format:H:i', // ensures time format like 14:30:00
             ],
             'end_time' => [
                 'nullable',
-                'date_format:H:i:s', // optional, but must be in H:i:s format if provided
-                'after:start_time', // ensures end_time is after start_time if provided
+                'date_format:H:i', // optional, but must be in H:i:s format if provided
+                // 'after:start_time', // ensures end_time is after start_time if provided
             ],
         ]);
     }
