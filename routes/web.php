@@ -1,6 +1,5 @@
 <?php
 
-use App\Models\SubscriptionPlan;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\MediaController;
 use App\Http\Controllers\ClientController;
