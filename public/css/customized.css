@@ -198,3 +198,6 @@ input[type="checkbox"] {
     height: 18px;
     cursor: pointer;
 }
+.calendar a {
+    color: #073b74 !important;
+}

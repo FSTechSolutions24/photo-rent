@@ -11,26 +11,38 @@ const calendarOptions = {
     plugins: [dayGridPlugin, timeGridPlugin],
     initialView: 'dayGridMonth',
     headerToolbar: {
-    left: 'prev,next today',
-    center: 'title',
-    right: 'dayGridMonth,timeGridWeek,timeGridDay'
+        left: 'prev,next today',
+        center: 'title',
+        right: 'dayGridMonth,timeGridWeek,timeGridDay'
     },
-    events: [
-        {
-            title: 'Vue Event',
-            start: '2026-01-05',
-            backgroundColor: '#28a745', // green
-            borderColor: '#28a745',
-            textColor: '#ffffff'
-        },
-        {
-            title: 'AdminLTE Meeting',
-            start: '2026-01-10',
-            backgroundColor: '#007bff', // blue
-            borderColor: '#007bff',
-            textColor: '#ffffff'
+    eventClick: function(info) {
+        // prevent FullCalendar default behavior
+        info.jsEvent.preventDefault()
+
+        // example: open appointment details page
+        const appointmentId = info.event.id
+        window.location.href = `/photographer/appointments/${appointmentId}/edit`
+    },
+    eventMouseEnter(info) {
+        info.el.style.cursor = 'pointer'
+    },
+    events: async (info, successCallback, failureCallback) => {
+        try {
+            const response = await axios.get('/photographer/appointments/data')
+            successCallback(
+                response.data.map(event => ({
+                    id: event.id,
+                    title: event.name,
+                    start: event.date,
+                    backgroundColor: '#073b74',
+                    borderColor: '#073b74',
+                    textColor: '#ffffff'
+                }))
+            )
+        } catch (error) {
+            failureCallback(error)
         }
-    ]
+    }
 
 };
 </script>

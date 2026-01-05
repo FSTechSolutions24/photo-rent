@@ -29,6 +29,8 @@ Route::get('/', function () {
 Route::middleware(['auth', 'photographer'])->prefix('photographer')->name('photographer.')->group(function () {
     Route::get('profile/settings', [ProfileController::class, 'profile_settings'])->name('profile.settings');
     Route::get('calendar/preview', [ProfileController::class, 'calendar'])->name('my.calendar');
+
+    Route::get('appointments/data', [AppointmentController::class, 'getData'])->name('appointments.data');
     Route::resource('appointments', AppointmentController::class);
 });
 

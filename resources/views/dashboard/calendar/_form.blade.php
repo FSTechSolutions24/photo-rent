@@ -19,7 +19,15 @@
 
 <div class="mb-3">
     <label class="form-label">Session:</label>
-    <input type="text" name="session_id" value="{{ old('session_id', $appointment->session_id ?? '') }}" class="input form-control" autocomplete="false">
+    <select name="session_id" class="form-control select2" value="{{ old('session_id', $appointment->session_id ?? '') }}">
+        <option value=""></option>
+        @foreach ($sessions as $session)
+            <option value="{{ $session->id }}"
+                {{ (old('session_id', $appointment->session_id ?? '') == $session->id) ? 'selected' : '' }}>
+                {{ $session->name }}
+            </option>
+        @endforeach
+    </select>
     @error('session_id')
         <small class="text-danger">{{ $message }}</small>
     @enderror

@@ -22,7 +22,15 @@ class AppointmentController extends Controller
 
     public function create()
     {
-        return view('dashboard.calendar.create');
+        $sessions = auth()->user()->photographer->sessions;
+        return view('dashboard.calendar.create', compact('sessions'));
+    }
+
+    public function edit($id){
+        $appointment = Appointment::findOrFail($id);
+        $sessions = auth()->user()->photographer->sessions;
+        
+        return view('dashboard.calendar.edit', compact('appointment','sessions'));   
     }
 
     public function store(Request $request)
@@ -32,6 +40,15 @@ class AppointmentController extends Controller
         Appointment::create($data);
 
         return redirect()->route('photographer.appointments.index')->with('success', 'Appointment created successfully.');
+    }
+
+    public function update(Request $request, Appointment $appointment)
+    {
+        $data = $this->validateAppointment($request, $appointment->id);
+
+        $appointment->update($data);
+
+        return redirect()->route('photographer.appointments.index')->with('Appointment', 'Plan updated successfully.');
     }
 
     public function show(Client $client)
@@ -151,6 +168,10 @@ class AppointmentController extends Controller
 
     public function appointment_booking(){
         return view('dashboard.calendar.appointment_booking');
+    }
+
+    public function getData(){
+        return Appointment::select('id','name','date')->get();
     }
 
 }
