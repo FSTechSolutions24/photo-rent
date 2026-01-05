@@ -2,14 +2,25 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Appointment extends Model
 {
     use HasFactory;
 
     protected $fillable = ['session_id', 'name', 'description', 'date', 'start_time', 'end_time'];
+
+    public function getStartTimeAttribute($value)
+    {
+        return Carbon::parse($value)->format('H:i');
+    }
+
+    public function getEndTimeAttribute($value)
+    {
+        return Carbon::parse($value)->format('H:i');
+    }
 
     public function session()
     {
