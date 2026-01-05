@@ -39622,6 +39622,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
     var calendarOptions = {
       plugins: [_fullcalendar_daygrid__WEBPACK_IMPORTED_MODULE_1__["default"], _fullcalendar_timegrid__WEBPACK_IMPORTED_MODULE_2__["default"]],
       initialView: 'dayGridMonth',
+      contentHeight: 700,
       headerToolbar: {
         left: 'prev,next today',
         center: 'title',

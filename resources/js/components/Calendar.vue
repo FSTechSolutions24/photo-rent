@@ -10,6 +10,7 @@ import timeGridPlugin from '@fullcalendar/timegrid';
 const calendarOptions = {
     plugins: [dayGridPlugin, timeGridPlugin],
     initialView: 'dayGridMonth',
+    contentHeight: 700,
     headerToolbar: {
         left: 'prev,next today',
         center: 'title',
