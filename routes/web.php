@@ -26,6 +26,7 @@ Route::get('/', function () {
 });
 
 Route::middleware(['auth', 'photographer'])->prefix('photographer')->name('photographer.')->group(function () {
+    Route::put('profile/update', [ProfileController::class, 'profile_update'])->name('profile.update');
     Route::get('profile/settings', [ProfileController::class, 'profile_settings'])->name('profile.settings');
     Route::get('calendar/preview', [ProfileController::class, 'calendar'])->name('my.calendar');
 

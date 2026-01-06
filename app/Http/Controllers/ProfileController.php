@@ -1,12 +1,15 @@
 <?php
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
+use App\Models\User;
 use App\Models\Client;
 use App\Models\Photographer;
-use App\Models\SubscriptionPlan;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
+use App\Models\SubscriptionPlan;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
 
@@ -16,6 +19,31 @@ class ProfileController extends Controller
     public function index()
     {
         
+    }
+
+    public function profile_update(Request $request)
+    {
+        $user = auth()->user();
+
+        // ✅ Validation
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->id)],
+            'password' => ['nullable', 'string', 'min:8', 'confirmed'],
+        ]);
+
+        // ✅ Update basic fields
+        $user->name  = $validated['name'];
+        $user->email = $validated['email'];
+
+        // ✅ Update password ONLY if provided
+        if ($request->filled('password')) {
+            $user->password = Hash::make($request->password);
+        }
+
+        $user->save();
+
+        return redirect()->back()->with('success', 'Profile updated successfully.');
     }
 
     public function create()
@@ -123,7 +151,8 @@ class ProfileController extends Controller
     }
 
     public function profile_settings(){
-        return view('dashboard.profile.settings');
+        $user = Auth::user();
+        return view('dashboard.profile.settings', compact('user'));
     }
 
 }
