@@ -81,8 +81,10 @@ class FolderController extends Controller
         // Get uploaded file
         $file = $request->file('file');
 
+        $userid = Auth::user()->id;
+
         // Define a path, e.g. galleries/{galleryId}/{folderId}/
-        $path = "galleries/{$galleryId}/folders/{$folderId}/media";
+        $path = "users/{$userid}/galleries/{$galleryId}/folders/{$folderId}/media";
 
         // Store file in the public disk
         $storedPath = $file->store($path, 'public');

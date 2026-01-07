@@ -26,8 +26,9 @@ class MediaController extends Controller
             'photo' => 'required|image|max:10240', // 10MB per file
         ]);
 
+        $userid = Auth::user()->id;
         $path = $request->file('photo')->store(
-            "galleries/{$gallery->id}/" . ($validated['folder_id'] ?? 'root'),
+            "users/{$userid}/galleries/{$gallery->id}/" . ($validated['folder_id'] ?? 'root'),
             's3'
         );
 
