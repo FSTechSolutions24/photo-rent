@@ -18,7 +18,7 @@
                        placeholder="you@example.com"
                        required autofocus>
             </div>
-        </div>
+        </div>        
 
         {{-- Password --}}
         <div class="form-group mb-4">
@@ -33,19 +33,11 @@
             </div>
         </div>
 
-        {{-- Remember --}}
-        {{-- <div class="d-flex justify-content-between align-items-center mb-4">
-            <div class="icheck-primary">
-                <input type="checkbox" id="remember" name="remember">
-                <label for="remember">Remember me</label>
+        @error('email')
+            <div class="text-danger">
+                {{ $message }}
             </div>
-
-            @if (Route::has('password.request'))
-                <a href="{{ route('password.request') }}" class="text-sm text-primary">
-                    Forgot password?
-                </a>
-            @endif
-        </div> --}}
+        @enderror
 
         {{-- Submit --}}
         <button type="submit" class="btn btn-primary btn-lg w-100 shadow-sm sign-in-btn">
@@ -191,6 +183,10 @@
         min-height: 100%;
     }
     
+}
+
+.text-danger {
+    color: #f94747 !important;
 }
 
 </style>
