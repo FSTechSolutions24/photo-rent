@@ -18,13 +18,16 @@
 
                     <ul class="list-group list-group-unbordered mb-3">
                         <li class="list-group-item">
-                            <b>Followers</b> <a class="float-right">1,322</a>
+                            <b>Clients</b> <a class="float-right">{{ $data['client_count'] }}</a>
                         </li>
                         <li class="list-group-item">
-                            <b>Following</b> <a class="float-right">543</a>
+                            <b>Galleries</b> <a class="float-right">{{ $data['gallery_count'] }}</a>
                         </li>
                         <li class="list-group-item">
-                            <b>Friends</b> <a class="float-right">13,287</a>
+                            <b>Sessions</b> <a class="float-right">{{ $data['session_count'] }}</a>
+                        </li>
+                        <li class="list-group-item">
+                            <b>Storage</b> <a class="float-right">{{ $data['available_storage'] }} / {{ $data['plan_storage'] }}</a>
                         </li>
                     </ul>
 

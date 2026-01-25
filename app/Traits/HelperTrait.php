@@ -65,4 +65,16 @@ trait HelperTrait
 
         return true;
     }
+
+    public function convert_storage($size){
+        if ($size >= 1073741824) { // 1 GB
+            return number_format($size / 1073741824, 2) . ' GB';
+        } elseif ($size >= 1048576) { // 1 MB
+            return number_format($size / 1048576, 2) . ' MB';
+        } elseif ($size >= 1024) { // 1 KB
+            return number_format($size / 1024, 2) . ' KB';
+        } else {
+            return $size . ' bytes';
+        }
+    }
 }

@@ -3,6 +3,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\Client;
+use App\Traits\HelperTrait;
 use App\Models\Photographer;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -13,9 +14,10 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
 
-
 class ProfileController extends Controller
 {
+    use HelperTrait;
+
     public function index()
     {
         
@@ -150,9 +152,32 @@ class ProfileController extends Controller
 
     }
 
+    public function get_session_count($photographer){
+        return (count($photographer->sessions));
+    }
+
+    public function get_gallery_count($photographer){
+        return (count($photographer->galleries));
+    }
+
+    public function get_client_count($photographer){
+        return (count($photographer->clients));
+    }
+
+    public function prepare_user_data($user){
+        $photographer = $user->photographer;
+        $data['available_storage'] = $this->convert_storage($photographer->available_storage);
+        $data['plan_storage'] = $this->convert_storage($photographer->plan_storage);
+        $data['session_count'] = $this->get_session_count($photographer);
+        $data['gallery_count'] = $this->get_gallery_count($photographer);
+        $data['client_count'] = $this->get_client_count($photographer);
+        return $data;
+    }
+
     public function profile_settings(){
         $user = Auth::user();
-        return view('dashboard.profile.settings', compact('user'));
+        $data = $this->prepare_user_data($user);
+        return view('dashboard.profile.settings', compact('user','data'));
     }
 
 }
