@@ -10,7 +10,7 @@
         </div>
     @endif
 
-    <form method="POST" action="{{ route('gallery.show', [$photographer->subdomain, $client->name, $gallery->slug]) }}">
+    <form method="POST" action="{{ route('gallery.show', [$photographer->subdomain, $gallery->slug]) }}">
         @csrf
         <input type="password" name="password" placeholder="Enter gallery password"
                class="w-full border rounded-lg px-4 py-2 mb-4 focus:ring focus:ring-blue-300" required>

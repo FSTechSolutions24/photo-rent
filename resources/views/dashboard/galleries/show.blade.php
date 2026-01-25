@@ -1,95 +1,86 @@
-<div class="grid-container">
-  <div>
-    <img class='grid-item grid-item-1' src='https://images.unsplash.com/photo-1544568100-847a948585b9?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=400&fit=max&ixid=eyJhcHBfaWQiOjE0NTg5fQ' alt=''>
-    
-  </div>
-  <div>
-    <img class='grid-item grid-item-10' src='https://images.unsplash.com/photo-1504595403659-9088ce801e29?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=400&fit=max&ixid=eyJhcHBfaWQiOjE0NTg5fQ' alt=''>
-    
-  </div>
-  <div>
-    <img class='grid-item grid-item-3' src='https://images.unsplash.com/photo-1510771463146-e89e6e86560e?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=400&fit=max&ixid=eyJhcHBfaWQiOjE0NTg5fQ' alt=''>
-    
-  </div>
-  <div>
-    <img class='grid-item grid-item-4' src='https://images.unsplash.com/photo-1507146426996-ef05306b995a?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=400&fit=max&ixid=eyJhcHBfaWQiOjE0NTg5fQ' alt=''>
-    
-  </div>
-  <div>
-    <img class='grid-item grid-item-2' src='https://images.unsplash.com/photo-1517423440428-a5a00ad493e8?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=400&fit=max&ixid=eyJhcHBfaWQiOjE0NTg5fQ' alt=''>
-    
-  </div>
-  <div>
-    <img class='grid-item grid-item-5' src='https://images.unsplash.com/photo-1530281700549-e82e7bf110d6?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=400&fit=max&ixid=eyJhcHBfaWQiOjE0NTg5fQ' alt=''>
-    
-  </div>
-
-  <div>
-    <img class='grid-item grid-item-7' src='https://images.unsplash.com/photo-1552053831-71594a27632d?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=400&fit=max&ixid=eyJhcHBfaWQiOjE0NTg5fQ' alt=''>
-    
-  </div>
-  <div>
-    <img class='grid-item grid-item-8' src='https://images.unsplash.com/photo-1518717758536-85ae29035b6d?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=400&fit=max&ixid=eyJhcHBfaWQiOjE0NTg5fQ' alt=''>
-    
-  </div>
-    <div>
-    <img class='grid-item grid-item-6' src='https://images.unsplash.com/photo-1548199973-03cce0bbc87b?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=400&fit=max&ixid=eyJhcHBfaWQiOjE0NTg5fQ' alt=''>
-    
-  </div>
-  <div>
-    <img class='grid-item grid-item-9' src='https://images.unsplash.com/photo-1535930891776-0c2dfb7fda1a?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=400&fit=max&ixid=eyJhcHBfaWQiOjE0NTg5fQ' alt=''>
-    
-  </div>
-  
+<div class="gallery">
+    @foreach ($gallery->folders as $folder)
+        @foreach ($folder->media as $media)
+            <div class="gallery-item">
+                <img src="{{ asset('storage/' . $media->path) }}" alt="">
+            </div>
+        @endforeach
+    @endforeach
 </div>
 
+
 <style>
-    body {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  font-family: sans-serif;
-  background: #000;
-  margin-left: 5px;
-  margin-right: 15px;
+/* Reset-ish */
+* {
+    box-sizing: border-box;
 }
-h1 {
-  color: coral;
-}
-img {
 
+body {
+    margin: 0;
+    background: #0b0b0b;
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    color: #fff;
 }
-.grid-container {
-  columns: 4 200px;
-  column-gap: 0.5rem;
-  width: 100%;
-  margin: 0 auto;
-  div {
-    width: 150px;
-    display: inline-block;
+
+/* Gallery container */
+.gallery {
+    column-count: 1;
+    column-gap: 12px;
+    padding: 12px;
+}
+
+/* Tablet */
+@media (min-width: 640px) {
+    .gallery {
+        column-count: 2;
+    }
+}
+
+/* Small desktop */
+@media (min-width: 900px) {
+    .gallery {
+        column-count: 3;
+    }
+}
+
+/* Large desktop */
+@media (min-width: 1200px) {
+    .gallery {
+        column-count: 4;
+    }
+}
+
+/* Gallery item */
+.gallery-item {
+    break-inside: avoid;
+    margin-bottom: 12px;
+    border-radius: 14px;
+    overflow: hidden;
+    background: #111;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Image */
+.gallery-item img {
     width: 100%;
-    /* border: solid 2px black; */
-    padding: 0.25rem;
-    box-shadow: 5px 5px 5px rgba(0,0,0,0.5);
-    /* border-radius: 5px; */
-    transition: all .25s ease-in-out;
-   
-    img {
-      width: 100%;
-      /* border-radius: 5px; */
-      transition: all .25s ease-in-out;
-    }
-    p {
-      margin: 5px 0;
-      padding: 0;
-      text-align: center;
-      font-style: italic;
-    }
-  }
+    height: auto;
+    display: block;
+    object-fit: cover;
+    transition: transform 0.4s ease;
 }
 
+/* Hover effect (desktop only) */
+@media (hover: hover) {
+    .gallery-item:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.9);
+    }
 
+    .gallery-item:hover img {
+        transform: scale(1.05);
+    }
+}
 
 
 

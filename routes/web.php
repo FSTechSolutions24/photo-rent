@@ -72,7 +72,7 @@ Route::middleware(['auth'])->prefix('dashboard')->name('dashboard.')->group(func
 
 
 Route::domain('{photographer_subdomain}.' . env('APP_DOMAIN'))->group(function () {
-    Route::match(['get', 'post'], '/{client_name}/{gallery_slug}', [GalleryController::class, 'show'])->name('gallery.show');
+    Route::match(['get', 'post'], '/{gallery_slug}', [GalleryController::class, 'show'])->name('gallery.show');
 });
 
 

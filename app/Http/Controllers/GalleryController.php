@@ -7,27 +7,27 @@ use App\Models\Gallery;
 use Illuminate\Support\Str;
 use App\Models\Photographer;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
-use Yajra\DataTables\Facades\DataTables;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Storage;
+use Yajra\DataTables\Facades\DataTables;
 
 class GalleryController extends Controller
 {
     //
-    public function show(Request $request, $photographer_subdomain, $client_name, $gallery_slug)
+    public function show(Request $request, $photographer_subdomain, $gallery_slug)
     {
         // 1️⃣ Fetch photographer by subdomain
         $photographer = Photographer::where('subdomain', $photographer_subdomain)->firstOrFail();
 
         // 2️⃣ Find the client under this photographer
-        $client = $photographer->clients()->where('name', $client_name)->firstOrFail();
 
         // 3️⃣ Get the gallery with folders and images
-        $gallery = $client->galleries()
+        $gallery = $photographer->galleries()
             ->where('slug', $gallery_slug)
-            ->with(['folders.media', 'media'])
+            ->with(['folders.media'])
             ->firstOrFail();
 
         // 4️⃣ Password protection logic
@@ -50,8 +50,23 @@ class GalleryController extends Controller
 
                 // $password = Crypt::decryptString($gallery->client_password);
 
-                if (($request->password != $gallery->password)) {
-                    return back()->withErrors(['password' => 'Incorrect password.'])->withInput();
+                $storedClientPassword = Crypt::decryptString($gallery->client_password);
+                $storedGuestPassword = Crypt::decryptString($gallery->guest_password);
+
+                $guest = $client = false;
+                if ($request->password == $storedGuestPassword) {
+                    $guest = true;
+                    session(['visitor_type' => 'guest']);
+                }
+                if ($request->password == $storedClientPassword) {
+                    $client = true;
+                    session(['visitor_type' => 'client']);
+                }
+
+                if(!$guest && !$client) {
+                    return back()
+                        ->withErrors(['password' => 'Incorrect password.'])
+                        ->withInput();
                 }
 
                 // Password correct → grant access
@@ -59,12 +74,12 @@ class GalleryController extends Controller
 
             } else {
                 // No access yet → show password page
-                return view('dashboard.galleries.password', compact('gallery', 'photographer', 'client'));
+                return view('dashboard.galleries.password', compact('gallery', 'photographer'));
             }
         }
 
         // 5️⃣ Access granted → show gallery
-        return view('dashboard.galleries.show', compact('gallery', 'photographer', 'client'));
+        return view('dashboard.galleries.show', compact('gallery', 'photographer'));
     }
 
     public function index(){
@@ -114,9 +129,20 @@ class GalleryController extends Controller
         return view('dashboard.galleries.edit', compact('gallery','clients'));   
     }
 
-    protected function validateGallery(Request $request, $id = null){
+    protected function validateGallery(Request $request, $gallery = null)
+    {
+        // Determine the correct photographer_id
+        $photographerId = $gallery ? $gallery->photographer_id : Photographer::where('user_id', Auth::id())->first()->id;
+
         return $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('galleries')
+                    ->where(fn ($query) => $query->where('photographer_id', $photographerId))
+                    ->when($gallery, fn($rule) => $rule->ignore($gallery->id)),
+            ],
             'client_password' => ['required', 'string', 'min:6', 'different:guest_password'],
             'guest_password' => ['required', 'string', 'min:6', 'different:client_password'],
             'thumbnail' => 'nullable|image|max:2048',
@@ -131,7 +157,7 @@ class GalleryController extends Controller
     }
 
     public function update(Request $request, Gallery $gallery){
-        $data = $this->validateGallery($request);
+        $data = $this->validateGallery($request, $gallery);
 
         $data = $this->prepare_gallery_data($data);
 
