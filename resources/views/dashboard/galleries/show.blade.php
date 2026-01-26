@@ -112,6 +112,12 @@
         setTimeout(() => {
             items.forEach(item => {
                 item.classList.add('loaded');
+
+                // Show images inside each item
+                const img = item.querySelector('img');
+                if (img) {
+                    img.style.display = 'block';
+                }
             });
         }, 1000);
     });
@@ -172,7 +178,7 @@ body {
 .gallery-item img {
     width: 100%;
     height: auto;
-    display: block;
+    display: none;
     object-fit: cover;
     transition: transform 0.4s ease;
 }
