@@ -132,9 +132,9 @@
 
             <div class="flex items-center gap-4">
                 <a href="/login" class="text-[10px] font-bold uppercase tracking-widest hidden sm:block">Login</a>
-                <button class="bg-white text-black px-6 py-2.5 rounded-full text-[10px] font-bold uppercase tracking-widest hover:scale-105 transition-transform active:scale-95">
+                <a href="/register" class="bg-white text-black px-6 py-2.5 rounded-full text-[10px] font-bold uppercase tracking-widest hover:scale-105 transition-transform active:scale-95">
                     Start Archiving
-                </button>
+                </a>
             </div>
         </div>
     </nav>
