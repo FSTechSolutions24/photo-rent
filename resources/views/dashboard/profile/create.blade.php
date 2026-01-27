@@ -432,7 +432,7 @@
   }
 
   .selected-plan {
-    background: #dce2ff;
+    background: #e9edff;
   }
 
 </style>
