@@ -147,6 +147,31 @@
 
   $(document).on('click','#create-btn',function(){
 
+
+
+
+    // axios.get(`/dashboard/api/profile/createphotographerprofile`, {
+    //   params: { 
+    //     selectedPlan: window.selectedPlan, 
+    //     subdomain: $('#subdomain-input').val(), 
+    //   }
+    // })
+    // .then(response => {
+    //   if(response.data.success) {
+    //     window.location.href = '/dashboard';
+    //   }
+    // })
+    // .catch(error => {
+    // });
+
+
+
+
+
+
+    
+    var plan = window.selectedPlan;
+    var subdomain = $('#subdomain-input').val(); 
     axios.get(`/dashboard/api/profile/createphotographerprofile`, {
       params: { 
         selectedPlan: window.selectedPlan, 
@@ -154,14 +179,19 @@
       }
     })
     .then(response => {
-      if(response.data.success) {
-        window.location.href = '/dashboard';
-      }
+      // do the paymob iframe logic
+      console.log(response);
+      paymob_payment(response.data.url);
     })
     .catch(error => {
     });
 
   })
+
+  function paymob_payment(url){
+    console.log(url);
+    window.open(url, '_self');
+  }
 
 </script>
 @endsection

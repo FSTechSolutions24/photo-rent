@@ -10,7 +10,7 @@ class Photographer extends Model
 {
     use HasFactory, Notifiable;
 
-    protected $fillable = ['user_id', 'subdomain', 'plan_storage', 'available_storage'];
+    protected $fillable = ['user_id', 'subdomain', 'plan_storage', 'available_storage', 'payment_order_id'];
 
     public function user()
     {

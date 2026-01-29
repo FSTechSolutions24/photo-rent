@@ -70,6 +70,9 @@ Route::middleware(['auth'])->prefix('dashboard')->name('dashboard.')->group(func
     Route::get('/api/profile/createphotographerprofile', [ProfileController::class, 'createphotographerprofile'])->name('createphotographerprofile');
 });
 
+Route::get('paymobcallbackresponseview', [ProfileController::class, 'paymobcallbackresponseview'])->name('paymob.paymobcallbackresponseview');
+Route::post('paymobcallback', [ProfileController::class, 'callback'])->name('paymob.callback');
+
 
 Route::domain('{photographer_subdomain}.' . env('APP_DOMAIN'))->group(function () {
     Route::match(['get', 'post'], '/{gallery_slug}', [GalleryController::class, 'show'])->name('gallery.show');
