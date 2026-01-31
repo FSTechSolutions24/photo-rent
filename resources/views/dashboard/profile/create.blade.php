@@ -144,11 +144,7 @@
     }
   }
 
-
   $(document).on('click','#create-btn',function(){
-
-
-
 
     // axios.get(`/dashboard/api/profile/createphotographerprofile`, {
     //   params: { 
@@ -164,12 +160,6 @@
     // .catch(error => {
     // });
 
-
-
-
-
-
-    
     var plan = window.selectedPlan;
     var subdomain = $('#subdomain-input').val(); 
     axios.get(`/dashboard/api/profile/createphotographerprofile`, {

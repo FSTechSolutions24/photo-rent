@@ -1,16 +1,21 @@
 <?php
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Client;
+use App\Models\PaymentLog;
+use App\Models\Transaction;
 use App\Traits\HelperTrait;
 use App\Models\Photographer;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use App\Models\SubscriptionPlan;
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use App\Models\PhotographerSubscription;
 use Illuminate\Support\Facades\Validator;
 
 
@@ -143,25 +148,19 @@ class ProfileController extends Controller
     public function createphotographerprofile(Request $request)
     {
 
-        // $subdomain = $request->query('subdomain');
-        // $selectedPlan = $request->query('selectedPlan');
+        $subdomain = $request->query('subdomain');
+        $selectedPlan = $request->query('selectedPlan');
 
-        // $plan = SubscriptionPlan::where('id', $selectedPlan)->firstOrFail();
+        $plan = SubscriptionPlan::where('id', $selectedPlan)->firstOrFail();
 
-        // $photographer = Photographer::create([
-        //     'user_id' => Auth::user()->id,
-        //     'plan_storage' => ($plan->storage_gb * 1024 * 1024 * 1024),
-        //     'subdomain' => $subdomain,
-        // ]);
+        Photographer::create([
+            'user_id' => Auth::user()->id,
+            'plan_storage' => ($plan->storage_gb * 1024 * 1024 * 1024),
+            'subdomain' => $subdomain,
+            'active' => 0,
+        ]);
 
-        // return response()->json([
-        //     'success' => true,
-        // ]);
-
-        session(['subdomain' => $request->query('subdomain')]);
-        session(['selectedPlan' => $request->query('selectedPlan')]);
-
-        $plan = SubscriptionPlan::where('id', $request->query('selectedPlan'))->firstOrFail();
+        $plan = SubscriptionPlan::where('id', $selectedPlan)->firstOrFail();
 
         $url = $this->paymob_create_order($plan);
 
@@ -171,23 +170,22 @@ class ProfileController extends Controller
             'url' => $url,
         ]);
 
-
     }
-
-
     
     public function paymob_create_order($plan){
-
         $token = $this->getToken();
         $paymob = $this->createOrder($token, $plan);
-        $this->update_photographer_with_paymob_order($paymob->id);
         $paymentToken = $this->getPaymentToken($paymob, $token, $plan);        
         return 'https://accept.paymobsolutions.com/api/acceptance/iframes/' . $this->config_values['iframe_id'] . '?payment_token=' . $paymentToken;
     }
 
-    function update_photographer_with_paymob_order($paymob_order_id){
-        Photographer::where('user_id', Auth::user()->id)->update([
-            'payment_order_id'=>$paymob_order_id
+    function add_payment_log($paymob_order_id, $type){
+        PaymentLog::create([
+            'user_id' => Auth::user()->id,
+            'payment_getway' => 'paymob',
+            'order_id' => $paymob_order_id,
+            'status' => 'sent',
+            'type' => $type,
         ]);
     }
 
@@ -228,7 +226,6 @@ class ProfileController extends Controller
         return $response->token;
     }
 
-
     public function createOrder($token, $plan)
     {
         
@@ -255,6 +252,7 @@ class ProfileController extends Controller
             $data
         );
 
+        $this->add_payment_log($response->id, 'create_order');
         return $response;
     }
 
@@ -368,43 +366,58 @@ class ProfileController extends Controller
         }
 
         $hased = hash_hmac('sha512', $connectedString, $secret);
-
-        $callbackData = [
-            'hased' => $hased,
-            'hmac' => $hmac
-        ];
         
-        // $portal_id = $data['obj']['order']['id'];
+        $order_id = $data['obj']['order']['id'];
 
-        // $order = Order::where('payment_order_id',$portal_id)->firstOrFail();
+        $order = PaymentLog::where('order_id',$order_id)->firstOrFail();
 
-        // if (/*$hased == $hmac && */ $data['obj']['success'] == "true") {
-    
-        //     // $gateway = Gateway::get('paymob');
-    
-        //     try {
-        //         // $response = $gateway->complete($order);
-        //         Transaction::create([
-        //             'order_id' => $order['id'],
-        //             'transaction_id' => $data['obj']['id'],
-        //             'payment_method' => 'paymob',
-        //             'created_at' => date('Y-m-d H:i:s'),
-        //         ]);
-                
-        //     } catch (Exception $e) {    
-        //         return response()->json([
-        //             'message' => $e->getMessage(),
-        //         ], 403);
-        //     }
-    
-    
-        //     if (!request()->ajax()) {
-        //         return redirect()->route('checkout.complete.show');
-        //     }
-
-
-        // }      
+        if ($hased == $hmac &&  $data['obj']['success'] == "true") {    
+            Transaction::create([
+                'user_id' => $order['user_id'],
+                'order_id' => $order['order_id'],
+                'transaction_id' => $data['obj']['id'],
+                'payment_method' => 'paymob',
+                'created_at' => date('Y-m-d H:i:s'),
+                'status' => $data['obj']['order']['status'],
+            ]);                
+            
+            $this->after_payment_success($order);
+            return redirect()->route('checkout.complete.show');
+        }      
 
     }
+
+    public function after_payment_success(array $order)
+    {
+        DB::transaction(function () use ($order) {
+
+            $photographer = Photographer::where('user_id', $order['user_id'])->firstOrFail();
+            $plan = SubscriptionPlan::findOrFail($order['plan_id']);
+
+            // Activate photographer
+            $photographer->update([
+                'active' => 1,
+            ]);
+
+            $start_date = Carbon::now();
+            $end_date   = $start_date->copy();
+
+            if ($plan->billing_cycle === 'month') {
+                $end_date->addMonthNoOverflow();
+            } elseif ($plan->billing_cycle === 'year') {
+                $end_date->addYearNoOverflow();
+            }
+
+            PhotographerSubscription::create([
+                'user_id' => $order['user_id'],
+                'photographer_id' => $photographer->id,
+                'plan_id' => $plan->id,
+                'start_date' => $start_date->toDateTimeString(),
+                'end_date' => $end_date->toDateTimeString(),
+            ]);
+
+        });
+    }
+
 
 }
