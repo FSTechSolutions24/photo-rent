@@ -26,9 +26,9 @@ class AuthServiceProvider extends ServiceProvider
         $this->registerPolicies();
 
         Gate::define('has-photographer', function ($user) {
-            return $user->photographer && $user->photographer->status == 1;
+            return $user->photographer && $user->photographer->active == 1;
         });
-        
+
         Gate::define('is-superadmin', function ($user) {
             return $user->type === 'superadmin';
         });

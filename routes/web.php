@@ -68,6 +68,7 @@ Route::middleware(['auth'])->prefix('dashboard')->name('dashboard.')->group(func
     Route::resource('profile', ProfileController::class);
     Route::get('/api/profile/checksubdomain', [ProfileController::class, 'checksubdomain'])->name('checksubdomain');
     Route::get('/api/profile/createphotographerprofile', [ProfileController::class, 'createphotographerprofile'])->name('createphotographerprofile');
+    Route::get('/profile/inactive', [ProfileController::class, 'inactivephotographer'])->name('profile.inactive');
 });
 
 Route::get('paymobcallbackresponseview', [ProfileController::class, 'paymobcallbackresponseview'])->name('paymob.paymobcallbackresponseview');
@@ -90,4 +91,4 @@ require __DIR__.'/auth.php';
 
 Auth::routes();
 
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+

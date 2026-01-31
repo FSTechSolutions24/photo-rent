@@ -61,12 +61,16 @@ class ProfileController extends Controller
         return redirect()->back()->with('success', 'Profile updated successfully.');
     }
 
+    public function inactivephotographer(){
+        return view('dashboard.profile.inactive');
+    }
+
     public function create()
     {
         $user = auth()->user();
 
         // Check if user has photographer relation
-        if ($user->photographer) {
+        if ($user->photographer && $user->photographer->active == 1) {
             return redirect()->route('dashboard'); // or 'dashboard.index' depending on your route name
         }
 
