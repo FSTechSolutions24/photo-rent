@@ -379,6 +379,7 @@ class ProfileController extends Controller
                 'payment_method' => 'paymob',
                 'created_at' => date('Y-m-d H:i:s'),
                 'status' => $data['obj']['order']['status'],
+                'amount' => $data['obj']['order']['price'],
             ]);                
             
             $this->after_payment_success($order);

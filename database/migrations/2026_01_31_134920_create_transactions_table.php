@@ -20,6 +20,7 @@ class CreateTransactionsTable extends Migration
             $table->string('transaction_id');
             $table->string('payment_method');
             $table->string('status');
+            $table->decimal('amount', 19, 2);
             $table->timestamps();
         });
     }
