@@ -68,7 +68,11 @@ return [
             'region' => env('WASABI_REGION', 'us-east-1'),
             'bucket' => env('WASABI_BUCKET'),
             'endpoint' => env('WASABI_ENDPOINT'),
-            'use_path_style_endpoint' => false,
+            'use_path_style_endpoint' => true,
+            'visibility' => 'private',
+            'http' => [
+                'verify' => false,
+            ],
         ],
 
     ],

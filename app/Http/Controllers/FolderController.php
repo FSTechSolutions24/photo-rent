@@ -87,9 +87,7 @@ class FolderController extends Controller
         $path = "users/{$userid}/galleries/{$galleryId}/folders/{$folderId}/media";
 
         // // Store file in the public disk
-        $storedPath = $file->store($path, 's3');
-
-        // $path = $file->store('galleries/session1', 's3');
+        $storedPath = $file->store($path, 'wasabi');
 
         // Optional: Save record in DB if you have a File/Media model
         $this->save_media_record($galleryId, $folderId, $storedPath, $file);
