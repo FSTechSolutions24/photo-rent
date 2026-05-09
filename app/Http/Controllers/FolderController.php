@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Media;
 use App\Models\Folder;
 use App\Models\Gallery;
+use App\Jobs\ProcessMedia;
 use App\Traits\HelperTrait;
+use Illuminate\Support\Str;
 use App\Models\Photographer;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -80,21 +82,34 @@ class FolderController extends Controller
 
         // Get uploaded file
         $file = $request->file('file');
+        $userId = Auth::user()->id;
 
-        $userid = Auth::user()->id;
+        $extension = $file->getClientOriginalExtension();
+        $filename = Str::uuid() . '.' . $extension;
+        $basePath = "users/{$userId}/galleries/{$galleryId}/folders/{$folderId}/media";
 
-        // Define a path, e.g. galleries/{galleryId}/{folderId}/
-        $path = "users/{$userid}/galleries/{$galleryId}/folders/{$folderId}/media";
+        // ✅ Store ORIGINAL only
+        $originalPath = "{$basePath}/original/{$filename}";
+        Storage::disk('wasabi')->put($originalPath, file_get_contents($file));
+        // ✅ Save DB record (store only original for now)
+        $this->save_media_record($galleryId, $folderId, $originalPath, $file);
 
-        // // Store file in the public disk
-        $storedPath = $file->store($path, 'wasabi');
+        // dd([
+        //     config('queue.default'),
+        //     config('queue.connections.database.table'),
+        // ]);
 
-        // Optional: Save record in DB if you have a File/Media model
-        $this->save_media_record($galleryId, $folderId, $storedPath, $file);
+
+        // dd(
+        //     ProcessMedia::class,
+        //     get_class(ProcessMedia::dispatch('a', 'b', 'c'))
+        // );
+        // ✅ Dispatch background job for processing
+        ProcessMedia::dispatch($originalPath, $basePath, $filename);
 
         return response()->json([
             'success' => true,
-            'path' => Storage::url($storedPath),
+            'path' => Storage::url($originalPath),
             'name' => $file->getClientOriginalName(),
         ]);
     }
