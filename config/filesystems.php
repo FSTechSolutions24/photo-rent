@@ -15,6 +15,8 @@ return [
 
     'default' => env('FILESYSTEM_DRIVER', 'local'),
 
+    'cdn_url' => env('CDN_URL'),
+
     /*
     |--------------------------------------------------------------------------
     | Filesystem Disks

@@ -77,4 +77,8 @@ trait HelperTrait
             return $size . ' bytes';
         }
     }
+
+    function cdn_url($path){
+        return rtrim(config('filesystems.cdn_url'), '/') . '/'. ltrim($path, '/');
+    }
 }
