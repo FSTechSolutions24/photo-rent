@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Client;
 use App\Models\Gallery;
 use Illuminate\Support\Str;
+use App\Traits\HelperTrait;
 use App\Models\Photographer;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -16,6 +17,7 @@ use Yajra\DataTables\Facades\DataTables;
 
 class GalleryController extends Controller
 {
+    use HelperTrait;
     //
     public function show(Request $request, $photographer_subdomain, $gallery_slug)
     {
@@ -32,6 +34,13 @@ class GalleryController extends Controller
 
         // 4️⃣ Password protection logic
         $sessionKey = 'access_granted_' . $gallery->id;
+
+        // 5 prepare the pre-signed urls
+        foreach($gallery['folders'] as $folder){
+            foreach($folder['media'] as &$media){
+                $media['path'] = $this->get_pre_signed_url($media->path, 'medium');                
+            }
+        }
 
         // If access is not already granted
         if (!session($sessionKey)) {

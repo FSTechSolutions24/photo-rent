@@ -67,6 +67,11 @@ class FolderController extends Controller
         return response()->json($folders);
     }
 
+    public function download(Request $request, $galleryId, $folderId)
+    {
+        $mediaItems = Media::whereIn('id', $request->ids)->get();
+    }
+
     public function upload(Request $request, $galleryId, $folderId)
     {
         /**
@@ -230,15 +235,16 @@ class FolderController extends Controller
             return '<input class="form-control" type="checkbox">';
         })
         ->addColumn('thumbnail', function ($model) {
-            // $url = Storage::url($model->path);
-            $url = str_replace('/original/', '/thumb/', $this->cdn_url($model->path));
+            $url = $this->get_pre_signed_url($model->path, 'thumb');            
             return '<div class="thumbnail-holder"><img class="img-fluid" src="'.$url.'" width="80"></div>';
         })
-        ->addColumn('delete', function($model){
-            return '<button onclick="window.deleteMedia('.$model->id.')" class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></button>';
+        ->addColumn('actions', function($model){
+            $buffer  = '<button onclick="window.deleteMedia('.$model->id.')" class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></button>';
+            $buffer .= '<button onclick="window.downloadMedia('.$model->id.')" class="btn btn-sm btn-outline-success" style="margin-left: 4px;"><i class="fas fa-download"></i></button>';
+            return $buffer;
         })
         ->addIndexColumn()
-        ->rawColumns(['thumbnail','multiselect','delete'])
+        ->rawColumns(['thumbnail','multiselect','actions'])
         ->make(true);
     }
 

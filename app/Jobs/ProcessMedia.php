@@ -30,7 +30,7 @@ class ProcessMedia implements ShouldQueue
         $extension = strtolower(pathinfo($this->originalPath, PATHINFO_EXTENSION));
 
         // Skip non-images
-        if (!in_array($extension, ['jpg', 'jpeg', 'png', 'gif'])) {
+        if (!in_array($extension, ['jpg', 'jpeg', 'png', 'gif', 'webp'])) {
             return;
         }
 
@@ -46,7 +46,7 @@ class ProcessMedia implements ShouldQueue
         $medium = $image->scale(width: 2000); // keeps aspect ratio
 
         Storage::disk('wasabi')->put(
-            "{$this->basePath}/medium/{$this->filename}.webp",
+            "{$this->basePath}/medium/{$this->filename}.{$extension}",
             (string) $medium->toWebp(80)
         );
 
@@ -56,7 +56,7 @@ class ProcessMedia implements ShouldQueue
         $thumb = $image->cover(400, 400); // like fit()
 
         Storage::disk('wasabi')->put(
-            "{$this->basePath}/thumb/{$this->filename}.webp",
+            "{$this->basePath}/thumb/{$this->filename}.{$extension}",
             (string) $thumb->toWebp(70)
         );
     }

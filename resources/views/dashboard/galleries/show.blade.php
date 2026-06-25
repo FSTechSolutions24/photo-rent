@@ -23,8 +23,8 @@
                 <div class="skeleton"></div>
 
                 <img 
-                    src="{{ asset('storage/' . $media->path) }}"
-                    data-full="{{ asset('storage/' . $media->path) }}"
+                    src="{{ $media->path }}"
+                    data-full="{{ $media->path }}"
                     alt=""
                     loading="lazy"
                 >

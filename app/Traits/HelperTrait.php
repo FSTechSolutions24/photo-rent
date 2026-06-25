@@ -81,4 +81,13 @@ trait HelperTrait
     function cdn_url($path){
         return rtrim(config('filesystems.cdn_url'), '/') . '/'. ltrim($path, '/');
     }
+
+    function get_pre_signed_url($path, $type){
+        $url = str_replace('/original/', '/'.$type.'/', ($path));
+        return
+            Storage::disk('wasabi')->temporaryUrl(
+                $url,
+                now()->addDays(7)
+            );
+    }
 }

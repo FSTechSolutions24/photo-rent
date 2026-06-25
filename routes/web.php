@@ -50,6 +50,7 @@ Route::middleware(['auth', 'photographer'])->prefix('dashboard')->name('dashboar
     // Folders (nested under gallery)
     Route::post('/api/galleries/{gallery}/folders/{folder}/media', [FolderController::class, 'listJsonMedia'])->name('api.galleries.folders.media');
     Route::post('/galleries/{gallery}/folders/{folder}/upload', [FolderController::class, 'upload'])->name('galleries.folders.upload');
+    Route::post('/galleries/{gallery}/folders/{folder}/download', [FolderController::class, 'download'])->name('galleries.folders.download');
     Route::get('/api/galleries/{gallery}/folders', [FolderController::class, 'listJson'])->name('api.galleries.folders.index');
     Route::resource('galleries.folders', FolderController::class);
     
@@ -57,6 +58,8 @@ Route::middleware(['auth', 'photographer'])->prefix('dashboard')->name('dashboar
     // Photos (nested under gallery)
     Route::post('galleries/{gallery}/photos', [MediaController::class, 'store'])->name('photos.store');        
     Route::delete('media/{gallery}/delete',[MediaController::class, 'destroy'])->name('media.destroy');
+    Route::post('media/{gallery}/download',[MediaController::class, 'download'])->name('media.download');
+    Route::post('media/{gallery}/download_folder',[MediaController::class, 'download_folder'])->name('media.download_folder');
 
 });
 

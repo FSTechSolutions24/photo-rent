@@ -9,7 +9,7 @@
                 <th scope="col">Disk</th>
                 <th scope="col">Size</th>            
                 <th scope="col">Created</th>            
-                <th scope="col">Delete</th>            
+                <th scope="col">Actions</th>            
             </tr>
         </thead>
         <tbody>                  
@@ -34,9 +34,24 @@
             emitter.on('folder-unselected-action', this.handleUnSelectFolderAction);
             emitter.on('media-uploaded', this.reloadTable);
             window.deleteMedia = this.deleteMedia;
+            window.downloadMedia = this.downloadMedia;
         },
 
         methods: {
+            downloadMedia(id) {
+                axios.post(`/dashboard/media/${this.galleryId}/download`, {
+                    id
+                }).then(response => {
+                    const url = response.data.url;
+
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = '';
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+                });
+            },
             deleteMedia(id) {
                 Swal.fire({
                     title: 'Are you sure?',
@@ -125,7 +140,7 @@
                             { data: 'disk' },
                             { data: 'size' },
                             { data: 'created_at' },
-                            { data: 'delete' },
+                            { data: 'actions' },
                         ],
                     });
                 });
