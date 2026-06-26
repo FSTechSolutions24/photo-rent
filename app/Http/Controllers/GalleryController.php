@@ -109,6 +109,7 @@ class GalleryController extends Controller
         ->addColumn('actions', function ($model) {
 
             $editUrl = route('dashboard.galleries.edit', $model->id);
+            $downloadUrl = route('dashboard.galleries.download');
 
             $buffer = '<a href="'.$editUrl.'" class="btn btn-sm btn-outline-primary">
                 <i class="fas fa-edit"></i>
@@ -118,8 +119,18 @@ class GalleryController extends Controller
                 'gallery' => $model->id,
             ]);
 
-            $buffer .= '<a href="'.$folderUrl.'" class="btn btn-sm btn-outline-success" style="margin-left: 10px;">
+            $buffer .= '<a href="'.$folderUrl.'" class="btn btn-sm btn-outline-success" style="margin-left: 5px;">
                 <i class="fas fa-cogs"></i>
+            </a>';
+
+            $buffer .= '
+            <form id="download-form-'.$model->id.'" action="'.$downloadUrl.'" method="POST" style="display:inline;">
+                '.csrf_field().'
+                <input type="hidden" name="id" value="'.$model->id.'">
+            </form>
+
+            <a href="#" onclick="event.preventDefault(); document.getElementById(\'download-form-'.$model->id.'\').submit();" class="btn btn-sm btn-outline-primary" style="margin-left:5px;">
+                <i class="fas fa-download"></i>
             </a>';
             
             return $buffer;
@@ -136,6 +147,14 @@ class GalleryController extends Controller
         $gallery->client_password = Crypt::decryptString($gallery->client_password);
         $gallery->guest_password = Crypt::decryptString($gallery->guest_password);
         return view('dashboard.galleries.edit', compact('gallery','clients'));   
+    }
+    
+    public function download(Request $request)
+    {
+        $id = $request->id;
+        dd($id);
+
+        // Download logic
     }
 
     protected function validateGallery(Request $request, $gallery = null)

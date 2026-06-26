@@ -40,6 +40,7 @@ Route::middleware(['auth', 'photographer'])->prefix('dashboard')->name('dashboar
     Route::resource('clients', ClientController::class);
 
     // Galleries (nested under client)
+    Route::post('galleries/download', [GalleryController::class, 'download'])->name('galleries.download');
     Route::get('galleries/data', [GalleryController::class, 'getData'])->name('galleries.data');
     Route::resource('galleries', GalleryController::class);
     
