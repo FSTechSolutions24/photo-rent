@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Client;
 use App\Models\Gallery;
+use App\Models\GalleryDownload;
 use Illuminate\Support\Str;
 use App\Traits\HelperTrait;
 use App\Models\Photographer;
@@ -151,10 +152,52 @@ class GalleryController extends Controller
     
     public function download(Request $request)
     {
-        $id = $request->id;
-        dd($id);
 
         // Download logic
+        $exist_gallery = $this->search_gallery_file_exist($request);
+        if($exist_gallery){
+            $this->modify_gallery_expiration_date($request);
+            $this->send_url_to_email_asked_for_download($request);
+        }
+        else {
+            $this->add_new_gallery_media_download_request($request);
+        }        
+        
+
+    }
+
+    public function search_gallery_file_exist($data){
+
+    }
+
+    public function modify_gallery_expiration_date($data){
+
+    }
+
+    public function send_url_to_email_asked_for_download($data){
+
+    }
+
+    public function add_new_gallery_media_download_request($data){
+
+        $user_type = $this->get_user_type($data);
+    
+
+        GalleryDownload::create([
+            'gallery_id' => $data['id'],
+            'folder_id' => $data['folder_id'],
+            'user_type' => $user_type,
+            'requested_by_email' => $data['requested_by_email'],
+            'full_gallery' => $data['folder_id'] ? 0 : 1,
+            'status' => 'Pending',
+        ]);
+    }
+
+    public function get_user_type($data){
+        if(Auth::user()->id){
+            return 'admin';
+        }
+        return 'guest';
     }
 
     protected function validateGallery(Request $request, $gallery = null)

@@ -5,16 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Media extends Model
+class GalleryDownload extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['folder_id', 'gallery_id', 'path', 'name', 'disk', 'size', 'meta', 'private'];
-
-    public function folder()
-    {
-        return $this->belongsTo(Folder::class);
-    }
+    protected $fillable = ['gallery_id', 'folder_id', 'user_type', 'requested_by_email', 'full_gallery', 'url', 'status', 'size', 'expires_at'];
 
     public function gallery()
     {
