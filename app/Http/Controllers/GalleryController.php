@@ -167,7 +167,7 @@ class GalleryController extends Controller
     }
 
     public function search_gallery_file_exist($data){
-
+        return true;
     }
 
     public function modify_gallery_expiration_date($data){
@@ -182,7 +182,6 @@ class GalleryController extends Controller
 
         $user_type = $this->get_user_type($data);
     
-
         GalleryDownload::create([
             'gallery_id' => $data['id'],
             'folder_id' => $data['folder_id'],
