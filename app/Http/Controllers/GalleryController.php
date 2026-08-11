@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use App\Models\Client;
 use App\Models\Gallery;
 use App\Models\GalleryDownload;
+use App\Models\GalleriesToBeEmailed;
 use Illuminate\Support\Str;
 use App\Traits\HelperTrait;
 use App\Models\Photographer;
@@ -153,29 +155,69 @@ class GalleryController extends Controller
     public function download(Request $request)
     {
 
+        $email = $request['email'];
         // Download logic
         $exist_gallery = $this->search_gallery_file_exist($request);
         if($exist_gallery){
-            $this->modify_gallery_expiration_date($request);
-            $this->send_url_to_email_asked_for_download($request);
+            $this->modify_gallery_expiration_date($exist_gallery);
+            $this->send_url_to_email_asked_for_download($exist_gallery, $email);
         }
         else {
-            $this->add_new_gallery_media_download_request($request);
+            $this->add_new_gallery_media_download_request($exist_gallery);
         }        
         
+        return view('dashboard.galleries.index');
 
     }
 
     public function search_gallery_file_exist($data){
-        return true;
+
+        // we need to check if the gallery exist and with the same permission of the current request
+        // what is the current user permission? guest or client >> based on that we will do the user_type condition
+
+        $current_user_type = $this->get_current_user_type();
+
+        return GalleryDownload::where('user_type', $current_user_type)->where('gallery_id', $data['id'])->first();
+
     }
 
-    public function modify_gallery_expiration_date($data){
+    public function get_current_user_type(){
 
+        if(Auth::user()->id > 0){
+            return 'admin';
+        }
+
+        if(session('visitor_type') == 'client') {
+            return 'admin';
+        }
+
+        else {
+            return 'guest';
+        }
+        
     }
 
-    public function send_url_to_email_asked_for_download($data){
+    public function modify_gallery_expiration_date($gallery){
+        $gallery->expires_at = Carbon::now()->addDays(3);
+        $gallery->save();
+    }
 
+    public function send_url_to_email_asked_for_download($gallery, $email){
+
+        if(Auth::user()->id > 0){
+            $email = Auth::user()->email;
+        }
+
+        GalleriesToBeEmailed::create([
+            'gallery_downloads_id' => $gallery->id,
+            'send_to' => $email,
+            'status' => 'Pending',
+        ]);
+
+        // we will need a script to be running every 1 minute to run the queue to send the emails
+        // the script should get the records from GalleriesToBeEmailed where the status is Pending
+        // if the email sent seccessfully then update the GalleriesToBeEmailed with the sent at and status completed
+    
     }
 
     public function add_new_gallery_media_download_request($data){

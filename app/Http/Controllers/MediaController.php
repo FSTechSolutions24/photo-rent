@@ -81,6 +81,7 @@ class MediaController extends Controller
     public function download(Request $request, $galleryId)
     {
 
+        dd('hi');
         $media = Media::findOrFail($request->id);
 
         $url = Storage::disk('wasabi')->temporaryUrl(
