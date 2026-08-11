@@ -222,7 +222,7 @@ class GalleryController extends Controller
 
     public function add_new_gallery_media_download_request($data){
 
-        $user_type = $this->get_user_type($data);
+        $user_type = $this->get_current_user_type();
     
         GalleryDownload::create([
             'gallery_id' => $data['id'],
@@ -232,13 +232,6 @@ class GalleryController extends Controller
             'full_gallery' => $data['folder_id'] ? 0 : 1,
             'status' => 'Pending',
         ]);
-    }
-
-    public function get_user_type($data){
-        if(Auth::user()->id){
-            return 'admin';
-        }
-        return 'guest';
     }
 
     protected function validateGallery(Request $request, $gallery = null)
