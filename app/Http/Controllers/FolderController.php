@@ -97,9 +97,12 @@ class FolderController extends Controller
         }        
     }
 
-    public function modify_folder_expiration_date($folder){
-        $folder->expires_at = Carbon::now()->addDays(3);
-        $folder->save();
+    public function modify_folder_expiration_date($exist_download){
+        if($exist_download->status != 'Completed'){
+            return;
+        }
+        $exist_download->expires_at = Carbon::now()->addDays(3);
+        $exist_download->save();
     }
 
     public function send_url_to_email_asked_for_download($download, $email){

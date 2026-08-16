@@ -157,10 +157,10 @@ class GalleryController extends Controller
 
         $email = $request['email'];
         // Download logic
-        $exist_gallery = $this->search_gallery_file_exist($request);
-        if($exist_gallery){
-            $this->modify_gallery_expiration_date($exist_gallery);
-            $this->send_url_to_email_asked_for_download($exist_gallery, $email);
+        $exist_download = $this->search_gallery_file_exist($request);
+        if($exist_download){
+            $this->modify_gallery_expiration_date($exist_download);
+            $this->send_url_to_email_asked_for_download($exist_download, $email);
         }
         else {
             $this->add_new_gallery_media_download_request($request);
@@ -197,9 +197,12 @@ class GalleryController extends Controller
         
     }
 
-    public function modify_gallery_expiration_date($gallery){
-        $gallery->expires_at = Carbon::now()->addDays(3);
-        $gallery->save();
+    public function modify_gallery_expiration_date($exist_download){
+        if($exist_download->status != 'Completed'){
+            return;
+        }
+        $exist_download->expires_at = Carbon::now()->addDays(3);
+        $exist_download->save();
     }
 
     public function send_url_to_email_asked_for_download($gallery, $email){
