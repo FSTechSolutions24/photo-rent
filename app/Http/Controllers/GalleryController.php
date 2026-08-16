@@ -163,7 +163,7 @@ class GalleryController extends Controller
             $this->send_url_to_email_asked_for_download($exist_gallery, $email);
         }
         else {
-            $this->add_new_gallery_media_download_request($exist_gallery);
+            $this->add_new_gallery_media_download_request($request);
         }        
         
         return view('dashboard.galleries.index');

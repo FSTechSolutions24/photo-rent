@@ -248,42 +248,22 @@ export default {
                 }
             });
         },
-        downloadFolder(id){
-            axios.post(`/dashboard/media/${this.galleryId}/download_folder`, { id }, {
-                responseType: 'blob' 
-            }).then(async response => {
-                // CRITICAL CHECK: Did the server return JSON error instead of a ZIP?
-                if (response.data.type === 'application/json') {
-                    const text = await response.data.text();
-                    const errorJson = JSON.parse(text);
-                    console.error("Backend Error:", errorJson);
-                    alert("Download failed: " + (errorJson.error || "Server error"));
-                    return;
-                }
+        downloadFolder(id) {
+            axios.post('/dashboard/folders/download', { id })
+            .then(response => {
+                console.log('Download request created:', response.data);
 
-                // 1. Try to extract the real filename from the server headers
-                let filename = 'folder_download.zip';
-                const disposition = response.headers['content-disposition'];
-                if (disposition && disposition.indexOf('attachment') !== -1) {
-                    const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
-                    const matches = filenameRegex.exec(disposition);
-                    if (matches != null && matches[1]) { 
-                        filename = matches[1].replace(/['"]/g, '');
-                    }
-                }
-
-                // If it's a real zip, proceed with download
-                const blobUrl = window.URL.createObjectURL(new Blob([response.data], { type: 'application/zip' }));
-                const a = document.createElement('a');
-                a.href = blobUrl;
-                a.download = filename;
-                document.body.appendChild(a);
-                a.click();
-                
-                a.remove();
-                window.URL.revokeObjectURL(blobUrl);
+                // Optional success message
+                alert('Your download has been added to the download queue.');
             })
-            .catch(err => console.error("Bulk download failed", err));
+            .catch(err => {
+                console.error('Failed to create download request:', err);
+
+                alert(
+                    'Download request failed: ' +
+                    (err.response?.data?.error || 'Server error')
+                );
+            });
         },
     }
 }

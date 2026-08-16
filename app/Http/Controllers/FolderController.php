@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use App\Models\Media;
 use App\Models\Folder;
 use App\Models\Gallery;
@@ -11,6 +12,8 @@ use Illuminate\Support\Str;
 use App\Models\Photographer;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Models\GalleriesToBeEmailed;
+use App\Models\GalleryDownload;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Yajra\DataTables\Facades\DataTables;
@@ -67,9 +70,99 @@ class FolderController extends Controller
         return response()->json($folders);
     }
 
-    public function download(Request $request, $galleryId, $folderId)
+    public function download(Request $request)
     {
-        $mediaItems = Media::whereIn('id', $request->ids)->get();
+        // $mediaItems = Media::whereIn('id', $request->ids)->get();
+
+        $folder = $request['id'];
+
+        $folder_db = Folder::where('id', $folder['id'])->first();
+
+        $email = $request['email'];
+        // Download logic
+
+        // dd($request->json());
+
+        $data['folder_id'] = $folder_db['id'];
+        $data['gallery_id'] = $folder_db['gallery_id'];
+        $data['requested_by_email'] = $email;
+        $exist_download = $this->search_folder_file_exist($data);
+
+        if($exist_download){
+            $this->modify_folder_expiration_date($exist_download);
+            $this->send_url_to_email_asked_for_download($exist_download, $email);
+        }
+        else {
+            $this->add_new_folder_media_download_request($data);
+        }        
+    }
+
+    public function modify_folder_expiration_date($folder){
+        $folder->expires_at = Carbon::now()->addDays(3);
+        $folder->save();
+    }
+
+    public function send_url_to_email_asked_for_download($download, $email){
+
+        if(Auth::user()->id > 0){
+            $email = Auth::user()->email;
+        }
+
+        GalleriesToBeEmailed::create([
+            'gallery_downloads_id' => $download->id,
+            'send_to' => $email,
+            'status' => 'Pending',
+        ]);
+
+        // we will need a script to be running every 1 minute to run the queue to send the emails
+        // the script should get the records from GalleriesToBeEmailed where the status is Pending
+        // if the email sent seccessfully then update the GalleriesToBeEmailed with the sent at and status completed
+    
+    }
+
+    public function add_new_folder_media_download_request($data){
+
+        $user_type = $this->get_current_user_type();
+    
+        GalleryDownload::create([
+            'gallery_id' => $data['gallery_id'],
+            'folder_id' => $data['folder_id'],
+            'user_type' => $user_type,
+            'requested_by_email' => $data['requested_by_email'],
+            'full_gallery' => $data['folder_id'] ? 0 : 1,
+            'status' => 'Pending',
+        ]);
+    }
+
+    public function search_folder_file_exist($data){
+
+        // we need to check if the gallery exist and with the same permission of the current request
+        // what is the current user permission? guest or client >> based on that we will do the user_type condition
+
+        $current_user_type = $this->get_current_user_type();
+
+        return GalleryDownload::where('user_type', $current_user_type)
+        ->where('gallery_id', $data['gallery_id'])
+        ->where('folder_id', $data['folder_id'])
+        ->first();
+
+    }
+
+    
+    public function get_current_user_type(){
+
+        if(Auth::user()->id > 0){
+            return 'admin';
+        }
+
+        if(session('visitor_type') == 'client') {
+            return 'admin';
+        }
+
+        else {
+            return 'guest';
+        }
+        
     }
 
     public function upload(Request $request, $galleryId, $folderId)
