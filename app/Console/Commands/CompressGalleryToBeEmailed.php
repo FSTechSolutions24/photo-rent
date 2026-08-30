@@ -87,7 +87,14 @@ class CompressGalleryToBeEmailed extends Command
     private function compressGallery($gallery_download)
     {
         // Get all folders belonging to the gallery
-        $folders = Folder::where('gallery_id', $gallery_download->gallery_id)->get();
+        $foldersQuery = Folder::where('gallery_id', $gallery_download->gallery_id);
+
+        // Older requests have no saved selection and should continue to include every folder.
+        if (!empty($gallery_download->selected_folder_ids)) {
+            $foldersQuery->whereIn('id', $gallery_download->selected_folder_ids);
+        }
+
+        $folders = $foldersQuery->get();
 
         // Gallery folder name inside ZIP
         $galleryFolderName = Str::slug($gallery_download->gallery->name, '_');

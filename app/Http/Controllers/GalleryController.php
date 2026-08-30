@@ -170,6 +170,55 @@ class GalleryController extends Controller
 
     }
 
+    /**
+     * Queue a download requested from the public gallery page.
+     */
+    public function requestDownload(Request $request, $photographer_subdomain, $gallery_slug)
+    {
+        $data = $request->validate([
+            'email' => ['required', 'email', 'max:255'],
+            'folder_ids' => ['nullable', 'array'],
+            'folder_ids.*' => ['integer'],
+            'download_all' => ['nullable', 'boolean'],
+        ]);
+
+        $photographer = Photographer::where('subdomain', $photographer_subdomain)->firstOrFail();
+        $gallery = $photographer->galleries()->where('slug', $gallery_slug)->with('folders')->firstOrFail();
+
+        abort_unless(session('access_granted_' . $gallery->id), 403);
+
+        $availableFolderIds = $gallery->folders->pluck('id')->map(function ($id) {
+            return (int) $id;
+        });
+
+        $folderIds = $request->boolean('download_all')
+            ? $availableFolderIds->all()
+            : collect($data['folder_ids'] ?? [])->map(function ($id) {
+                return (int) $id;
+            })->intersect($availableFolderIds)->values()->all();
+
+        if (empty($folderIds)) {
+            return back()->withErrors(['folder_ids' => 'Please select at least one folder to download.'])->withInput();
+        }
+
+        $download = GalleryDownload::create([
+            'gallery_id' => $gallery->id,
+            'user_type' => $this->get_current_user_type(),
+            'requested_by_email' => $data['email'],
+            'selected_folder_ids' => $folderIds,
+            'full_gallery' => count($folderIds) === $availableFolderIds->count(),
+            'status' => 'Pending',
+        ]);
+
+        GalleriesToBeEmailed::create([
+            'gallery_downloads_id' => $download->id,
+            'send_to' => $data['email'],
+            'status' => 'Pending',
+        ]);
+
+        return back()->with('download_requested', 'Your download is being prepared. We will email the link to you shortly.');
+    }
+
     public function search_gallery_file_exist($data){
 
         // we need to check if the gallery exist and with the same permission of the current request
@@ -183,7 +232,7 @@ class GalleryController extends Controller
 
     public function get_current_user_type(){
 
-        if(Auth::user()->id > 0){
+        if(Auth::check()){
             return 'admin';
         }
 

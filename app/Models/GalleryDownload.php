@@ -9,7 +9,11 @@ class GalleryDownload extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['gallery_id', 'folder_id', 'user_type', 'requested_by_email', 'full_gallery', 'url', 'status', 'size', 'expires_at'];
+    protected $fillable = ['gallery_id', 'folder_id', 'selected_folder_ids', 'user_type', 'requested_by_email', 'full_gallery', 'url', 'status', 'size', 'expires_at'];
+
+    protected $casts = [
+        'selected_folder_ids' => 'array',
+    ];
 
     public function gallery()
     {

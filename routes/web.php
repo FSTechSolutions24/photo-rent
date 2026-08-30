@@ -81,6 +81,7 @@ Route::post('paymobcallback', [ProfileController::class, 'callback'])->name('pay
 
 
 Route::domain('{photographer_subdomain}.' . env('APP_DOMAIN'))->group(function () {
+    Route::post('/{gallery_slug}/download', [GalleryController::class, 'requestDownload'])->name('gallery.download');
     Route::match(['get', 'post'], '/{gallery_slug}', [GalleryController::class, 'show'])->name('gallery.show');
 });
 
