@@ -8,5 +8,5 @@ use Illuminate\Database\Eloquent\Model;
 class PaymentLog extends Model
 {
     use HasFactory;
-    protected $fillable = ['user_id', 'payment_getway', 'order_id', 'status', 'type'];
+    protected $fillable = ['user_id', 'payment_getway', 'order_id', 'status', 'type', 'plan_id'];
 }
