@@ -62,7 +62,7 @@
         <strong id="financeOutstanding">0.00</strong>
     </div>
     <div class="session-finance-summary__item session-finance-summary__item--net">
-        <span class="session-finance-summary__label" id="financeNetLabel"><i class="fas fa-chart-line"></i> Profit</span>
+        <span class="session-finance-summary__label" id="financeNetLabel"><i class="fas fa-chart-line"></i> Profit / Loss</span>
         <strong id="financeNet">0.00</strong>
     </div>
 </div>
@@ -94,7 +94,9 @@
         .session-finance-summary__item--received strong { color: #198754; }
         .session-finance-summary__item--spent strong { color: #dc3545; }
         .session-finance-summary__item--outstanding strong { color: #d98b00; }
+        .session-finance-summary__item--net.is-profit strong { color: #198754; }
         .session-finance-summary__item--net.is-loss strong { color: #dc3545; }
+        .session-finance-summary__item--net.is-zero strong { color: #6c757d; }
         @media (max-width: 767.98px) {
             .session-finance-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
             .session-finance-summary__item:nth-child(2) { border-right: 0; }
@@ -195,13 +197,17 @@
                 var outstanding = Math.max(0, amount($('#sessionTotalAmount').val()) - received);
                 var net = received - spent;
                 var isLoss = net < 0;
+                var isProfit = net > 0;
+                var netIcon = isProfit ? 'fa-arrow-up' : (isLoss ? 'fa-arrow-down' : 'fa-minus');
 
                 $('#financeReceived').text(formatAmount(received));
                 $('#financeSpent').text(formatAmount(spent));
                 $('#financeOutstanding').text(formatAmount(outstanding));
-                $('#financeNet').text(formatAmount(Math.abs(net)));
-                $('#financeNetLabel').html('<i class="fas ' + (isLoss ? 'fa-chart-line' : 'fa-chart-line') + '"></i> ' + (isLoss ? 'Loss' : 'Profit'));
-                $('.session-finance-summary__item--net').toggleClass('is-loss', isLoss);
+                $('#financeNet').html('<i class="fas ' + netIcon + ' mr-1"></i>' + formatAmount(Math.abs(net)));
+                $('.session-finance-summary__item--net')
+                    .toggleClass('is-profit', isProfit)
+                    .toggleClass('is-loss', isLoss)
+                    .toggleClass('is-zero', !isProfit && !isLoss);
             }
 
             updateFinanceSummary();

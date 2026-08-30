@@ -7,6 +7,7 @@ use App\Http\Controllers\FolderController;
 use App\Http\Controllers\GalleryController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SessionController;
+use App\Http\Controllers\FinanceReportController;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\SubscriptionPlanController;
 
@@ -48,6 +49,9 @@ Route::middleware(['auth', 'photographer'])->prefix('dashboard')->name('dashboar
     // Session
     Route::get('sessions/data', [SessionController::class, 'getData'])->name('sessions.data');
     Route::resource('sessions', SessionController::class);
+
+    // Finance report
+    Route::get('finance-report', [FinanceReportController::class, 'index'])->name('finance-report.index');
 
     // Folders (nested under gallery)
     Route::post('/api/galleries/{gallery}/folders/{folder}/media', [FolderController::class, 'listJsonMedia'])->name('api.galleries.folders.media');

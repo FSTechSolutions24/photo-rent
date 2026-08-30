@@ -438,6 +438,12 @@ return [
             ],
         ],
         [
+            'text' => 'Finance Report',
+            'url' => 'dashboard/finance-report',
+            'icon' => 'fas fa-fw fa-chart-pie',
+            'can' => 'has-photographer',
+        ],
+        [
             'text' => 'Scheduling',
             'icon' => 'far fa-calendar-alt',
             'can' => 'has-photographer',
