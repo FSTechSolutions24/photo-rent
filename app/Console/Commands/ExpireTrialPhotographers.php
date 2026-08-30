@@ -13,6 +13,7 @@ class ExpireTrialPhotographers extends Command
 
     public function handle()
     {
+        // php artisan trials:expire
         $expired = Photographer::where('is_trial', true)
             ->where('active', true)
             ->whereNotNull('trial_ends_at')
