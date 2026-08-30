@@ -418,6 +418,11 @@ return [
                     'url' => 'dashboard/galleries',
                     'icon'=>'fas fa-eye'
                 ],                
+                [
+                    'text' => 'WhatsApp template',
+                    'url' => 'dashboard/whatsapp-template',
+                    'icon'=>'fab fa-whatsapp'
+                ],
             ],
         ],
         [

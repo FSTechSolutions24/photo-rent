@@ -10,6 +10,7 @@ use App\Models\GalleriesToBeEmailed;
 use Illuminate\Support\Str;
 use App\Traits\HelperTrait;
 use App\Models\Photographer;
+use App\Models\WhatsAppTemplate;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Auth;
@@ -102,7 +103,7 @@ class GalleryController extends Controller
     
         $photographer = Auth::user()->photographer;
         $galleries = $photographer
-            ? $photographer->galleries()->with(['client', 'session'])->get()
+            ? $photographer->galleries()->with(['client', 'session.client'])->get()
             : collect();
 
         return DataTables::of($galleries)
@@ -120,6 +121,20 @@ class GalleryController extends Controller
             $buffer = '<a href="'.$editUrl.'" class="btn btn-sm btn-outline-primary">
                 <i class="fas fa-edit"></i>
             </a>';
+
+            // Gallery sharing always uses the gallery's assigned session.
+            $phone = optional($model->session)->phone;
+
+            if ($phone) {
+                $whatsAppUrl = route('dashboard.galleries.whatsapp', $model->id);
+                $buffer .= '<a href="'.$whatsAppUrl.'" target="_blank" rel="noopener" class="btn btn-sm btn-outline-success" style="margin-left:5px;" title="Send via WhatsApp">
+                    <i class="fab fa-whatsapp"></i>
+                </a>';
+            } else {
+                $buffer .= '<span class="btn btn-sm btn-outline-secondary disabled" style="margin-left:5px;" title="Assign a client with a phone number to send via WhatsApp">
+                    <i class="fab fa-whatsapp"></i>
+                </span>';
+            }
 
             $folderUrl = route('dashboard.galleries.folders.index', [
                 'gallery' => $model->id,
@@ -145,6 +160,47 @@ class GalleryController extends Controller
         ->rawColumns(['actions'])
         ->make(true);
 
+    }
+
+    /** Build the saved WhatsApp message for a gallery and open WhatsApp. */
+    public function sendViaWhatsApp($id)
+    {
+        $photographer = Auth::user()->photographer;
+        $gallery = $photographer->galleries()->with('session.client')->findOrFail($id);
+        $session = $gallery->session;
+        $phone = optional($session)->phone;
+
+        abort_unless($phone, 422, 'This gallery needs an assigned session with a phone number.');
+
+        $template = WhatsAppTemplate::firstOrCreate(
+            ['photographer_id' => $photographer->id],
+            ['message' => "Hello {{client_name}},\n\nYour gallery is ready: {{url}}\n\nClient password: {{client_password}}\nGuest password: {{guest_password}}"]
+        );
+
+        $galleryUrl = route('gallery.show', [
+            'photographer_subdomain' => $photographer->subdomain,
+            'gallery_slug' => $gallery->slug,
+        ]);
+
+        $message = strtr($template->message, [
+            '{{client_name}}' => optional(optional($session)->client)->name ?? 'Client',
+            '{{url}}' => $galleryUrl,
+            '{{client_password}}' => Crypt::decryptString($gallery->client_password),
+            '{{guest_password}}' => Crypt::decryptString($gallery->guest_password),
+        ]);
+
+        return redirect()->away('https://wa.me/'.$this->whatsAppPhone($phone).'?text='.rawurlencode($message));
+    }
+
+    private function whatsAppPhone(string $phone): string
+    {
+        $phone = preg_replace('/\D+/', '', $phone);
+
+        if (str_starts_with($phone, '0')) {
+            return '20' . substr($phone, 1);
+        }
+
+        return str_starts_with($phone, '1') ? '20' . $phone : $phone;
     }
     
     public function edit($id){

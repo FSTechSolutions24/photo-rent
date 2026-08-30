@@ -3,7 +3,9 @@
 
 @section('content')
 
-    <h4 class="page_header">Gallery List</h4>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="page_header mb-0">Gallery List</h4>
+    </div>
     <div class="ibox-content">
         <table class="table">
             <thead>

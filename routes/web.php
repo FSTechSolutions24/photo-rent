@@ -10,6 +10,7 @@ use App\Http\Controllers\SessionController;
 use App\Http\Controllers\FinanceReportController;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\SubscriptionPlanController;
+use App\Http\Controllers\WhatsAppTemplateController;
 
 /*
 |--------------------------------------------------------------------------
@@ -44,7 +45,11 @@ Route::middleware(['auth', 'photographer'])->prefix('dashboard')->name('dashboar
     Route::post('folders/download', [FolderController::class, 'download'])->name('folders.download');
     Route::post('galleries/download', [GalleryController::class, 'download'])->name('galleries.download');
     Route::get('galleries/data', [GalleryController::class, 'getData'])->name('galleries.data');
+    Route::get('galleries/{gallery}/whatsapp', [GalleryController::class, 'sendViaWhatsApp'])->name('galleries.whatsapp');
     Route::resource('galleries', GalleryController::class);
+
+    Route::get('whatsapp-template', [WhatsAppTemplateController::class, 'edit'])->name('whatsapp-template.edit');
+    Route::put('whatsapp-template', [WhatsAppTemplateController::class, 'update'])->name('whatsapp-template.update');
     
     // Session
     Route::get('sessions/data', [SessionController::class, 'getData'])->name('sessions.data');
