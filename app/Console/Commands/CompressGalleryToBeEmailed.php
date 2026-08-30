@@ -92,6 +92,9 @@ class CompressGalleryToBeEmailed extends Command
         // Older requests have no saved selection and should continue to include every folder.
         if (!empty($gallery_download->selected_folder_ids)) {
             $foldersQuery->whereIn('id', $gallery_download->selected_folder_ids);
+        } elseif ($gallery_download->folder_id) {
+            // Dashboard folder downloads predate multi-folder selections.
+            $foldersQuery->where('id', $gallery_download->folder_id);
         }
 
         $folders = $foldersQuery->get();

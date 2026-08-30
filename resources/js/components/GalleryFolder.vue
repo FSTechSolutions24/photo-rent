@@ -252,9 +252,7 @@ export default {
             axios.post('/dashboard/folders/download', { id })
             .then(response => {
                 console.log('Download request created:', response.data);
-
-                // Optional success message
-                alert('Your download has been added to the download queue.');
+                alert(response.data.message);
             })
             .catch(err => {
                 console.error('Failed to create download request:', err);
