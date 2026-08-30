@@ -42,10 +42,29 @@
 
 <div class="mb-3">
     <label>Total Amount:</label>
-    <input type="text" name="total_amount"  value="{{ old('total_amount', $session->total_amount ?? '') }}" class="input form-control">
+    <input type="text" name="total_amount" id="sessionTotalAmount" value="{{ old('total_amount', $session->total_amount ?? '') }}" class="input form-control">
     @error('total_amount')
         <small class="text-danger">{{ $message }}</small>
     @enderror
+</div>
+
+<div class="session-finance-summary" aria-live="polite">
+    <div class="session-finance-summary__item session-finance-summary__item--received">
+        <span class="session-finance-summary__label"><i class="fas fa-hand-holding-usd"></i> Received</span>
+        <strong id="financeReceived">0.00</strong>
+    </div>
+    <div class="session-finance-summary__item session-finance-summary__item--spent">
+        <span class="session-finance-summary__label"><i class="fas fa-receipt"></i> Spent</span>
+        <strong id="financeSpent">0.00</strong>
+    </div>
+    <div class="session-finance-summary__item session-finance-summary__item--outstanding">
+        <span class="session-finance-summary__label"><i class="fas fa-clock"></i> Still to collect</span>
+        <strong id="financeOutstanding">0.00</strong>
+    </div>
+    <div class="session-finance-summary__item session-finance-summary__item--net">
+        <span class="session-finance-summary__label" id="financeNetLabel"><i class="fas fa-chart-line"></i> Profit</span>
+        <strong id="financeNet">0.00</strong>
+    </div>
 </div>
 
 
@@ -56,8 +75,34 @@
 </div>
 
 @section('js')
+    <style>
+        .session-finance-summary {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            margin: 1.25rem 0 1rem;
+            overflow: hidden;
+            border: 1px solid #e6eaf0;
+            border-radius: .65rem;
+            background: #fff;
+            box-shadow: 0 5px 18px rgba(35, 50, 70, .07);
+        }
+        .session-finance-summary__item { padding: .85rem 1rem; border-right: 1px solid #e6eaf0; }
+        .session-finance-summary__item:last-child { border-right: 0; }
+        .session-finance-summary__label { display: block; margin-bottom: .3rem; color: #6c757d; font-size: .78rem; font-weight: 600; text-transform: uppercase; letter-spacing: .03em; }
+        .session-finance-summary__label i { margin-right: .25rem; }
+        .session-finance-summary__item strong { display: block; color: #273142; font-size: 1.25rem; line-height: 1.15; }
+        .session-finance-summary__item--received strong { color: #198754; }
+        .session-finance-summary__item--spent strong { color: #dc3545; }
+        .session-finance-summary__item--outstanding strong { color: #d98b00; }
+        .session-finance-summary__item--net.is-loss strong { color: #dc3545; }
+        @media (max-width: 767.98px) {
+            .session-finance-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .session-finance-summary__item:nth-child(2) { border-right: 0; }
+            .session-finance-summary__item:nth-child(-n+2) { border-bottom: 1px solid #e6eaf0; }
+        }
+    </style>
     <script>
-        var sessionFiance = @json(old('lines', $session->finance ?? []));
+        var sessionFinance = @json(old('lines', $session->finance ?? []));
 
         $(document).ready(function(){
             var myAppendGrid = new AppendGrid({
@@ -112,8 +157,8 @@
                 initRows: 0
             });
 
-            // Convert sessionFiance into the required array of objects
-            var rows = sessionFiance.map(function (line) {
+            // Convert existing finance records into the required array of objects
+            var rows = sessionFinance.map(function (line) {
                 return {
                     name: line.name || "",
                     description: line.description || "",
@@ -125,6 +170,46 @@
 
             // Append all rows at once
             myAppendGrid.appendRow(rows);
+
+            function amount(value) {
+                var parsed = parseFloat(String(value || '').replace(/,/g, ''));
+                return isNaN(parsed) ? 0 : parsed;
+            }
+
+            function formatAmount(value) {
+                return value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            }
+
+            function updateFinanceSummary() {
+                var received = 0;
+                var spent = 0;
+
+                myAppendGrid.getAllValue().forEach(function (row) {
+                    if (row.credit_debit === 'credit') {
+                        received += amount(row.amount);
+                    } else if (row.credit_debit === 'debit') {
+                        spent += amount(row.amount);
+                    }
+                });
+
+                var outstanding = Math.max(0, amount($('#sessionTotalAmount').val()) - received);
+                var net = received - spent;
+                var isLoss = net < 0;
+
+                $('#financeReceived').text(formatAmount(received));
+                $('#financeSpent').text(formatAmount(spent));
+                $('#financeOutstanding').text(formatAmount(outstanding));
+                $('#financeNet').text(formatAmount(Math.abs(net)));
+                $('#financeNetLabel').html('<i class="fas ' + (isLoss ? 'fa-chart-line' : 'fa-chart-line') + '"></i> ' + (isLoss ? 'Loss' : 'Profit'));
+                $('.session-finance-summary__item--net').toggleClass('is-loss', isLoss);
+            }
+
+            updateFinanceSummary();
+            $('#sessionTotalAmount').on('input change', updateFinanceSummary);
+            $('#tblAppendGrid').on('input change', 'input, select, textarea', updateFinanceSummary);
+            $('#tblAppendGrid').on('click', 'button, a', function () {
+                setTimeout(updateFinanceSummary, 0);
+            });
 
             // When form is submitted → collect the grid data
             $("form").on("submit", function(e) {
