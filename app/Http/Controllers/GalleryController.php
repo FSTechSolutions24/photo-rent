@@ -102,12 +102,15 @@ class GalleryController extends Controller
     
         $photographer = Auth::user()->photographer;
         $galleries = $photographer
-            ? $photographer->galleries()->with('client')->get()
+            ? $photographer->galleries()->with(['client', 'session'])->get()
             : collect();
 
         return DataTables::of($galleries)
         ->addColumn('is_public', function ($model) {
             return $model->is_public == '1' ? 'Yes' : 'No';
+        })
+        ->addColumn('session_name', function ($model) {
+            return $model->session ? $model->session->name : '-';
         })
         ->addColumn('actions', function ($model) {
 
@@ -147,9 +150,10 @@ class GalleryController extends Controller
     public function edit($id){
         $gallery = Gallery::findOrFail($id);
         $clients = auth()->user()->photographer->clients;
+        $sessions = auth()->user()->photographer->sessions()->orderByDesc('date')->get();
         $gallery->client_password = Crypt::decryptString($gallery->client_password);
         $gallery->guest_password = Crypt::decryptString($gallery->guest_password);
-        return view('dashboard.galleries.edit', compact('gallery','clients'));   
+        return view('dashboard.galleries.edit', compact('gallery', 'clients', 'sessions'));   
     }
     
     public function download(Request $request)
@@ -304,13 +308,19 @@ class GalleryController extends Controller
             'guest_password' => ['required', 'string', 'min:6', 'different:client_password'],
             'thumbnail' => 'nullable|image|max:2048',
             'is_public' => ['nullable', 'in:0,1'],
+            'session_id' => [
+                'nullable',
+                'integer',
+                Rule::exists('sessions', 'id')->where('photographer_id', $photographerId),
+            ],
         ]);
     }
 
     public function create()
     {
         $clients = auth()->user()->photographer->clients;
-        return view('dashboard.galleries.create', compact('clients'));
+        $sessions = auth()->user()->photographer->sessions()->orderByDesc('date')->get();
+        return view('dashboard.galleries.create', compact('clients', 'sessions'));
     }
 
     public function update(Request $request, Gallery $gallery){

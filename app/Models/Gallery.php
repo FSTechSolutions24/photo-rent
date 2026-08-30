@@ -9,11 +9,16 @@ class Gallery extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['photographer_id', 'name', 'slug', 'thumbnail_path', 'client_password', 'guest_password', 'is_public'];
+    protected $fillable = ['photographer_id', 'session_id', 'name', 'slug', 'thumbnail_path', 'client_password', 'guest_password', 'is_public'];
 
     public function client()
     {
         return $this->belongsTo(Client::class);
+    }
+
+    public function session()
+    {
+        return $this->belongsTo(Session::class);
     }
 
     public function folders()

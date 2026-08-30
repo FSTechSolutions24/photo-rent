@@ -9,6 +9,21 @@
 </div>
 
 <div class="mb-3">
+    <label for="session_id">Session:</label>
+    <select name="session_id" id="session_id" class="form-control select2">
+        <option value="">No session assigned</option>
+        @foreach ($sessions as $session)
+            <option value="{{ $session->id }}" {{ old('session_id', $gallery->session_id ?? '') == $session->id ? 'selected' : '' }}>
+                {{ $session->name }} — {{ \Illuminate\Support\Carbon::parse($session->date)->format('d M Y') }}
+            </option>
+        @endforeach
+    </select>
+    @error('session_id')
+        <small class="text-danger">{{ $message }}</small>
+    @enderror
+</div>
+
+<div class="mb-3">
     <label>Thumbnail:</label>
     <input type="file" name="thumbnail_path" id="thumbnail_path" class="input form-control" value="{{ old('phone', $gallery->phone ?? '') }}">
 
@@ -56,6 +71,7 @@
 </div>
 
 <script>
+    $(function () { $('#session_id').select2({ width: '100%' }); });
     document.getElementById('thumbnail_path').addEventListener('change', function(event) {
         const [file] = event.target.files;
         if (file) {

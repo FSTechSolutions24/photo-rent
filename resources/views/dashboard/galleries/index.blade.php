@@ -11,6 +11,7 @@
                     <th>Actions</th>
                     <th>#</th>
                     <th>Gallery Name</th>                
+                    <th>Session</th>
                     <th>Is public</th>                
                 </tr>
             </thead>
@@ -38,6 +39,7 @@
             {data:  'actions'},
             {data:  'id'},
             {data:  'name'},
+            {data:  'session_name'},
             {data:  'is_public'},
           ]
         })
