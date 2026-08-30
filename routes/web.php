@@ -74,10 +74,12 @@ Route::middleware(['auth', 'photographer'])->group(function () {
 });
 
 Route::middleware(['auth'])->prefix('dashboard')->name('dashboard.')->group(function () {
-    Route::resource('profile', ProfileController::class);
+    // These fixed paths must come before the resource wildcard: profile/{profile}.
+    Route::get('/profile/inactive', [ProfileController::class, 'inactivephotographer'])->name('profile.inactive');
+    Route::post('/profile/renew-subscription', [ProfileController::class, 'renewSubscription'])->name('profile.renew-subscription');
     Route::get('/api/profile/checksubdomain', [ProfileController::class, 'checksubdomain'])->name('checksubdomain');
     Route::get('/api/profile/createphotographerprofile', [ProfileController::class, 'createphotographerprofile'])->name('createphotographerprofile');
-    Route::get('/profile/inactive', [ProfileController::class, 'inactivephotographer'])->name('profile.inactive');
+    Route::resource('profile', ProfileController::class);
 });
 
 Route::get('paymobcallbackresponseview', [ProfileController::class, 'paymobcallbackresponseview'])->name('paymob.paymobcallbackresponseview');

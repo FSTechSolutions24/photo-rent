@@ -61,8 +61,13 @@ class ProfileController extends Controller
         return redirect()->back()->with('success', 'Profile updated successfully.');
     }
 
-    public function inactivephotographer(){
-        return view('dashboard.profile.inactive');
+    public function inactivephotographer()
+    {
+        $photographer = Auth::user()->photographer;
+        abort_unless($photographer && ! $photographer->active, 404);
+
+        $plans = SubscriptionPlan::with('lines')->get();
+        return view('dashboard.profile.inactive', compact('plans', 'photographer'));
     }
 
     public function create()
@@ -75,8 +80,9 @@ class ProfileController extends Controller
         }
 
         $plans = SubscriptionPlan::with('lines')->get();
+        $canStartTrial = ! $user->photographer;
 
-        return view('dashboard.profile.create', compact('plans'));
+        return view('dashboard.profile.create', compact('plans', 'canStartTrial'));
     }
 
     public function store(Request $request)
@@ -151,20 +157,44 @@ class ProfileController extends Controller
 
     public function createphotographerprofile(Request $request)
     {
-
-        $subdomain = $request->query('subdomain');
-        $selectedPlan = $request->query('selectedPlan');
-
-        $plan = SubscriptionPlan::where('id', $selectedPlan)->firstOrFail();
-
-        Photographer::create([
-            'user_id' => Auth::user()->id,
-            'plan_storage' => ($plan->storage_gb * 1024 * 1024 * 1024),
-            'subdomain' => $subdomain,
-            'active' => 0,
+        $data = $request->validate([
+            'subdomain' => ['required', 'string', 'max:255', 'regex:/^[A-Za-z0-9]+(?:-[A-Za-z0-9]+)*$/', 'unique:photographers,subdomain'],
+            'selectedPlan' => ['required'],
         ]);
 
-        $plan = SubscriptionPlan::where('id', $selectedPlan)->firstOrFail();
+        abort_if(Auth::user()->photographer, 422, 'A photographer profile already exists for this account.');
+
+        if ($data['selectedPlan'] === 'trial') {
+            $startsAt = Carbon::now();
+
+            Photographer::create([
+                'user_id' => Auth::id(),
+                'subdomain' => $data['subdomain'],
+                'plan_storage' => Photographer::TRIAL_STORAGE_BYTES,
+                'available_storage' => Photographer::TRIAL_STORAGE_BYTES,
+                'active' => true,
+                'is_trial' => true,
+                'trial_started_at' => $startsAt,
+                'trial_ends_at' => $startsAt->copy()->addDays(Photographer::TRIAL_DAYS),
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'trial' => true,
+            ]);
+        }
+
+        $plan = SubscriptionPlan::findOrFail($data['selectedPlan']);
+        $storageBytes = $plan->storage_gb * 1024 * 1024 * 1024;
+
+        Photographer::create([
+            'user_id' => Auth::id(),
+            'plan_storage' => $storageBytes,
+            'available_storage' => $storageBytes,
+            'subdomain' => $data['subdomain'],
+            'active' => false,
+            'is_trial' => false,
+        ]);
 
         $url = $this->paymob_create_order($plan);
 
@@ -175,6 +205,24 @@ class ProfileController extends Controller
         ]);
 
     }
+
+    /** Start a paid subscription for an existing inactive photographer. */
+    public function renewSubscription(Request $request)
+    {
+        $data = $request->validate([
+            'selectedPlan' => ['required', 'integer', Rule::exists('subscription_plans', 'id')],
+        ]);
+
+        $photographer = Auth::user()->photographer;
+        abort_unless($photographer && ! $photographer->active, 422, 'This account cannot be renewed.');
+
+        $plan = SubscriptionPlan::findOrFail($data['selectedPlan']);
+
+        return response()->json([
+            'success' => true,
+            'url' => $this->paymob_create_order($plan),
+        ]);
+    }
     
     public function paymob_create_order($plan){
         $token = $this->getToken();
@@ -183,13 +231,14 @@ class ProfileController extends Controller
         return 'https://accept.paymobsolutions.com/api/acceptance/iframes/' . $this->config_values['iframe_id'] . '?payment_token=' . $paymentToken;
     }
 
-    function add_payment_log($paymob_order_id, $type){
+    function add_payment_log($paymob_order_id, $type, $planId){
         PaymentLog::create([
             'user_id' => Auth::user()->id,
             'payment_getway' => 'paymob',
             'order_id' => $paymob_order_id,
             'status' => 'sent',
             'type' => $type,
+            'plan_id' => $planId,
         ]);
     }
 
@@ -256,7 +305,7 @@ class ProfileController extends Controller
             $data
         );
 
-        $this->add_payment_log($response->id, 'create_order');
+        $this->add_payment_log($response->id, 'create_order', $plan->id);
         return $response;
     }
 
@@ -392,16 +441,22 @@ class ProfileController extends Controller
 
     }
 
-    public function after_payment_success(array $order)
+    public function after_payment_success(PaymentLog $order)
     {
         DB::transaction(function () use ($order) {
 
             $photographer = Photographer::where('user_id', $order['user_id'])->firstOrFail();
             $plan = SubscriptionPlan::findOrFail($order['plan_id']);
 
-            // Activate photographer
+            $storageBytes = $plan->storage_gb * 1024 * 1024 * 1024;
+            $usedStorage = max(0, $photographer->plan_storage - $photographer->available_storage);
+
+            // Activate photographer and convert a former trial account to the paid plan.
             $photographer->update([
                 'active' => 1,
+                'is_trial' => false,
+                'plan_storage' => $storageBytes,
+                'available_storage' => max(0, $storageBytes - $usedStorage),
             ]);
 
             $start_date = Carbon::now();
