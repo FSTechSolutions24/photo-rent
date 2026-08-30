@@ -72,29 +72,36 @@ class FolderController extends Controller
 
     public function download(Request $request)
     {
-        // $mediaItems = Media::whereIn('id', $request->ids)->get();
+        $request->validate([
+            'id' => ['required'],
+        ]);
 
-        $folder = $request['id'];
+        // The Vue modal sends the complete folder object; also accept a raw ID.
+        $folderId = is_array($request->id) ? ($request->id['id'] ?? null) : $request->id;
+        $folder = Folder::with('gallery')->findOrFail($folderId);
 
-        $folder_db = Folder::where('id', $folder['id'])->first();
+        $this->authorizeGallery($folder->gallery);
 
-        $email = $request['email'];
-        // Download logic
-
-        // dd($request->json());
-
-        $data['folder_id'] = $folder_db['id'];
-        $data['gallery_id'] = $folder_db['gallery_id'];
+        $email = Auth::user()->email;
+        $data['folder_id'] = $folder->id;
+        $data['gallery_id'] = $folder->gallery_id;
         $data['requested_by_email'] = $email;
         $exist_download = $this->search_folder_file_exist($data);
 
         if($exist_download){
             $this->modify_folder_expiration_date($exist_download);
-            $this->send_url_to_email_asked_for_download($exist_download, $email);
+            $download = $exist_download;
         }
         else {
-            $this->add_new_folder_media_download_request($data);
-        }        
+            $download = $this->add_new_folder_media_download_request($data);
+        }
+
+        // Every request, including a newly created one, needs an email waiting for the ZIP.
+        $this->send_url_to_email_asked_for_download($download, $email);
+
+        return response()->json([
+            'message' => 'Your download is being prepared and will be emailed to ' . $email . '.',
+        ]);
     }
 
     public function modify_folder_expiration_date($exist_download){
@@ -107,7 +114,7 @@ class FolderController extends Controller
 
     public function send_url_to_email_asked_for_download($download, $email){
 
-        if(Auth::user()->id > 0){
+        if(Auth::check()){
             $email = Auth::user()->email;
         }
 
@@ -127,7 +134,7 @@ class FolderController extends Controller
 
         $user_type = $this->get_current_user_type();
     
-        GalleryDownload::create([
+        return GalleryDownload::create([
             'gallery_id' => $data['gallery_id'],
             'folder_id' => $data['folder_id'],
             'user_type' => $user_type,
@@ -154,7 +161,7 @@ class FolderController extends Controller
     
     public function get_current_user_type(){
 
-        if(Auth::user()->id > 0){
+        if(Auth::check()){
             return 'admin';
         }
 
@@ -247,8 +254,8 @@ class FolderController extends Controller
 
     private function authorizeGallery(Gallery $gallery)
     {
-        $photographer_id = Photographer::where('user_id', Auth::id())->first()->id;
-        abort_if(!$photographer_id, 403);
+        $photographer = Photographer::where('user_id', Auth::id())->first();
+        abort_unless($photographer && (int) $gallery->photographer_id === (int) $photographer->id, 403);
     }
 
     public function destroy(Gallery $gallery, Folder $folder)

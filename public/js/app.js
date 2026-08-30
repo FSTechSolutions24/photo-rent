@@ -40235,9 +40235,7 @@ __webpack_require__.r(__webpack_exports__);
         id: id
       }).then(function (response) {
         console.log('Download request created:', response.data);
-
-        // Optional success message
-        alert('Your download has been added to the download queue.');
+        alert(response.data.message);
       })["catch"](function (err) {
         var _err$response;
         console.error('Failed to create download request:', err);
