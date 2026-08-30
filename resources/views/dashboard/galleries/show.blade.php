@@ -1,15 +1,15 @@
-<!-- Folder Navbar -->
-<div class="folder-nav">
-    <button class="folder-btn active" data-folder="all">All</button>
-
-    @foreach ($gallery->folders as $folder)
-        <button 
-            class="folder-btn"
-            data-folder="folder-{{ $folder->id }}"
-        >
-            {{ $folder->name }}
-        </button>
-    @endforeach
+<!-- Folder Navbar --> 
+<div class="folder-nav"> 
+    <div class="folder-buttons"> 
+        <button class="folder-btn active" data-folder="all"> All </button> 
+        @foreach ($gallery->folders as $folder) 
+            <button class="folder-btn" data-folder="folder-{{ $folder->id }}" > {{ $folder->name }} </button> 
+        @endforeach 
+    </div> 
+    <!-- Download Button --> 
+    <button class="download-folder-btn" type="button"> 
+        <i class="fas fa-download"></i> <span>Download</span> 
+    </button> 
 </div>
 
 <!-- Gallery -->
@@ -264,42 +264,74 @@ body {
 
 
 /* Folder navigation */
-.folder-nav {
-    display: flex;
-    gap: 10px;
-    padding: 12px;
-    overflow-x: auto;
-    background: #0b0b0b;
-    position: sticky;
-    top: 0;
-    z-index: 20;
-}
-
-.folder-nav::-webkit-scrollbar {
-    display: none;
-}
-
-.folder-btn {
-    background: #111;
-    color: #bbb;
-    border: 1px solid #222;
-    padding: 8px 16px;
-    border-radius: 999px;
-    font-size: 14px;
-    cursor: pointer;
-    white-space: nowrap;
-    transition: all 0.25s ease;
-}
-
-.folder-btn:hover {
-    color: #fff;
-    border-color: #333;
-}
-
-.folder-btn.active {
-    background: #fff;
-    color: #000;
-    border-color: #fff;
+.folder-nav { 
+    display: flex; 
+    align-items: center; 
+    gap: 10px; 
+    padding: 12px; 
+    background: #0b0b0b; 
+    position: sticky; 
+    top: 0; z-index: 20; 
+} 
+/* Folder buttons container */ 
+.folder-buttons { 
+    display: flex; 
+    align-items: center; 
+    gap: 10px; 
+    overflow-x: auto; 
+    flex: 1; 
+} 
+.folder-buttons::-webkit-scrollbar { 
+    display: none; 
+} 
+.folder-btn { 
+    background: #111; 
+    color: #bbb; 
+    border: 1px solid #222; 
+    padding: 8px 16px; 
+    border-radius: 999px; 
+    font-size: 14px; 
+    cursor: pointer; 
+    white-space: nowrap; 
+    transition: all 0.25s ease; 
+} 
+.folder-btn:hover { 
+    color: #fff; 
+    border-color: #333; 
+} 
+.folder-btn.active { 
+    background: #fff; 
+    color: #000; 
+    border-color: #fff; 
+} 
+/* Download button */ 
+.download-folder-btn { 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    gap: 8px; 
+    background: #fff; 
+    color: #000; 
+    border: 1px solid #fff; 
+    padding: 8px 16px; 
+    border-radius: 999px; 
+    font-size: 14px; 
+    font-weight: 600; 
+    cursor: pointer; 
+    white-space: nowrap; 
+    transition: all 0.25s ease; 
+    flex-shrink: 0; 
+} 
+.download-folder-btn i { 
+    font-size: 13px; 
+} 
+.download-folder-btn:hover { 
+    background: #ddd; 
+    border-color: #ddd; 
+    transform: translateY(-1px); 
+} 
+.download-folder-btn:active { 
+    transform: translateY(0); 
 }
 
 .gallery-item {
