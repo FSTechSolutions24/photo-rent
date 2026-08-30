@@ -75,8 +75,9 @@ class ProfileController extends Controller
         }
 
         $plans = SubscriptionPlan::with('lines')->get();
+        $canStartTrial = ! $user->photographer;
 
-        return view('dashboard.profile.create', compact('plans'));
+        return view('dashboard.profile.create', compact('plans', 'canStartTrial'));
     }
 
     public function store(Request $request)
@@ -151,20 +152,44 @@ class ProfileController extends Controller
 
     public function createphotographerprofile(Request $request)
     {
-
-        $subdomain = $request->query('subdomain');
-        $selectedPlan = $request->query('selectedPlan');
-
-        $plan = SubscriptionPlan::where('id', $selectedPlan)->firstOrFail();
-
-        Photographer::create([
-            'user_id' => Auth::user()->id,
-            'plan_storage' => ($plan->storage_gb * 1024 * 1024 * 1024),
-            'subdomain' => $subdomain,
-            'active' => 0,
+        $data = $request->validate([
+            'subdomain' => ['required', 'string', 'max:255', 'regex:/^[A-Za-z0-9]+(?:-[A-Za-z0-9]+)*$/', 'unique:photographers,subdomain'],
+            'selectedPlan' => ['required'],
         ]);
 
-        $plan = SubscriptionPlan::where('id', $selectedPlan)->firstOrFail();
+        abort_if(Auth::user()->photographer, 422, 'A photographer profile already exists for this account.');
+
+        if ($data['selectedPlan'] === 'trial') {
+            $startsAt = Carbon::now();
+
+            Photographer::create([
+                'user_id' => Auth::id(),
+                'subdomain' => $data['subdomain'],
+                'plan_storage' => Photographer::TRIAL_STORAGE_BYTES,
+                'available_storage' => Photographer::TRIAL_STORAGE_BYTES,
+                'active' => true,
+                'is_trial' => true,
+                'trial_started_at' => $startsAt,
+                'trial_ends_at' => $startsAt->copy()->addDays(Photographer::TRIAL_DAYS),
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'trial' => true,
+            ]);
+        }
+
+        $plan = SubscriptionPlan::findOrFail($data['selectedPlan']);
+        $storageBytes = $plan->storage_gb * 1024 * 1024 * 1024;
+
+        Photographer::create([
+            'user_id' => Auth::id(),
+            'plan_storage' => $storageBytes,
+            'available_storage' => $storageBytes,
+            'subdomain' => $data['subdomain'],
+            'active' => false,
+            'is_trial' => false,
+        ]);
 
         $url = $this->paymob_create_order($plan);
 

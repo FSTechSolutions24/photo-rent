@@ -19,7 +19,16 @@ class EnsureUserIsPhotographer
             abort(403, 'Access denied. Only active photographers can access this section.');
         }
 
+        if ($user->photographer) {
+            $user->photographer->expireTrialIfNeeded();
+            $user->refresh();
+        }
+
         if(!Gate::allows('has-photographer', $user)) { //the profile is not completed yet
+            if ($user->photographer) {
+                return redirect()->route('dashboard.profile.inactive');
+            }
+
             return redirect()->route('dashboard.profile.create');
         }
 
