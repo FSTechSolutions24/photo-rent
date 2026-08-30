@@ -52,4 +52,9 @@ class Photographer extends Model
     {
         return $this->hasMany(Session::class);
     }
+
+    public function appointments()
+    {
+        return $this->hasMany(Appointment::class);
+    }
 }

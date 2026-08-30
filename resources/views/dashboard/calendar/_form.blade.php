@@ -35,7 +35,7 @@
 
 <div class="mb-3">
     <label class="form-label">Date: <span class="required_start">*</span></label>
-    <input type="text" name="date" value="{{ old('date', $appointment->date ?? '') }}" class="input form-control" autocomplete="false">
+    <input type="date" name="date" value="{{ old('date', $appointment->date ?? '') }}" class="input form-control" required inputmode="none" onkeydown="return false" onpaste="return false" ondrop="return false">
     @error('date')
         <small class="text-danger">{{ $message }}</small>
     @enderror
@@ -44,16 +44,16 @@
 
 <div class="row">
     <div class="mb-3 col-md-6">
-        <label class="form-label">Start Time: <span class="required_start">*</span></label>
-        <input type="text" name="start_time" value="{{ old('start_time', $appointment->start_time ?? '') }}" class="input form-control" autocomplete="false">
+        <label class="form-label">Start Time:</label>
+        <input type="time" name="start_time" value="{{ old('start_time', $appointment->start_time ?? '') }}" class="input form-control" inputmode="none" onkeydown="return false" onpaste="return false" ondrop="return false">
         @error('start_time')
             <small class="text-danger">{{ $message }}</small>
         @enderror
     </div>
     
     <div class="mb-3 col-md-6">
-        <label class="form-label">End Time:</label>
-        <input type="text" name="end_time" value="{{ old('end_time', $appointment->end_time ?? '') }}" class="input form-control" autocomplete="false">
+        <label class="form-label">End Time: <small class="text-muted">(optional)</small></label>
+        <input type="time" name="end_time" value="{{ old('end_time', $appointment->end_time ?? '') }}" class="input form-control" inputmode="none" onkeydown="return false" onpaste="return false" ondrop="return false">
         @error('end_time')
             <small class="text-danger">{{ $message }}</small>
         @enderror

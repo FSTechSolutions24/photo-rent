@@ -39797,10 +39797,13 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
               case 1:
                 response = _context.v;
                 successCallback(response.data.map(function (event) {
+                  var hasStartTime = Boolean(event.start_time);
                   return {
                     id: event.id,
                     title: event.name,
-                    start: event.date,
+                    start: hasStartTime ? "".concat(event.date, "T").concat(event.start_time) : event.date,
+                    end: event.end_time ? "".concat(event.date, "T").concat(event.end_time) : undefined,
+                    allDay: !hasStartTime,
                     backgroundColor: '#073b74',
                     borderColor: '#073b74',
                     textColor: '#ffffff'

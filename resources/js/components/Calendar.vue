@@ -31,14 +31,20 @@ const calendarOptions = {
         try {
             const response = await axios.get('/photographer/appointments/data')
             successCallback(
-                response.data.map(event => ({
+            response.data.map(event => {
+                const hasStartTime = Boolean(event.start_time)
+
+                return {
                     id: event.id,
                     title: event.name,
-                    start: event.date,
+                    start: hasStartTime ? `${event.date}T${event.start_time}` : event.date,
+                    end: event.end_time ? `${event.date}T${event.end_time}` : undefined,
+                    allDay: !hasStartTime,
                     backgroundColor: '#073b74',
                     borderColor: '#073b74',
                     textColor: '#ffffff'
-                }))
+                }
+            })
             )
         } catch (error) {
             failureCallback(error)

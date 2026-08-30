@@ -10,20 +10,25 @@ class Appointment extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['session_id', 'name', 'description', 'date', 'start_time', 'end_time'];
+    protected $fillable = ['photographer_id', 'session_id', 'name', 'description', 'date', 'start_time', 'end_time'];
 
     public function getStartTimeAttribute($value)
     {
-        return Carbon::parse($value)->format('H:i');
+        return $value ? Carbon::parse($value)->format('H:i') : null;
     }
 
     public function getEndTimeAttribute($value)
     {
-        return Carbon::parse($value)->format('H:i');
+        return $value ? Carbon::parse($value)->format('H:i') : null;
     }
 
     public function session()
     {
-        return $this->hasMany(Session::class);
+        return $this->belongsTo(Session::class);
+    }
+
+    public function photographer()
+    {
+        return $this->belongsTo(Photographer::class);
     }
 }

@@ -11,6 +11,7 @@ use App\Http\Controllers\FinanceReportController;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\SubscriptionPlanController;
 use App\Http\Controllers\WhatsAppTemplateController;
+use App\Http\Controllers\DashboardController;
 
 /*
 |--------------------------------------------------------------------------
@@ -75,7 +76,8 @@ Route::middleware(['auth', 'photographer'])->prefix('dashboard')->name('dashboar
 });
 
 Route::middleware(['auth', 'photographer'])->group(function () {
-    Route::get('/dashboard', function () {return view('dashboard');})->name('dashboard');
+    // Route::get('/dashboard', function () {return view('dashboard');})->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 });
 
 Route::middleware(['auth'])->prefix('dashboard')->name('dashboard.')->group(function () {

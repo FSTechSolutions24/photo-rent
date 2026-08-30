@@ -27,8 +27,12 @@ class AppointmentController extends Controller
     }
 
     public function edit($id){
-        $appointment = Appointment::findOrFail($id);
-        $sessions = auth()->user()->photographer->sessions;
+        $photographer = auth()->user()->photographer;
+        $appointment = Appointment::where('photographer_id', $photographer->id)
+            ->orWhereHas('session', function ($query) use ($photographer) {
+                $query->where('photographer_id', $photographer->id);
+            })->findOrFail($id);
+        $sessions = $photographer->sessions;
         
         return view('dashboard.calendar.edit', compact('appointment','sessions'));   
     }
@@ -36,6 +40,7 @@ class AppointmentController extends Controller
     public function store(Request $request)
     {
         $data = $this->validateAppointment($request);
+        $data['photographer_id'] = auth()->user()->photographer->id;
 
         Appointment::create($data);
 
@@ -45,6 +50,8 @@ class AppointmentController extends Controller
     public function update(Request $request, Appointment $appointment)
     {
         $data = $this->validateAppointment($request, $appointment->id);
+        abort_unless($appointment->photographer_id === auth()->user()->photographer->id || $appointment->session?->photographer_id === auth()->user()->photographer->id, 403);
+        $data['photographer_id'] = auth()->user()->photographer->id;
 
         $appointment->update($data);
 
@@ -81,17 +88,18 @@ class AppointmentController extends Controller
             ],
             'session_id' => [
                 'nullable',
-                'integer', // assuming session_id references an ID in sessions table
-                Rule::exists('sessions', 'id') // checks if session_id exists in sessions table
+                'integer',
+                Rule::exists('sessions', 'id')->where('photographer_id', auth()->user()->photographer->id),
             ],
             'start_time' => [
-                'required',
-                'date_format:H:i', // ensures time format like 14:30:00
+                'nullable',
+                'required_with:end_time',
+                'date_format:H:i',
             ],
             'end_time' => [
                 'nullable',
-                'date_format:H:i', // optional, but must be in H:i:s format if provided
-                // 'after:start_time', // ensures end_time is after start_time if provided
+                'date_format:H:i',
+                'after:start_time',
             ],
         ]);
     }
@@ -171,7 +179,12 @@ class AppointmentController extends Controller
     }
 
     public function getData(){
-        return Appointment::select('id','name','date')->get();
+        $photographer = auth()->user()->photographer;
+
+        return Appointment::where('photographer_id', $photographer->id)
+            ->orWhereHas('session', function ($query) use ($photographer) {
+                $query->where('photographer_id', $photographer->id);
+            })->select('id', 'name', 'date', 'start_time', 'end_time')->get();
     }
 
 }
