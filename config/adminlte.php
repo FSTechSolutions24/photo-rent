@@ -258,7 +258,7 @@ return [
     */
 
     'use_route_url' => false,
-    'dashboard_url' => 'home',
+    'dashboard_url' => 'dashboard',
     'logout_url' => 'logout',
     'login_url' => 'login',
     'register_url' => 'register',
@@ -446,6 +446,12 @@ return [
             'text' => 'Finance Report',
             'url' => 'dashboard/finance-report',
             'icon' => 'fas fa-fw fa-chart-pie',
+            'can' => 'has-photographer',
+        ],
+        [
+            'text' => 'Portfolio',
+            'url' => 'dashboard/portfolio',
+            'icon' => 'fas fa-fw fa-briefcase',
             'can' => 'has-photographer',
         ],
         [

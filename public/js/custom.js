@@ -11,6 +11,7 @@ $(function () {
 
     $('.modal').modal({
         backdrop: 'static',
-        keyboard: false
+        keyboard: false,
+        show: false
     });
 });

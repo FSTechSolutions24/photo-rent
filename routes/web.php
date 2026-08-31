@@ -12,6 +12,7 @@ use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\SubscriptionPlanController;
 use App\Http\Controllers\WhatsAppTemplateController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\PortfolioController;
 
 /*
 |--------------------------------------------------------------------------
@@ -38,6 +39,8 @@ Route::middleware(['auth', 'photographer'])->prefix('photographer')->name('photo
 });
 
 Route::middleware(['auth', 'photographer'])->prefix('dashboard')->name('dashboard.')->group(function () {
+    Route::get('portfolio', [PortfolioController::class, 'edit'])->name('portfolio.edit');
+    Route::put('portfolio', [PortfolioController::class, 'update'])->name('portfolio.update');
     // Clients
     Route::get('clients/data', [ClientController::class, 'getData'])->name('clients.data');
     Route::resource('clients', ClientController::class);
@@ -94,6 +97,8 @@ Route::post('paymobcallback', [ProfileController::class, 'callback'])->name('pay
 
 
 Route::domain('{photographer_subdomain}.' . env('APP_DOMAIN'))->group(function () {
+    // Public portfolio for a photographer's subdomain, e.g. pola.localhost:8000/portfolio.
+    Route::get('/portfolio', [PortfolioController::class, 'show'])->name('portfolio.show');
     Route::post('/{gallery_slug}/download', [GalleryController::class, 'requestDownload'])->name('gallery.download');
     Route::match(['get', 'post'], '/{gallery_slug}', [GalleryController::class, 'show'])->name('gallery.show');
 });
