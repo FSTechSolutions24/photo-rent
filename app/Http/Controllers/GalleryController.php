@@ -46,8 +46,9 @@ class GalleryController extends Controller
             }
         }
 
-        // If access is not already granted
-        if (!session($sessionKey)) {
+        // Public galleries are available without a password. Private galleries
+        // retain the existing client/guest password gate.
+        if (! $gallery->is_public && ! session($sessionKey)) {
 
             // Handle password form submission (POST)
             if ($request->isMethod('post')) {
@@ -253,7 +254,7 @@ class GalleryController extends Controller
         $photographer = Photographer::where('subdomain', $photographer_subdomain)->firstOrFail();
         $gallery = $photographer->galleries()->where('slug', $gallery_slug)->with('folders')->firstOrFail();
 
-        abort_unless(session('access_granted_' . $gallery->id), 403);
+        abort_unless($gallery->is_public || session('access_granted_' . $gallery->id), 403);
 
         $availableFolderIds = $gallery->folders->pluck('id')->map(function ($id) {
             return (int) $id;
@@ -271,7 +272,7 @@ class GalleryController extends Controller
 
         $download = GalleryDownload::create([
             'gallery_id' => $gallery->id,
-            'user_type' => $this->get_current_user_type(),
+            'user_type' => $gallery->is_public ? 'guest' : $this->get_current_user_type(),
             'requested_by_email' => $data['email'],
             'selected_folder_ids' => $folderIds,
             'full_gallery' => count($folderIds) === $availableFolderIds->count(),
@@ -368,8 +369,20 @@ class GalleryController extends Controller
                     ->where(fn ($query) => $query->where('photographer_id', $photographerId))
                     ->when($gallery, fn($rule) => $rule->ignore($gallery->id)),
             ],
-            'client_password' => ['required', 'string', 'min:6', 'different:guest_password'],
-            'guest_password' => ['required', 'string', 'min:6', 'different:client_password'],
+            'client_password' => [
+                Rule::requiredIf(! $request->boolean('is_public')),
+                'nullable',
+                'string',
+                'min:6',
+                'different:guest_password',
+            ],
+            'guest_password' => [
+                Rule::requiredIf(! $request->boolean('is_public')),
+                'nullable',
+                'string',
+                'min:6',
+                'different:client_password',
+            ],
             'thumbnail_path' => ['nullable', 'image', 'max:2048'],
             'background_path' => [
                 'nullable',
@@ -486,8 +499,11 @@ class GalleryController extends Controller
 
         // Prepare other fields
         $data['slug'] = Str::slug($data['name']) ?: Str::random(8);
-        $data['client_password'] = Crypt::encryptString($data['client_password']);
-        $data['guest_password'] = Crypt::encryptString($data['guest_password']);
+        // The database columns remain non-nullable. Public galleries may omit
+        // passwords, so store encrypted empty strings instead of requiring a
+        // schema change. Private galleries have already passed validation.
+        $data['client_password'] = Crypt::encryptString((string) ($data['client_password'] ?? ''));
+        $data['guest_password'] = Crypt::encryptString((string) ($data['guest_password'] ?? ''));
 
         return $data;
     }

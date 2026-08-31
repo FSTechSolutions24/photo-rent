@@ -116,32 +116,33 @@
     @enderror
 </div>
 
+@php($isPublic = old('is_public', $gallery->is_public ?? 0) == 1)
+
+<div class="mb-3 form-check">
+    <input type="hidden" name="is_public" value="0">
+    <div class="d-flex align-items-center">
+        <input type="checkbox" name="is_public" value="1" id="is_public" class="form-check-input me-2" {{ $isPublic ? 'checked' : '' }}>
+        <label for="is_public" class="form-check-label mt-1 ml-1">Public gallery</label>
+    </div>
+    <small class="form-text text-muted">Public galleries open without a password. Passwords are required for private galleries.</small>
+    @error('is_public')
+        <small class="text-danger d-block">{{ $message }}</small>
+    @enderror
+</div>
+
 <div class="mb-3">
-    <label>Client Password:</label>
-    <input type="text" name="client_password" value="{{ old('client_password', $gallery->client_password ?? '') }}" class="input form-control" required>
+    <label for="client_password">Client Password: <span class="password-required-marker required_start" {{ $isPublic ? 'hidden' : '' }}>*</span></label>
+    <input id="client_password" type="text" name="client_password" value="{{ old('client_password', $gallery->client_password ?? '') }}" class="input form-control" {{ $isPublic ? '' : 'required' }}>
     @error('client_password')
         <small class="text-danger">{{ $message }}</small>
     @enderror
 </div>
 
 <div class="mb-3">
-    <label>Guest Password:</label>
-    <input type="text" name="guest_password"  value="{{ old('guest_password', $gallery->guest_password ?? '') }}" class="input form-control"  required>
+    <label for="guest_password">Guest Password: <span class="password-required-marker required_start" {{ $isPublic ? 'hidden' : '' }}>*</span></label>
+    <input id="guest_password" type="text" name="guest_password" value="{{ old('guest_password', $gallery->guest_password ?? '') }}" class="input form-control" {{ $isPublic ? '' : 'required' }}>
     @error('guest_password')
         <small class="text-danger">{{ $message }}</small>
-    @enderror
-</div>
-
-<div class="mb-3 form-check d-flex align-items-center">
-
-    <input type="hidden" name="is_public" value="0">
-
-    <input type="checkbox" name="is_public" value="1" id="is_public" class="form-check-input me-2" {{ old('is_public', $gallery->is_public ?? 0) == 1 ? 'checked' : '' }}>
-
-    <label for="is_public" class="form-check-label mt-1 ml-1">Is Public</label>
-
-    @error('is_public')
-        <small class="text-danger d-block">{{ $message }}</small>
     @enderror
 </div>
 
@@ -253,6 +254,24 @@
 
         setImagePreview('thumbnail_path', 'thumbnailPreview');
         setImagePreview('background_path', 'backgroundPreview');
+
+        const publicCheckbox = document.getElementById('is_public');
+        const passwordInputs = [
+            document.getElementById('client_password'),
+            document.getElementById('guest_password'),
+        ];
+        const passwordMarkers = document.querySelectorAll('.password-required-marker');
+        const syncPasswordRequirements = () => {
+            const passwordsAreRequired = !publicCheckbox.checked;
+            passwordInputs.forEach(input => {
+                input.required = passwordsAreRequired;
+                input.setAttribute('aria-required', passwordsAreRequired ? 'true' : 'false');
+            });
+            passwordMarkers.forEach(marker => marker.hidden = !passwordsAreRequired);
+        };
+
+        publicCheckbox.addEventListener('change', syncPasswordRequirements);
+        syncPasswordRequirements();
 
         const layoutInputs = document.querySelectorAll('input[name="gallery_layout"]');
         const updateSelectedLayout = input => {
