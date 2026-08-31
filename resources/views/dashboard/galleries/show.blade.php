@@ -1,5 +1,21 @@
 <link rel="stylesheet" href="{{ asset('vendor/fontawesome-free/css/all.min.css') }}">
 
+@php
+    $galleryBackgroundUrl = $gallery->background_url;
+@endphp
+
+<header class="masonry-gallery-hero {{ $galleryBackgroundUrl ? 'masonry-gallery-hero--with-image' : '' }}">
+    @if ($galleryBackgroundUrl)
+        <div class="masonry-gallery-hero__image" style="background-image: url('{{ $galleryBackgroundUrl }}')"></div>
+    @endif
+    <div class="masonry-gallery-hero__overlay"></div>
+    <div class="masonry-gallery-hero__content">
+        <p>PRIVATE PHOTO COLLECTION</p>
+        <h1>{{ $gallery->name }}</h1>
+        <span>{{ $gallery->folders->count() }} {{ Str::plural('collection', $gallery->folders->count()) }} · {{ $gallery->folders->sum(fn ($folder) => $folder->media->count()) }} photographs</span>
+    </div>
+</header>
+
 <!-- Folder Navbar --> 
 <div class="folder-nav"> 
     <div class="folder-buttons"> 
@@ -573,6 +589,59 @@ body {
 
 .folder-btn {
     scroll-snap-align: start;
+}
+
+/* Gallery heading — shared background image, styled to preserve the original dark masonry experience. */
+.masonry-gallery-hero {
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    min-height: 300px;
+    padding: clamp(2rem, 6vw, 5rem) clamp(1rem, 5vw, 5rem) 2.6rem;
+    overflow: hidden;
+    background: linear-gradient(135deg, #191919, #090909);
+}
+.masonry-gallery-hero__image,
+.masonry-gallery-hero__overlay {
+    position: absolute;
+    inset: 0;
+}
+.masonry-gallery-hero__image {
+    background-position: center;
+    background-size: cover;
+}
+.masonry-gallery-hero__overlay {
+    background: linear-gradient(90deg, rgba(0, 0, 0, .8), rgba(0, 0, 0, .43));
+}
+.masonry-gallery-hero__content {
+    position: relative;
+    z-index: 1;
+    max-width: 900px;
+}
+.masonry-gallery-hero p {
+    margin: 0 0 .7rem;
+    color: #d6d6d6;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: .18em;
+}
+.masonry-gallery-hero h1 {
+    margin: 0;
+    color: #fff;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: clamp(2.4rem, 6vw, 5.5rem);
+    font-weight: 400;
+    letter-spacing: -.05em;
+    line-height: .92;
+}
+.masonry-gallery-hero span {
+    display: block;
+    margin-top: 1rem;
+    color: #d5d5d5;
+    font-size: 13px;
+}
+@media (max-width: 700px) {
+    .masonry-gallery-hero { min-height: 340px; }
 }
 
 /* Download drawer */

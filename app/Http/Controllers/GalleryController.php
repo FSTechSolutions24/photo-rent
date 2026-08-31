@@ -92,7 +92,15 @@ class GalleryController extends Controller
         }
 
         // 5️⃣ Access granted → show gallery
-        return view('dashboard.galleries.show', compact('gallery', 'photographer'));
+        $layout = $gallery->gallery_layout ?? Gallery::LAYOUT_MASONRY;
+
+        $view = match ($layout) {
+            Gallery::LAYOUT_EDITORIAL => 'dashboard.galleries.show-editorial',
+            Gallery::LAYOUT_LUXE => 'dashboard.galleries.show-luxe',
+            default => 'dashboard.galleries.show',
+        };
+
+        return view($view, compact('gallery', 'photographer'));
     }
 
     public function index(){
@@ -362,7 +370,13 @@ class GalleryController extends Controller
             ],
             'client_password' => ['required', 'string', 'min:6', 'different:guest_password'],
             'guest_password' => ['required', 'string', 'min:6', 'different:client_password'],
-            'thumbnail' => 'nullable|image|max:2048',
+            'thumbnail_path' => ['nullable', 'image', 'max:2048'],
+            'background_path' => ['nullable', 'image', 'max:5120'],
+            'gallery_layout' => ['required', Rule::in([
+                Gallery::LAYOUT_MASONRY,
+                Gallery::LAYOUT_EDITORIAL,
+                Gallery::LAYOUT_LUXE,
+            ])],
             'is_public' => ['nullable', 'in:0,1'],
             'session_id' => [
                 'nullable',
@@ -387,6 +401,7 @@ class GalleryController extends Controller
         $gallery->update($data);
         
         $this->update_gallery_thumbnail($request, $gallery);
+        $this->update_gallery_background($request, $gallery);
 
         return redirect()->route('dashboard.galleries.index')->with('success', 'Client updated successfully.');
     }
@@ -402,28 +417,64 @@ class GalleryController extends Controller
         $gallery = Gallery::create($data);
 
         $this->update_gallery_thumbnail($request, $gallery);
+        $this->update_gallery_background($request, $gallery);
 
         return redirect()->route('dashboard.galleries.index')->with('success', 'Gallery created successfully.');
     }
 
     public function update_gallery_thumbnail(Request $request, $gallery){
-        // Handle thumbnail upload
         if ($request->hasFile('thumbnail_path')) {
-
-            // 1. Delete old thumbnail if it exists
-            if ($gallery->thumbnail_path && Storage::disk('public')->exists($gallery->thumbnail_path)) {
-                Storage::disk('public')->delete($gallery->thumbnail_path);
-            }
-
-            // Store file locally under /storage/app/thumbnails/{gallery_id}
-            $thumbnailPath = $request->file('thumbnail_path')->store("galleries/{$gallery->id}/thumbnail", 'public'); // 'local' can later be changed to 's3' or 'wasabi'
-            // Update the gallery model
-            $gallery->thumbnail_path = $thumbnailPath;
+            $this->delete_gallery_asset($gallery->thumbnail_path);
+            $gallery->thumbnail_path = $this->store_gallery_asset($request->file('thumbnail_path'), $gallery, 'thumbnail');
             $gallery->save();
         }
     }
 
+    public function update_gallery_background(Request $request, $gallery)
+    {
+        if (! $request->hasFile('background_path')) {
+            return;
+        }
+
+        $this->delete_gallery_asset($gallery->background_path);
+        $gallery->background_path = $this->store_gallery_asset($request->file('background_path'), $gallery, 'background');
+        $gallery->save();
+    }
+
+    private function store_gallery_asset($file, Gallery $gallery, string $type): string
+    {
+        $extension = strtolower($file->getClientOriginalExtension() ?: $file->extension() ?: 'jpg');
+        $path = sprintf(
+            'users/%s/galleries/%s/assets/%s/%s.%s',
+            Auth::id(),
+            $gallery->id,
+            $type,
+            Str::uuid(),
+            $extension
+        );
+
+        Storage::disk('wasabi')->put($path, file_get_contents($file));
+
+        return $path;
+    }
+
+    private function delete_gallery_asset(?string $path): void
+    {
+        if (! $path) {
+            return;
+        }
+
+        $disk = str_starts_with($path, 'users/') ? 'wasabi' : 'public';
+
+        if (Storage::disk($disk)->exists($path)) {
+            Storage::disk($disk)->delete($path);
+        }
+    }
+
     public function prepare_gallery_data(array $data){
+
+        // Uploaded files are stored separately once the gallery has an ID.
+        unset($data['thumbnail_path'], $data['background_path']);
 
         // Prepare other fields
         $data['slug'] = Str::slug($data['name']) ?: Str::random(8);
