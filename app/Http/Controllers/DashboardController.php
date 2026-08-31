@@ -47,13 +47,57 @@ class DashboardController extends Controller
             ->where(function ($query) use ($now) {
                 $query->whereDate('date', '>', $now->toDateString())
                     ->orWhere(function ($query) use ($now) {
-                        $query->whereDate('date', $now->toDateString())->where('start_time', '>=', $now->format('H:i:s'));
+                        $query->whereDate('date', $now->toDateString())
+                            ->where(function ($query) use ($now) {
+                                $query->whereNull('start_time')
+                                    ->orWhere('start_time', '>=', $now->format('H:i:s'));
+                            });
                     });
             })
-            ->orderBy('date')->orderBy('start_time')->get();
+            ->get()
+            ->map(function ($appointment) {
+                $date = Carbon::parse($appointment->date)->format('Y-m-d');
+                $startsAt = $appointment->start_time
+                    ? Carbon::parse($date . ' ' . $appointment->start_time)
+                    : Carbon::parse($date)->startOfDay();
 
-        $nextAppointment = $nextAppointments->first();
+                return [
+                    'name' => $appointment->name,
+                    'starts_at' => $startsAt,
+                    'time_label' => $appointment->start_time
+                        ? $appointment->start_time . ($appointment->end_time ? ' - ' . $appointment->end_time : '')
+                        : 'All day',
+                    'subtitle' => $appointment->session->name ?? 'No session assigned',
+                    'edit_url' => route('photographer.appointments.edit', $appointment->id),
+                    'type' => 'appointment',
+                ];
+            });
 
-        return view('dashboard', compact('counts', 'summary', 'nextAppointment', 'nextAppointments'));
+        $nextSessions = $photographer->sessions()
+            ->with('client')
+            ->where('date', '>=', $now->format('Y-m-d H:i:s'))
+            ->get()
+            ->map(function ($session) {
+                $startsAt = Carbon::parse($session->date);
+
+                return [
+                    'name' => $session->name,
+                    'starts_at' => $startsAt,
+                    'time_label' => $startsAt->format('H:i'),
+                    'subtitle' => $session->client->name ?? 'Session',
+                    'edit_url' => route('dashboard.sessions.edit', $session->id),
+                    'type' => 'session',
+                ];
+            });
+
+        $upcomingMeetings = $nextAppointments
+            ->concat($nextSessions)
+            ->sortBy(function ($meeting) {
+                return $meeting['starts_at']->getTimestamp();
+            })
+            ->values();
+        $nextMeeting = $upcomingMeetings->first();
+
+        return view('dashboard', compact('counts', 'summary', 'nextMeeting', 'upcomingMeetings'));
     }
 }
