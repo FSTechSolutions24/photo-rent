@@ -371,7 +371,12 @@ class GalleryController extends Controller
             'client_password' => ['required', 'string', 'min:6', 'different:guest_password'],
             'guest_password' => ['required', 'string', 'min:6', 'different:client_password'],
             'thumbnail_path' => ['nullable', 'image', 'max:2048'],
-            'background_path' => ['nullable', 'image', 'max:5120'],
+            'background_path' => [
+                'nullable',
+                'image',
+                'max:15360',
+                'dimensions:min_width=1920,min_height=720',
+            ],
             'gallery_layout' => ['required', Rule::in([
                 Gallery::LAYOUT_MASONRY,
                 Gallery::LAYOUT_EDITORIAL,
@@ -383,6 +388,9 @@ class GalleryController extends Controller
                 'integer',
                 Rule::exists('sessions', 'id')->where('photographer_id', $photographerId),
             ],
+        ], [
+            'background_path.max' => 'The gallery background may not be larger than 15 MB.',
+            'background_path.dimensions' => 'The gallery background must be at least 1920 x 720 pixels to remain sharp on large screens.',
         ]);
     }
 
