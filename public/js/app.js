@@ -39777,10 +39777,10 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       eventClick: function eventClick(info) {
         // prevent FullCalendar default behavior
         info.jsEvent.preventDefault();
-
-        // example: open appointment details page
-        var appointmentId = info.event.id;
-        window.location.href = "/photographer/appointments/".concat(appointmentId, "/edit");
+        var editUrl = info.event.extendedProps.editUrl;
+        if (editUrl) {
+          window.location.href = editUrl;
+        }
       },
       eventMouseEnter: function eventMouseEnter(info) {
         info.el.style.cursor = 'pointer';
@@ -39796,19 +39796,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
                 return axios.get('/photographer/appointments/data');
               case 1:
                 response = _context.v;
-                successCallback(response.data.map(function (event) {
-                  var hasStartTime = Boolean(event.start_time);
-                  return {
-                    id: event.id,
-                    title: event.name,
-                    start: hasStartTime ? "".concat(event.date, "T").concat(event.start_time) : event.date,
-                    end: event.end_time ? "".concat(event.date, "T").concat(event.end_time) : undefined,
-                    allDay: !hasStartTime,
-                    backgroundColor: '#073b74',
-                    borderColor: '#073b74',
-                    textColor: '#ffffff'
-                  };
-                }));
+                successCallback(response.data);
                 _context.n = 3;
                 break;
               case 2:

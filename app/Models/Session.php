@@ -10,7 +10,7 @@ class Session extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'phone', 'date', 'total_amount', 'client_id', 'photographer_id'];
+    protected $fillable = ['name', 'phone', 'date', 'total_amount', 'notes', 'client_id', 'photographer_id'];
 
     public function client()
     {

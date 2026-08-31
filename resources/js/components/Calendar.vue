@@ -20,9 +20,10 @@ const calendarOptions = {
         // prevent FullCalendar default behavior
         info.jsEvent.preventDefault()
 
-        // example: open appointment details page
-        const appointmentId = info.event.id
-        window.location.href = `/photographer/appointments/${appointmentId}/edit`
+        const editUrl = info.event.extendedProps.editUrl
+        if (editUrl) {
+            window.location.href = editUrl
+        }
     },
     eventMouseEnter(info) {
         info.el.style.cursor = 'pointer'
@@ -30,22 +31,7 @@ const calendarOptions = {
     events: async (info, successCallback, failureCallback) => {
         try {
             const response = await axios.get('/photographer/appointments/data')
-            successCallback(
-            response.data.map(event => {
-                const hasStartTime = Boolean(event.start_time)
-
-                return {
-                    id: event.id,
-                    title: event.name,
-                    start: hasStartTime ? `${event.date}T${event.start_time}` : event.date,
-                    end: event.end_time ? `${event.date}T${event.end_time}` : undefined,
-                    allDay: !hasStartTime,
-                    backgroundColor: '#073b74',
-                    borderColor: '#073b74',
-                    textColor: '#ffffff'
-                }
-            })
-            )
+            successCallback(response.data)
         } catch (error) {
             failureCallback(error)
         }

@@ -1,6 +1,8 @@
 @php
     $title = $photographer->portfolio_title ?: $photographer->user->name;
-    $theme = $photographer->portfolio_theme ?: 'classic';
+    // Legacy portfolio styles use the current dark design. Only the new light
+    // option changes the palette; the portfolio structure remains identical.
+    $theme = $photographer->portfolio_theme === 'light' ? 'light' : 'bold';
     $featured = $galleries->first();
     $featuredImage = $photographer->portfolio_cover_url ?: $featured?->thumbnail_url;
     $contactEmail = $photographer->portfolio_contact_email ?: $photographer->user->email;
@@ -24,13 +26,37 @@
         .theme-bold .slider-button{border-color:rgba(255,255,255,.2);color:#fff}
         .theme-bold .slider-progress{background:rgba(255,255,255,.14)}
         .theme-bold .portfolio-empty{border-color:rgba(255,255,255,.12)}
+        /* Light Showcase keeps the Dark Showcase layout and changes only its palette. */
+        .theme-light{background:#f8f7f4;color:#20242a}
+        .theme-light .nav{color:#20242a}
+        .theme-light .nav a{color:#20242a}
+        .theme-light .hero{display:block;min-height:690px;background:#e9e6df center/cover no-repeat;color:#20242a}
+        .theme-light .hero-copy{min-height:690px;max-width:840px}
+        .theme-light .hero p:not(.eyebrow){color:rgba(32,36,42,.76)}
+        .theme-light .work{max-width:1450px}
+        .theme-light .section-head p{color:#6c7279}
+        .theme-light .grid{gap:.9rem}
+        .theme-light .card,.theme-light .card:first-child{grid-column:span 4;border-radius:.65rem}
+        .theme-light .card:first-child{grid-column:span 8;grid-row:span 2}
+        .theme-light .card:first-child .card-media{height:100%;aspect-ratio:auto}
+        .theme-light .card-info{display:none}
+        .theme-light .contact{background:linear-gradient(135deg,#f1eee8,#e2e5e8);color:#20242a}
+        .theme-light .contact-copy{color:rgba(32,36,42,.64)}
+        .theme-light .contact-list{border-color:rgba(32,36,42,.16)}
+        .theme-light .contact-item{border-color:rgba(32,36,42,.16)!important;color:#20242a!important}
+        .theme-light .contact-item:hover{background:rgba(32,36,42,.035)}
+        .theme-light .contact-icon{border-color:rgba(32,36,42,.2)}
+        .theme-light .contact-text small{color:rgba(32,36,42,.5)}
+        .theme-light .contact-text strong{color:#20242a}
+        .theme-light .footer{border-color:rgba(32,36,42,.1);background:#e5e3dd;color:#697078}
+        @media(max-width:760px){.theme-light .hero,.theme-light .hero-copy{min-height:560px}.theme-light .card,.theme-light .card:first-child{grid-column:1;grid-row:auto}.theme-light .card:first-child .card-media{height:auto;aspect-ratio:4/3}}
     </style>
 </head>
 <body class="theme-{{ $theme }}">
     <nav class="nav"><span class="brand">{{ $title }}</span>@if($photographer->portfolio_show_contact)<a href="#contact">Contact</a>@endif</nav>
-    <header class="hero" @if($theme === 'bold' && $featuredImage) style="background-image:linear-gradient(90deg,rgba(8,14,22,.82),rgba(8,14,22,.15)),url('{{ $featuredImage }}')" @endif>
+    <header class="hero" @if(in_array($theme, ['bold', 'light'], true) && $featuredImage) style="background-image:{{ $theme === 'light' ? 'linear-gradient(90deg,rgba(255,255,255,.9),rgba(255,255,255,.28))' : 'linear-gradient(90deg,rgba(8,14,22,.82),rgba(8,14,22,.15))' }},url('{{ $featuredImage }}')" @endif>
         <div class="hero-copy"><p class="eyebrow">Photography portfolio</p><h1>{{ $title }}</h1>@if($photographer->portfolio_bio)<p>{{ $photographer->portfolio_bio }}</p>@endif</div>
-        @if($theme !== 'bold')<div class="hero-image {{ $featuredImage ? '' : 'hero-image--empty' }}" @if($featuredImage) style="background-image:url('{{ $featuredImage }}')" @endif></div>@endif
+        @if(! in_array($theme, ['bold', 'light'], true))<div class="hero-image {{ $featuredImage ? '' : 'hero-image--empty' }}" @if($featuredImage) style="background-image:url('{{ $featuredImage }}')" @endif></div>@endif
     </header>
     <main class="work">
         <div class="section-head showcase-head">

@@ -21,7 +21,7 @@ class PortfolioController extends Controller
         $data = $request->validate([
             'portfolio_title' => ['nullable', 'string', 'max:100'],
             'portfolio_bio' => ['nullable', 'string', 'max:1000'],
-            'portfolio_theme' => ['required', 'in:classic,minimal,bold'],
+            'portfolio_theme' => ['required', 'in:bold,light'],
             'portfolio_primary_color' => ['required', 'regex:/^#[0-9A-Fa-f]{6}$/'],
             'portfolio_accent_color' => ['required', 'regex:/^#[0-9A-Fa-f]{6}$/'],
             'portfolio_show_contact' => ['nullable', 'boolean'],

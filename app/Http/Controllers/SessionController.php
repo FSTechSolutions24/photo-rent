@@ -65,21 +65,26 @@ class SessionController extends Controller
 
     protected function validateSession(Request $request, $id = null){
         $photographer_id = Photographer::where('user_id', Auth::id())->first()->id;
-        return $request->validate([
+        $data = $request->validate([
             'name' => 'required|string|max:255',
             'phone' => [
                 'required',
                 'regex:/^(?:\+20|0)?1[0125][0-9]{8}$/',
-                Rule::unique('clients', 'phone')->where('photographer_id', Auth::id())->ignore($id, 'id'),
             ],
-            'date' => ['required', 'date_format:Y-m-d H:i:s'],
+            'date' => ['required', 'date_format:Y-m-d\TH:i'],
             'client_id' => [
                 'nullable',
                 'integer',
                 Rule::exists('clients', 'id')->where('photographer_id', $photographer_id),
             ],
             'total_amount' => ['nullable','numeric','regex:/^\d+(\.\d{1,2})?$/'],
+            'notes' => ['nullable', 'string', 'max:5000'],
         ]);
+
+        $data['date'] = Carbon::createFromFormat('Y-m-d\TH:i', $data['date'])
+            ->format('Y-m-d H:i:s');
+
+        return $data;
     }
 
     public function create()

@@ -1,6 +1,7 @@
 <?php
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use App\Models\Client;
 use App\Models\Appointment;
 use App\Models\Photographer;
@@ -181,10 +182,49 @@ class AppointmentController extends Controller
     public function getData(){
         $photographer = auth()->user()->photographer;
 
-        return Appointment::where('photographer_id', $photographer->id)
+        $appointments = Appointment::where('photographer_id', $photographer->id)
             ->orWhereHas('session', function ($query) use ($photographer) {
                 $query->where('photographer_id', $photographer->id);
-            })->select('id', 'name', 'date', 'start_time', 'end_time')->get();
+            })
+            ->select('id', 'name', 'date', 'start_time', 'end_time')
+            ->get()
+            ->map(function ($appointment) {
+                $hasStartTime = ! empty($appointment->start_time);
+
+                return [
+                    'id' => 'appointment-' . $appointment->id,
+                    'title' => $appointment->name,
+                    'start' => $hasStartTime
+                        ? $appointment->date . 'T' . $appointment->start_time
+                        : $appointment->date,
+                    'end' => $appointment->end_time
+                        ? $appointment->date . 'T' . $appointment->end_time
+                        : null,
+                    'allDay' => ! $hasStartTime,
+                    'backgroundColor' => '#073b74',
+                    'borderColor' => '#073b74',
+                    'textColor' => '#ffffff',
+                    'editUrl' => route('photographer.appointments.edit', $appointment->id),
+                ];
+            });
+
+        $sessions = $photographer->sessions()
+            ->select('id', 'name', 'date')
+            ->get()
+            ->map(function ($session) {
+                return [
+                    'id' => 'session-' . $session->id,
+                    'title' => $session->name,
+                    'start' => Carbon::parse($session->date)->format('Y-m-d\TH:i:s'),
+                    'allDay' => false,
+                    'backgroundColor' => '#198754',
+                    'borderColor' => '#198754',
+                    'textColor' => '#ffffff',
+                    'editUrl' => route('dashboard.sessions.edit', $session->id),
+                ];
+            });
+
+        return $appointments->concat($sessions)->values();
     }
 
 }

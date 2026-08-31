@@ -1,49 +1,70 @@
 @csrf
 
-<div class="mb-3">
-    <label>Session Name: <span class="required_start">*</span></label>
-    <input type="text" name="name" value="{{ old('name', $session->name ?? '') }}" class="input form-control" required>
-    @error('name')
-        <small class="text-danger">{{ $message }}</small>
-    @enderror
+@php
+    $sessionDateValue = old('date');
+    if ($sessionDateValue === null && isset($session) && $session->date) {
+        $sessionDateValue = \Illuminate\Support\Carbon::parse($session->date)->format('Y-m-d\TH:i');
+    }
+@endphp
+
+<div class="row">
+    <div class="mb-3 col-md-6">
+        <label>Session Name: <span class="required_start">*</span></label>
+        <input type="text" name="name" value="{{ old('name', $session->name ?? '') }}" class="input form-control" required>
+        @error('name')
+            <small class="text-danger">{{ $message }}</small>
+        @enderror
+    </div>
+
+    <div class="mb-3 col-md-6">
+        <label>Client:</label>
+        <select name="client_id" id="sessionClient" class="form-control select2">
+            <option value=""></option>
+            @foreach ($clients as $client)
+                <option value="{{ $client->id }}" data-phone="{{ $client->phone ?? '' }}"
+                    {{ (old('client_id', $session->client_id ?? '') == $client->id) ? 'selected' : '' }}>
+                    {{ $client->name }}
+                </option>
+            @endforeach
+        </select>
+        @error('client_id')
+            <small class="text-danger">{{ $message }}</small>
+        @enderror
+    </div>
+</div>
+
+<div class="row">
+    <div class="mb-3 col-md-6">
+        <label>Phone: <span class="required_start">*</span></label>
+        <input type="text" name="phone" id="sessionPhone" value="{{ old('phone', $session->phone ?? '') }}" class="input form-control" required>
+        @error('phone')
+            <small class="text-danger">{{ $message }}</small>
+        @enderror
+    </div>
+
+    <div class="mb-3 col-md-6">
+        <label for="sessionDate">Date and time: <span class="required_start">*</span></label>
+        <input type="datetime-local" name="date" id="sessionDate" value="{{ $sessionDateValue }}" class="input form-control" step="60" required>
+        @error('date')
+            <small class="text-danger">{{ $message }}</small>
+        @enderror
+    </div>
+</div>
+
+<div class="row">
+    <div class="mb-3 col-md-6">
+        <label>Total Amount:</label>
+        <input type="text" name="total_amount" id="sessionTotalAmount" value="{{ old('total_amount', $session->total_amount ?? '') }}" class="input form-control">
+        @error('total_amount')
+            <small class="text-danger">{{ $message }}</small>
+        @enderror
+    </div>
 </div>
 
 <div class="mb-3">
-    <label>Client:</label>
-    <select name="client_id" class="form-control select2" value="{{ old('client_id', $session->client_id ?? '') }}">
-        <option value=""></option>
-        @foreach ($clients as $client)
-            <option value="{{ $client->id }}"
-                {{ (old('client_id', $session->client_id ?? '') == $client->id) ? 'selected' : '' }}>
-                {{ $client->name }}
-            </option>
-        @endforeach
-    </select>
-    @error('client_id')
-        <small class="text-danger">{{ $message }}</small>
-    @enderror
-</div>
-
-<div class="mb-3">
-    <label>Phone: <span class="required_start">*</span></label>
-    <input type="text" name="phone"  value="{{ old('phone', $session->phone ?? '') }}" class="input form-control"  required>
-    @error('phone')
-        <small class="text-danger">{{ $message }}</small>
-    @enderror
-</div>
-
-<div class="mb-3">
-    <label>Date: <span class="required_start">*</span></label>
-    <input type="text" name="date"  value="{{ old('date', $session->date ?? '') }}" class="input form-control"  required>
-    @error('date')
-        <small class="text-danger">{{ $message }}</small>
-    @enderror
-</div>
-
-<div class="mb-3">
-    <label>Total Amount:</label>
-    <input type="text" name="total_amount" id="sessionTotalAmount" value="{{ old('total_amount', $session->total_amount ?? '') }}" class="input form-control">
-    @error('total_amount')
+    <label for="sessionNotes">Notes:</label>
+    <textarea name="notes" id="sessionNotes" class="input form-control" rows="2" maxlength="5000" placeholder="Add any notes about this session...">{{ old('notes', $session->notes ?? '') }}</textarea>
+    @error('notes')
         <small class="text-danger">{{ $message }}</small>
     @enderror
 </div>
@@ -107,6 +128,11 @@
         var sessionFinance = @json(old('lines', $session->finance ?? []));
 
         $(document).ready(function(){
+            $('#sessionClient').on('change', function () {
+                var selectedOption = this.options[this.selectedIndex];
+                $('#sessionPhone').val(selectedOption ? (selectedOption.dataset.phone || '') : '');
+            });
+
             var myAppendGrid = new AppendGrid({
                 element: "tblAppendGrid",
                 uiFramework: "bootstrap4",
