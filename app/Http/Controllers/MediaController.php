@@ -55,14 +55,16 @@ class MediaController extends Controller
                 ], 500);
             }
 
-            $deleted = Media::where('id', $mediaId)->where('gallery_id', $galleryId)->delete();
+            $media = Media::where('id', $mediaId)->where('gallery_id', $galleryId)->first();
 
-            if ($deleted === 0) {
+            if (! $media) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Media not found'
                 ], 404);
-            }            
+            }
+
+            $media->delete();
 
             return response()->json([
                 'success' => true,

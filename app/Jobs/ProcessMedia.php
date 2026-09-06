@@ -17,12 +17,14 @@ class ProcessMedia implements ShouldQueue
     protected $originalPath;
     protected $basePath;
     protected $filename;
+    protected $mediaId;
 
-    public function __construct($originalPath, $basePath, $filename)
+    public function __construct($originalPath, $basePath, $filename, $mediaId = null)
     {
         $this->originalPath = $originalPath;
         $this->basePath = $basePath;
         $this->filename = pathinfo($filename, PATHINFO_FILENAME);
+        $this->mediaId = $mediaId;
     }
 
     public function handle()
@@ -38,26 +40,50 @@ class ProcessMedia implements ShouldQueue
 
         $fileContent = Storage::disk('wasabi')->get($this->originalPath);
 
-        $image = $manager->read($fileContent);
-
         // =========================
         // MEDIUM
         // =========================
-        $medium = $image->scale(width: 2000); // keeps aspect ratio
+        $medium = $manager->read($fileContent)->orient();
+        if ($medium->width() >= $medium->height()) {
+            $medium->scaleDown(width: 2000);
+        } else {
+            $medium->scaleDown(height: 2000);
+        }
 
         Storage::disk('wasabi')->put(
             "{$this->basePath}/medium/{$this->filename}.{$extension}",
-            (string) $medium->toWebp(80)
+            $this->encodeForExtension($medium, $extension, 80)
         );
 
         // =========================
         // THUMB
         // =========================
-        $thumb = $image->cover(400, 400); // like fit()
+        $thumb = $manager->read($fileContent)->orient()->cover(400, 400); // like fit()
 
         Storage::disk('wasabi')->put(
             "{$this->basePath}/thumb/{$this->filename}.{$extension}",
-            (string) $thumb->toWebp(70)
+            $this->encodeForExtension($thumb, $extension, 70)
         );
+
+        if ($this->mediaId && config('face-recognition.enabled')) {
+            AnalyzeMediaFaces::dispatch((int) $this->mediaId);
+        }
+    }
+
+    private function encodeForExtension($image, string $extension, int $quality): string
+    {
+        switch ($extension) {
+            case 'jpg':
+            case 'jpeg':
+                return (string) $image->toJpeg($quality);
+            case 'png':
+                return (string) $image->toPng();
+            case 'gif':
+                return (string) $image->toGif();
+            case 'webp':
+                return (string) $image->toWebp($quality);
+        }
+
+        throw new \InvalidArgumentException("Unsupported image extension [{$extension}].");
     }
 }

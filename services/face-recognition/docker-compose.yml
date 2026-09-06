@@ -1,0 +1,16 @@
+services:
+  face-recognition:
+    build: .
+    ports:
+      - "127.0.0.1:8090:8090"
+    environment:
+      FACE_MODEL_DIR: /models
+      FACE_MODEL_VERSION: opencv-yunet-2023mar+sface-2021dec
+      FACE_API_KEY: ${FACE_API_KEY:-}
+      FACE_DETECTION_THRESHOLD: ${FACE_DETECTION_THRESHOLD:-0.88}
+      FACE_MIN_FACE_PIXELS: ${FACE_MIN_FACE_PIXELS:-48}
+      FACE_MIN_QUALITY: ${FACE_MIN_QUALITY:-0.12}
+      FACE_CLUSTER_EPS: ${FACE_CLUSTER_EPS:-0.32}
+    volumes:
+      - ./models:/models:ro
+    restart: unless-stopped

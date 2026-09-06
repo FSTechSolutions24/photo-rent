@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 
 class Gallery extends Model
@@ -14,7 +15,30 @@ class Gallery extends Model
     public const LAYOUT_EDITORIAL = 'editorial';
     public const LAYOUT_LUXE = 'luxe';
 
-    protected $fillable = ['photographer_id', 'session_id', 'name', 'slug', 'thumbnail_path', 'background_path', 'gallery_layout', 'client_password', 'guest_password', 'is_public'];
+    protected $fillable = [
+        'photographer_id', 'session_id', 'name', 'slug', 'thumbnail_path', 'background_path',
+        'gallery_layout', 'client_password', 'guest_password', 'is_public',
+        'face_processing_enabled', 'face_filter_published', 'face_processing_status',
+        'face_processing_error', 'faces_clustered_at',
+    ];
+
+    protected $casts = [
+        'face_processing_enabled' => 'boolean',
+        'face_filter_published' => 'boolean',
+        'faces_clustered_at' => 'datetime',
+    ];
+
+    protected static function booted()
+    {
+        static::deleting(function (Gallery $gallery) {
+            if (! Schema::hasTable('media_faces')) {
+                return;
+            }
+
+            Storage::disk(config('face-recognition.storage_disk'))
+                ->deleteDirectory("face-data/galleries/{$gallery->id}");
+        });
+    }
 
     public function client()
     {
@@ -34,6 +58,11 @@ class Gallery extends Model
     public function media()
     {
         return $this->hasMany(Media::class);
+    }
+
+    public function faceClusters()
+    {
+        return $this->hasMany(GalleryFaceCluster::class);
     }
 
     public function getThumbnailUrlAttribute()

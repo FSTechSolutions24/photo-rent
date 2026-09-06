@@ -200,7 +200,7 @@ class FolderController extends Controller
         $originalPath = "{$basePath}/original/{$filename}";
         Storage::disk('wasabi')->put($originalPath, file_get_contents($file));
         // ✅ Save DB record (store only original for now)
-        $this->save_media_record($galleryId, $folderId, $originalPath, $file);
+        $media = $this->save_media_record($galleryId, $folderId, $originalPath, $file);
 
         // dd([
         //     config('queue.default'),
@@ -213,7 +213,7 @@ class FolderController extends Controller
         //     get_class(ProcessMedia::dispatch('a', 'b', 'c'))
         // );
         // ✅ Dispatch background job for processing
-        ProcessMedia::dispatch($originalPath, $basePath, $filename);
+        ProcessMedia::dispatch($originalPath, $basePath, $filename, $media->id);
 
         return response()->json([
             'success' => true,
@@ -229,13 +229,15 @@ class FolderController extends Controller
             'name' => $file->getClientOriginalName(),
             'path' => $storedPath,
             'size' => $file->getSize(),
-            'disk' => 'local',
+            'disk' => 'wasabi',
             'mime_type' => $file->getMimeType(),
         ]);
 
         if($media){
             $this->deduct_from_available_storage($file->getSize());
         }
+
+        return $media;
     }
 
     function deduct_from_available_storage($size){
