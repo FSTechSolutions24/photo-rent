@@ -30,6 +30,8 @@
     </button> 
 </div>
 
+@include('dashboard.galleries._face_filter', ['faceTheme' => 'dark'])
+
 @if (session('download_requested'))
     <div class="download-toast" role="status">
         <i class="fas fa-check-circle"></i>

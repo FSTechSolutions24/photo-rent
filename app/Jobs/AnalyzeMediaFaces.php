@@ -26,10 +26,12 @@ class AnalyzeMediaFaces implements ShouldQueue, ShouldBeUnique
     public $uniqueFor = 600;
 
     protected $mediaId;
+    protected $clusterAfter;
 
-    public function __construct(int $mediaId)
+    public function __construct(int $mediaId, bool $clusterAfter = true)
     {
         $this->mediaId = $mediaId;
+        $this->clusterAfter = $clusterAfter;
         $this->onQueue(config('face-recognition.queue'));
     }
 
@@ -120,6 +122,10 @@ class AnalyzeMediaFaces implements ShouldQueue, ShouldBeUnique
             if (! in_array($oldCrop->crop_path, $newCrops, true)) {
                 Storage::disk($oldCrop->crop_disk)->delete($oldCrop->crop_path);
             }
+        }
+
+        if ($this->clusterAfter) {
+            ClusterGalleryFaces::dispatch($media->gallery_id)->delay(now()->addSeconds(10));
         }
     }
 

@@ -5,12 +5,15 @@ namespace App\Http\Controllers;
 use Carbon\Carbon;
 use App\Models\Client;
 use App\Models\Gallery;
+use App\Models\GalleryFaceCluster;
 use App\Models\GalleryDownload;
 use App\Models\GalleriesToBeEmailed;
 use Illuminate\Support\Str;
 use App\Traits\HelperTrait;
 use App\Models\Photographer;
 use App\Models\WhatsAppTemplate;
+use App\Jobs\AnalyzeMediaFaces;
+use App\Jobs\ClusterGalleryFaces;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Auth;
@@ -33,18 +36,11 @@ class GalleryController extends Controller
         // 3️⃣ Get the gallery with folders and images
         $gallery = $photographer->galleries()
             ->where('slug', $gallery_slug)
-            ->with(['folders.media'])
+            ->with('folders')
             ->firstOrFail();
 
         // 4️⃣ Password protection logic
         $sessionKey = 'access_granted_' . $gallery->id;
-
-        // 5 prepare the pre-signed urls
-        foreach($gallery['folders'] as $folder){
-            foreach($folder['media'] as &$media){
-                $media['path'] = $this->get_pre_signed_url($media->path, 'medium');                
-            }
-        }
 
         // Public galleries are available without a password. Private galleries
         // retain the existing client/guest password gate.
@@ -92,6 +88,37 @@ class GalleryController extends Controller
             }
         }
 
+        $faceClusters = collect();
+        $selectedFaceUuid = null;
+        $selectedCluster = null;
+
+        if ($gallery->face_filter_published) {
+            $faceClusters = $gallery->faceClusters()
+                ->where('status', GalleryFaceCluster::STATUS_VISIBLE)
+                ->orderByDesc('face_count')
+                ->get();
+
+            if ($request->filled('face')) {
+                $selectedFaceUuid = (string) $request->query('face');
+                $selectedCluster = $faceClusters->firstWhere('uuid', $selectedFaceUuid);
+                abort_unless($selectedCluster, 404);
+            }
+        }
+
+        $gallery->load(['folders.media' => function ($query) use ($selectedCluster) {
+            if ($selectedCluster) {
+                $query->whereHas('faces', function ($faceQuery) use ($selectedCluster) {
+                    $faceQuery->where('gallery_face_cluster_id', $selectedCluster->id);
+                });
+            }
+        }]);
+
+        foreach ($gallery->folders as $folder) {
+            foreach ($folder->media as $media) {
+                $media->path = $this->get_pre_signed_url($media->path, 'medium');
+            }
+        }
+
         // 5️⃣ Access granted → show gallery
         $layout = $gallery->gallery_layout ?? Gallery::LAYOUT_MASONRY;
 
@@ -101,7 +128,7 @@ class GalleryController extends Controller
             default => 'dashboard.galleries.show',
         };
 
-        return view($view, compact('gallery', 'photographer'));
+        return view($view, compact('gallery', 'photographer', 'faceClusters', 'selectedFaceUuid'));
     }
 
     public function index(){
@@ -214,6 +241,10 @@ class GalleryController extends Controller
     
     public function edit($id){
         $gallery = Gallery::findOrFail($id);
+        $this->authorizePhotographerGallery($gallery);
+        $gallery->load(['faceClusters' => function ($query) {
+            $query->orderByDesc('face_count');
+        }]);
         $clients = auth()->user()->photographer->clients;
         $sessions = auth()->user()->photographer->sessions()->orderByDesc('date')->get();
         $gallery->client_password = Crypt::decryptString($gallery->client_password);
@@ -396,6 +427,8 @@ class GalleryController extends Controller
                 Gallery::LAYOUT_LUXE,
             ])],
             'is_public' => ['nullable', 'in:0,1'],
+            'face_processing_enabled' => ['nullable', 'in:0,1'],
+            'face_filter_published' => ['nullable', 'in:0,1'],
             'session_id' => [
                 'nullable',
                 'integer',
@@ -415,9 +448,20 @@ class GalleryController extends Controller
     }
 
     public function update(Request $request, Gallery $gallery){
+        $this->authorizePhotographerGallery($gallery);
+        $wasEnabled = $gallery->face_processing_enabled;
         $data = $this->validateGallery($request, $gallery);
 
         $data = $this->prepare_gallery_data($data);
+
+        $data['face_processing_enabled'] = $request->boolean('face_processing_enabled');
+        $data['face_filter_published'] = $data['face_processing_enabled']
+            && $request->boolean('face_filter_published');
+        if (! $data['face_processing_enabled']) {
+            $data['face_processing_status'] = 'disabled';
+        } elseif (! $wasEnabled) {
+            $data['face_processing_status'] = 'pending';
+        }
 
         $gallery->update($data);
         
@@ -432,6 +476,11 @@ class GalleryController extends Controller
         $data = $this->validateGallery($request);
 
         $data['photographer_id'] = Photographer::where('user_id', Auth::id())->first()->id;
+
+        $data['face_processing_enabled'] = $request->boolean('face_processing_enabled');
+        $data['face_filter_published'] = $data['face_processing_enabled']
+            && $request->boolean('face_filter_published');
+        $data['face_processing_status'] = $data['face_processing_enabled'] ? 'pending' : 'disabled';
 
         $data = $this->prepare_gallery_data($data);
         
@@ -490,6 +539,106 @@ class GalleryController extends Controller
         if (Storage::disk($disk)->exists($path)) {
             Storage::disk($disk)->delete($path);
         }
+    }
+
+    public function processFaces(Gallery $gallery)
+    {
+        $this->authorizePhotographerGallery($gallery);
+        abort_unless(config('face-recognition.enabled'), 503, 'Face recognition is disabled in the application configuration.');
+
+        if (! $gallery->face_processing_enabled) {
+            return back()->withErrors(['faces' => 'Enable face processing and save the gallery first.']);
+        }
+
+        $gallery->update([
+            'face_processing_status' => 'processing',
+            'face_processing_error' => null,
+        ]);
+
+        $mediaItems = $gallery->media()->get()->filter(function ($media) {
+            return in_array(strtolower(pathinfo($media->path, PATHINFO_EXTENSION)), [
+                'jpg', 'jpeg', 'png', 'gif', 'webp',
+            ], true);
+        });
+
+        foreach ($mediaItems as $media) {
+            AnalyzeMediaFaces::dispatch($media->id, false);
+        }
+        ClusterGalleryFaces::dispatch($gallery->id);
+
+        return back()->with('success', 'Face processing was queued for '.$mediaItems->count().' images.');
+    }
+
+    public function updateFaceClusterVisibility(Request $request, Gallery $gallery, GalleryFaceCluster $cluster)
+    {
+        $this->authorizePhotographerGallery($gallery);
+        abort_unless((int) $cluster->gallery_id === (int) $gallery->id, 404);
+
+        $data = $request->validate([
+            'status' => ['required', Rule::in([
+                GalleryFaceCluster::STATUS_VISIBLE,
+                GalleryFaceCluster::STATUS_HIDDEN,
+            ])],
+        ]);
+        $cluster->update($data);
+
+        return back()->with('success', 'Face group visibility updated.');
+    }
+
+    public function updateAllFaceClusterVisibility(Request $request, Gallery $gallery)
+    {
+        $this->authorizePhotographerGallery($gallery);
+        $data = $request->validate([
+            'status' => ['required', Rule::in([
+                GalleryFaceCluster::STATUS_VISIBLE,
+                GalleryFaceCluster::STATUS_HIDDEN,
+            ])],
+        ]);
+
+        $gallery->faceClusters()->update(['status' => $data['status']]);
+
+        return back()->with('success', $data['status'] === GalleryFaceCluster::STATUS_VISIBLE
+            ? 'All face groups are now visible.'
+            : 'All face groups are now hidden.');
+    }
+
+    public function dashboardFaceThumbnail(Gallery $gallery, GalleryFaceCluster $cluster)
+    {
+        $this->authorizePhotographerGallery($gallery);
+        abort_unless((int) $cluster->gallery_id === (int) $gallery->id, 404);
+
+        return $this->faceThumbnailResponse($cluster);
+    }
+
+    public function publicFaceThumbnail($photographer_subdomain, $gallery_slug, $cluster_uuid)
+    {
+        $photographer = Photographer::where('subdomain', $photographer_subdomain)->firstOrFail();
+        $gallery = $photographer->galleries()->where('slug', $gallery_slug)->firstOrFail();
+        abort_unless($gallery->is_public || session('access_granted_'.$gallery->id), 403);
+        abort_unless($gallery->face_filter_published, 404);
+
+        $cluster = $gallery->faceClusters()
+            ->where('uuid', $cluster_uuid)
+            ->where('status', GalleryFaceCluster::STATUS_VISIBLE)
+            ->firstOrFail();
+
+        return $this->faceThumbnailResponse($cluster);
+    }
+
+    private function faceThumbnailResponse(GalleryFaceCluster $cluster)
+    {
+        abort_unless($cluster->thumbnail_disk && $cluster->thumbnail_path, 404);
+
+        return redirect()->away(Storage::disk($cluster->thumbnail_disk)->temporaryUrl(
+            $cluster->thumbnail_path,
+            now()->addMinutes(10)
+        ));
+    }
+
+    private function authorizePhotographerGallery(Gallery $gallery): void
+    {
+        $photographer = Auth::user()->photographer;
+        abort_unless($photographer && (int) $gallery->photographer_id === (int) $photographer->id, 403);
     }
 
     public function prepare_gallery_data(array $data){

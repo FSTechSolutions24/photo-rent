@@ -29,6 +29,8 @@
         </div>
     </nav>
 
+    @include('dashboard.galleries._face_filter', ['faceTheme' => 'light'])
+
     @if (session('download_requested'))
         <div class="editorial-toast" role="status">
             <i class="fas fa-check-circle"></i>{{ session('download_requested') }}
