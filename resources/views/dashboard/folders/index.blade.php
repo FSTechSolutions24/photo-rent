@@ -56,6 +56,9 @@
     <style>
         .gallery-folder-workspace {
             display: grid;
+            width: 100%;
+            min-width: 0;
+            max-width: 100%;
             gap: 22px;
             padding-bottom: 36px;
         }
@@ -63,6 +66,9 @@
         .upload-workspace,
         .media-library-section {
             width: 100%;
+            min-width: 0;
+            max-width: 100%;
+            box-sizing: border-box;
             border: 1px solid #e5ebf1;
             border-radius: 16px;
             background: #fff;

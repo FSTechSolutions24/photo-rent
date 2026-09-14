@@ -286,6 +286,9 @@ export default {
 <style>
     .folder-library {
         width: 100%;
+        min-width: 0;
+        max-width: 100%;
+        box-sizing: border-box;
     }
     .folder-library__header {
         display: flex;
@@ -322,8 +325,12 @@ export default {
     }
     .folder-library__rail {
         display: flex;
+        width: 100%;
         align-items: stretch;
         min-width: 0;
+        max-width: 100%;
+        overflow: hidden;
+        box-sizing: border-box;
         padding: 16px 20px 20px;
     }
     .folder-add-card,
@@ -374,11 +381,16 @@ export default {
     }
     .folder-library__scroll {
         display: flex;
+        width: 0;
         min-width: 0;
+        max-width: 100%;
         flex: 1;
         align-items: stretch;
         gap: 12px;
         overflow-x: auto;
+        overflow-y: hidden;
+        overscroll-behavior-x: contain;
+        -webkit-overflow-scrolling: touch;
         padding: 1px 3px 8px 1px;
         scrollbar-color: #c4d1dd transparent;
         scrollbar-width: thin;
