@@ -162,4 +162,26 @@ class MediaController extends Controller
         $photographer = Auth::user()->photographer;
         abort_unless($photographer && (int) $gallery->photographer_id === (int) $photographer->id, 403);
     }
+
+    public function updatePrivacy(Request $request, $galleryId)
+    {
+        $gallery = Gallery::findOrFail($galleryId);
+        $this->authorizeGallery($gallery);
+
+        $data = $request->validate([
+            'id' => ['required', 'integer'],
+            'private' => ['required', 'boolean'],
+        ]);
+
+        $media = $gallery->media()->findOrFail($data['id']);
+        $media->update(['private' => $data['private']]);
+
+        return response()->json([
+            'success' => true,
+            'private' => $media->private,
+            'message' => $media->private
+                ? 'Media is now visible only to the client and photographer.'
+                : 'Media is now visible to guests as well.',
+        ]);
+    }
 }

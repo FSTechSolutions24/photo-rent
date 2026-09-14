@@ -78,6 +78,7 @@ Route::middleware(['auth', 'photographer'])->prefix('dashboard')->name('dashboar
     // Photos (nested under gallery)
     Route::post('galleries/{gallery}/photos', [MediaController::class, 'store'])->name('photos.store');        
     Route::delete('media/{gallery}/delete',[MediaController::class, 'destroy'])->name('media.destroy');
+    Route::patch('media/{gallery}/privacy',[MediaController::class, 'updatePrivacy'])->name('media.privacy');
     Route::post('media/{gallery}/download',[MediaController::class, 'download'])->name('media.download');
     Route::post('media/{gallery}/download_folder',[MediaController::class, 'download_folder'])->name('media.download_folder');
 

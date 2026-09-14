@@ -374,13 +374,22 @@ class FolderController extends Controller
             $url = $this->get_pre_signed_url($model->path, 'thumb');            
             return '<div class="thumbnail-holder"><img class="img-fluid" src="'.$url.'" width="80"></div>';
         })
+        ->addColumn('private_toggle', function ($model) {
+            $checked = $model->private ? ' checked' : '';
+
+            return '<div class="custom-control custom-switch">'
+                .'<input type="checkbox" class="custom-control-input" id="media-private-'.$model->id.'" '
+                .'onchange="window.toggleMediaPrivate('.$model->id.', this)"'.$checked.'>'
+                .'<label class="custom-control-label" for="media-private-'.$model->id.'">Private</label>'
+                .'</div>';
+        })
         ->addColumn('actions', function($model){
             $buffer  = '<button onclick="window.deleteMedia('.$model->id.')" class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></button>';
             $buffer .= '<button onclick="window.downloadMedia('.$model->id.')" class="btn btn-sm btn-outline-success" style="margin-left: 4px;"><i class="fas fa-download"></i></button>';
             return $buffer;
         })
         ->addIndexColumn()
-        ->rawColumns(['thumbnail','multiselect','actions'])
+        ->rawColumns(['thumbnail','multiselect','private_toggle','actions'])
         ->make(true);
     }
 

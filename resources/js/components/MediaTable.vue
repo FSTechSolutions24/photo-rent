@@ -8,6 +8,7 @@
                 <th scope="col">Name</th>
                 <th scope="col">Disk</th>
                 <th scope="col">Size</th>            
+                <th scope="col">Private</th>
                 <th scope="col">Created</th>            
                 <th scope="col">Actions</th>            
             </tr>
@@ -35,9 +36,33 @@
             emitter.on('media-uploaded', this.reloadTable);
             window.deleteMedia = this.deleteMedia;
             window.downloadMedia = this.downloadMedia;
+            window.toggleMediaPrivate = this.toggleMediaPrivate;
         },
 
         methods: {
+            toggleMediaPrivate(id, checkbox) {
+                checkbox.disabled = true;
+
+                axios.patch(`/dashboard/media/${this.galleryId}/privacy`, {
+                    id,
+                    private: checkbox.checked,
+                }).then(response => {
+                    checkbox.checked = response.data.private;
+                    Swal.fire({
+                        icon: 'success',
+                        title: response.data.message,
+                        toast: true,
+                        position: 'top-end',
+                        showConfirmButton: false,
+                        timer: 2200,
+                    });
+                }).catch(error => {
+                    checkbox.checked = !checkbox.checked;
+                    Swal.fire('Error', error.response?.data?.message || 'The privacy setting could not be updated.', 'error');
+                }).finally(() => {
+                    checkbox.disabled = false;
+                });
+            },
             downloadMedia(id) {
                 axios.post(`/dashboard/media/${this.galleryId}/download`, {
                     id
@@ -139,6 +164,7 @@
                             { data: 'name' },
                             { data: 'disk' },
                             { data: 'size' },
+                            { data: 'private_toggle', orderable: false, searchable: false },
                             { data: 'created_at' },
                             { data: 'actions' },
                         ],

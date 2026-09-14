@@ -19,8 +19,16 @@ class Media extends Model
 
     protected $casts = [
         'meta' => 'array',
+        'private' => 'boolean',
         'face_analyzed_at' => 'datetime',
     ];
+
+    public function scopeVisibleToGuests($query)
+    {
+        return $query->where(function ($query) {
+            $query->where('private', false)->orWhereNull('private');
+        });
+    }
 
     protected static function booted()
     {

@@ -33,22 +33,14 @@ class GalleryController extends Controller
         // 3️⃣ Get the gallery with folders and images
         $gallery = $photographer->galleries()
             ->where('slug', $gallery_slug)
-            ->with(['folders.media'])
             ->firstOrFail();
 
         // 4️⃣ Password protection logic
         $sessionKey = 'access_granted_' . $gallery->id;
 
-        // 5 prepare the pre-signed urls
-        foreach($gallery['folders'] as $folder){
-            foreach($folder['media'] as &$media){
-                $media['path'] = $this->get_pre_signed_url($media->path, 'medium');                
-            }
-        }
-
         // Public galleries are available without a password. Private galleries
         // retain the existing client/guest password gate.
-        if (! $gallery->is_public && ! session($sessionKey)) {
+        if (! $gallery->is_public && ! $this->isOwningPhotographer($gallery) && ! session($sessionKey)) {
 
             // Handle password form submission (POST)
             if ($request->isMethod('post')) {
@@ -70,11 +62,11 @@ class GalleryController extends Controller
                 $guest = $client = false;
                 if (hash_equals($storedGuestPassword, $request->password)) {
                     $guest = true;
-                    session(['visitor_type' => 'guest']);
+                    session([$this->visitorTypeSessionKey($gallery) => 'guest']);
                 }
                 if (hash_equals($storedClientPassword, $request->password)) {
                     $client = true;
-                    session(['visitor_type' => 'client']);
+                    session([$this->visitorTypeSessionKey($gallery) => 'client']);
                 }
 
                 if(!$guest && !$client) {
@@ -93,6 +85,20 @@ class GalleryController extends Controller
         }
 
         // 5️⃣ Access granted → show gallery
+        $canViewPrivateMedia = $this->canViewPrivateMedia($gallery);
+        $gallery->load(['folders.media' => function ($query) use ($canViewPrivateMedia) {
+            if (! $canViewPrivateMedia) {
+                $query->visibleToGuests();
+            }
+        }]);
+
+        // Generate URLs only for media this viewer is permitted to see.
+        foreach ($gallery->folders as $folder) {
+            foreach ($folder->media as $media) {
+                $media->path = $this->get_pre_signed_url($media->path, 'medium');
+            }
+        }
+
         $layout = $gallery->gallery_layout ?? Gallery::LAYOUT_MASONRY;
 
         $view = match ($layout) {
@@ -263,7 +269,12 @@ class GalleryController extends Controller
         $photographer = Photographer::where('subdomain', $photographer_subdomain)->firstOrFail();
         $gallery = $photographer->galleries()->where('slug', $gallery_slug)->with('folders')->firstOrFail();
 
-        abort_unless($gallery->is_public || session('access_granted_' . $gallery->id), 403);
+        abort_unless(
+            $gallery->is_public
+                || $this->isOwningPhotographer($gallery)
+                || session('access_granted_' . $gallery->id),
+            403
+        );
 
         $availableFolderIds = $gallery->folders->pluck('id')->map(function ($id) {
             return (int) $id;
@@ -281,7 +292,7 @@ class GalleryController extends Controller
 
         $download = GalleryDownload::create([
             'gallery_id' => $gallery->id,
-            'user_type' => $gallery->is_public ? 'guest' : $this->get_current_user_type(),
+            'user_type' => $this->get_current_user_type($gallery),
             'requested_by_email' => $data['email'],
             'selected_folder_ids' => $folderIds,
             'full_gallery' => count($folderIds) === $availableFolderIds->count(),
@@ -308,20 +319,39 @@ class GalleryController extends Controller
 
     }
 
-    public function get_current_user_type(){
+    public function get_current_user_type(Gallery $gallery = null){
 
-        if(Auth::check()){
+        if ($gallery && $this->isOwningPhotographer($gallery)) {
             return 'admin';
         }
 
-        if(session('visitor_type') == 'client') {
+        if (! $gallery && Auth::check()) {
             return 'admin';
         }
 
-        else {
-            return 'guest';
+        if ($gallery && session($this->visitorTypeSessionKey($gallery)) === 'client') {
+            return 'client';
         }
-        
+
+        return 'guest';
+    }
+
+    private function canViewPrivateMedia(Gallery $gallery): bool
+    {
+        return $this->isOwningPhotographer($gallery)
+            || session($this->visitorTypeSessionKey($gallery)) === 'client';
+    }
+
+    private function isOwningPhotographer(Gallery $gallery): bool
+    {
+        return Auth::check()
+            && Auth::user()->photographer
+            && (int) Auth::user()->photographer->id === (int) $gallery->photographer_id;
+    }
+
+    private function visitorTypeSessionKey(Gallery $gallery): string
+    {
+        return 'visitor_type_' . $gallery->id;
     }
 
     public function modify_gallery_expiration_date($exist_download){
