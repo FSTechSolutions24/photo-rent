@@ -4,9 +4,9 @@
 
 @section('content')
 <div class="container-fluid">
-  <div class="d-flex justify-content-between align-items-center mb-3">
-    <h4 class="page_header mb-0">WhatsApp Message Template</h4>
-  </div>
+  <x-page-header title="WhatsApp Message Template" description="Customize the message used when sharing gallery access with clients."
+    :breadcrumbs="[['label' => 'Galleries', 'url' => route('dashboard.galleries.index')], ['label' => 'WhatsApp Template']]"
+    :action-url="route('dashboard.galleries.index')" action-label="View galleries" action-icon="fas fa-images" />
 
   <div class="card card-outline card-success" style="max-width: 850px;">
     <div class="card-body">

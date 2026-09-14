@@ -45,7 +45,7 @@ trait HelperTrait
             return false;
         }
 
-        $media = Media::find($mediaId);
+        $media = Media::where('id', $mediaId)->where('gallery_id', $galleryId)->first();
 
         if (!$media) {
             return false;
@@ -53,11 +53,13 @@ trait HelperTrait
 
         $size = $media->size;
 
-        $mediaPath = $media->path;
-
-        if (Storage::disk('public')->exists($mediaPath)) {
-            Storage::disk('public')->delete($mediaPath);
-        }
+        $disk = $media->disk ?: 'wasabi';
+        $paths = array_unique([
+            $media->path,
+            str_replace('/original/', '/medium/', $media->path),
+            str_replace('/original/', '/thumb/', $media->path),
+        ]);
+        Storage::disk($disk)->delete($paths);
 
         $photographer->available_storage +=  $size;
 
@@ -87,7 +89,7 @@ trait HelperTrait
         return
             Storage::disk('wasabi')->temporaryUrl(
                 $url,
-                now()->addDays(7)
+                now()->addHour()
             );
     }
 }

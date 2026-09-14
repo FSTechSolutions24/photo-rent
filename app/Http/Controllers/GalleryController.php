@@ -68,11 +68,11 @@ class GalleryController extends Controller
                 $storedGuestPassword = Crypt::decryptString($gallery->guest_password);
 
                 $guest = $client = false;
-                if ($request->password == $storedGuestPassword) {
+                if (hash_equals($storedGuestPassword, $request->password)) {
                     $guest = true;
                     session(['visitor_type' => 'guest']);
                 }
-                if ($request->password == $storedClientPassword) {
+                if (hash_equals($storedClientPassword, $request->password)) {
                     $client = true;
                     session(['visitor_type' => 'client']);
                 }
@@ -213,9 +213,10 @@ class GalleryController extends Controller
     }
     
     public function edit($id){
-        $gallery = Gallery::findOrFail($id);
-        $clients = auth()->user()->photographer->clients;
-        $sessions = auth()->user()->photographer->sessions()->orderByDesc('date')->get();
+        $photographer = auth()->user()->photographer;
+        $gallery = $photographer->galleries()->findOrFail($id);
+        $clients = $photographer->clients;
+        $sessions = $photographer->sessions()->orderByDesc('date')->get();
         $gallery->client_password = Crypt::decryptString($gallery->client_password);
         $gallery->guest_password = Crypt::decryptString($gallery->guest_password);
         return view('dashboard.galleries.edit', compact('gallery', 'clients', 'sessions'));   
@@ -223,16 +224,24 @@ class GalleryController extends Controller
     
     public function download(Request $request)
     {
-
-        $email = $request['email'];
+        $data = $request->validate([
+            'id' => ['required', 'integer'],
+        ]);
+        $gallery = Auth::user()->photographer->galleries()->findOrFail($data['id']);
+        $email = Auth::user()->email;
         // Download logic
-        $exist_download = $this->search_gallery_file_exist($request);
+        $exist_download = $this->search_gallery_file_exist(['id' => $gallery->id]);
         if($exist_download){
             $this->modify_gallery_expiration_date($exist_download);
             $this->send_url_to_email_asked_for_download($exist_download, $email);
         }
         else {
-            $this->add_new_gallery_media_download_request($request);
+            $download = $this->add_new_gallery_media_download_request([
+                'id' => $gallery->id,
+                'folder_id' => null,
+                'requested_by_email' => $email,
+            ]);
+            $this->send_url_to_email_asked_for_download($download, $email);
         }        
         
         return view('dashboard.galleries.index');
@@ -245,7 +254,7 @@ class GalleryController extends Controller
     public function requestDownload(Request $request, $photographer_subdomain, $gallery_slug)
     {
         $data = $request->validate([
-            'email' => ['required', 'email', 'max:255'],
+            'email' => ['required', 'email', 'not_regex:/[\r\n]/', 'max:255'],
             'folder_ids' => ['nullable', 'array'],
             'folder_ids.*' => ['integer'],
             'download_all' => ['nullable', 'boolean'],
@@ -325,7 +334,7 @@ class GalleryController extends Controller
 
     public function send_url_to_email_asked_for_download($gallery, $email){
 
-        if(Auth::user()->id > 0){
+        if(Auth::check()){
             $email = Auth::user()->email;
         }
 
@@ -345,7 +354,7 @@ class GalleryController extends Controller
 
         $user_type = $this->get_current_user_type();
     
-        GalleryDownload::create([
+        return GalleryDownload::create([
             'gallery_id' => $data['id'],
             'folder_id' => $data['folder_id'],
             'user_type' => $user_type,
@@ -383,10 +392,11 @@ class GalleryController extends Controller
                 'min:6',
                 'different:client_password',
             ],
-            'thumbnail_path' => ['nullable', 'image', 'max:2048'],
+            'thumbnail_path' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
             'background_path' => [
                 'nullable',
                 'image',
+                'mimes:jpg,jpeg,png,webp',
                 'max:15360',
                 'dimensions:min_width=1920,min_height=720',
             ],
@@ -415,6 +425,7 @@ class GalleryController extends Controller
     }
 
     public function update(Request $request, Gallery $gallery){
+        $this->authorizeGallery($gallery);
         $data = $this->validateGallery($request, $gallery);
 
         $data = $this->prepare_gallery_data($data);
@@ -464,7 +475,7 @@ class GalleryController extends Controller
 
     private function store_gallery_asset($file, Gallery $gallery, string $type): string
     {
-        $extension = strtolower($file->getClientOriginalExtension() ?: $file->extension() ?: 'jpg');
+        $extension = strtolower($file->extension());
         $path = sprintf(
             'users/%s/galleries/%s/assets/%s/%s.%s',
             Auth::id(),
@@ -510,6 +521,11 @@ class GalleryController extends Controller
 
     private function authorizeClient(Client $client)
     {
-        abort_if($client->photographer_id !== Auth::id(), 403);
+        abort_unless((int) $client->photographer_id === (int) Auth::user()->photographer->id, 403);
+    }
+
+    private function authorizeGallery(Gallery $gallery): void
+    {
+        abort_unless((int) $gallery->photographer_id === (int) Auth::user()->photographer->id, 403);
     }
 }

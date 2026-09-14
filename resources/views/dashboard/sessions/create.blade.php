@@ -3,7 +3,9 @@
 
 
 @section('content')
-    <h4 class="page_header">Create Session</h4>
+    <x-page-header title="Create Session" description="Schedule a photography session and connect it with the right client."
+        :breadcrumbs="[['label' => 'Sessions', 'url' => route('dashboard.sessions.index')], ['label' => 'Create Session']]"
+        :action-url="route('dashboard.sessions.index')" action-label="View sessions" action-icon="fas fa-camera" />
     <form method="POST" action="{{ route('dashboard.sessions.store') }}" enctype="multipart/form-data">
         <div class="ibox-content">
             @include('dashboard.sessions._form')

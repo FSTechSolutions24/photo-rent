@@ -1,6 +1,8 @@
 @extends('adminlte::page')
+@section('title', 'Profile')
 @section('content')
-<h4 class="page_header" style="padding-left: 7.5px;">Profile</h4>
+<x-page-header title="Profile" description="Manage your personal information, password, and account overview."
+    :breadcrumbs="[['label' => 'Profile']]" />
 <div class="container-fluid">
     <div class="row">
         <div class="col-md-3">
@@ -52,8 +54,17 @@
 
                     <div class="mb-3">
                         <label class="form-label">Email: </label>
-                        <input type="text" name="email" value="{{ old('email', $user->email ?? '') }}" class="input form-control" required autocomplete="false">
+                        <input type="email" name="email" value="{{ old('email', $user->email ?? '') }}" class="input form-control" required autocomplete="email">
                         @error('email')
+                            <small class="text-danger">{{ $message }}</small>
+                        @enderror
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Current Password:</label>
+                        <input type="password" name="current_password" class="input form-control" autocomplete="current-password">
+                        <small class="form-text text-muted">Required when changing your email address or password.</small>
+                        @error('current_password')
                             <small class="text-danger">{{ $message }}</small>
                         @enderror
                     </div>
@@ -81,5 +92,4 @@
         </div>
     </div>
 </div>
-</form>
 @stop

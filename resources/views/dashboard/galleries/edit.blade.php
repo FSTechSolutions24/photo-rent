@@ -2,7 +2,9 @@
 @section('title', 'Update Gallery')
 
 @section('content')
-    <h4 class="page_header">Update Gallery</h4>
+    <x-page-header title="Update Gallery" description="Adjust gallery details, access settings, and presentation options."
+        :breadcrumbs="[['label' => 'Galleries', 'url' => route('dashboard.galleries.index')], ['label' => 'Update Gallery']]"
+        :action-url="route('dashboard.galleries.index')" action-label="View galleries" action-icon="fas fa-images" />
     <form method="POST" action="{{ route('dashboard.galleries.update', $gallery->id) }}" enctype="multipart/form-data">
         @method('PUT')
         <div class="ibox-content">

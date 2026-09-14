@@ -2,7 +2,9 @@
 @section('title', 'Update Session')
 
 @section('content')
-    <h4 class="page_header">Update Session</h4>
+    <x-page-header title="Update Session" description="Keep this session’s schedule, pricing, and client information up to date."
+        :breadcrumbs="[['label' => 'Sessions', 'url' => route('dashboard.sessions.index')], ['label' => 'Update Session']]"
+        :action-url="route('dashboard.sessions.index')" action-label="View sessions" action-icon="fas fa-camera" />
     <form method="POST" action="{{ route('dashboard.sessions.update', $session->id) }}" enctype="multipart/form-data">
         @method('PUT')
         <div class="ibox-content">

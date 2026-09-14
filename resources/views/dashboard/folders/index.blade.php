@@ -3,7 +3,9 @@
 
 @section('content')
 
-    <h4 class="page_header">{{ $gallery->name }}</h4>
+    <x-page-header :title="$gallery->name" description="Organize this gallery into folders and manage its uploaded photographs."
+        :breadcrumbs="[['label' => 'Galleries', 'url' => route('dashboard.galleries.index')], ['label' => $gallery->name], ['label' => 'Folders']]"
+        :action-url="route('dashboard.galleries.index')" action-label="View galleries" action-icon="fas fa-images" />
     <div id="app">
         {{-- <folder-grid></folder-grid> --}}
         <div class="row">

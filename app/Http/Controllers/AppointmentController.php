@@ -29,10 +29,7 @@ class AppointmentController extends Controller
 
     public function edit($id){
         $photographer = auth()->user()->photographer;
-        $appointment = Appointment::where('photographer_id', $photographer->id)
-            ->orWhereHas('session', function ($query) use ($photographer) {
-                $query->where('photographer_id', $photographer->id);
-            })->findOrFail($id);
+        $appointment = $photographer->appointments()->findOrFail($id);
         $sessions = $photographer->sessions;
         
         return view('dashboard.calendar.edit', compact('appointment','sessions'));   
@@ -50,8 +47,8 @@ class AppointmentController extends Controller
 
     public function update(Request $request, Appointment $appointment)
     {
+        abort_unless((int) $appointment->photographer_id === (int) auth()->user()->photographer->id, 403);
         $data = $this->validateAppointment($request, $appointment->id);
-        abort_unless($appointment->photographer_id === auth()->user()->photographer->id || $appointment->session?->photographer_id === auth()->user()->photographer->id, 403);
         $data['photographer_id'] = auth()->user()->photographer->id;
 
         $appointment->update($data);
@@ -182,10 +179,7 @@ class AppointmentController extends Controller
     public function getData(){
         $photographer = auth()->user()->photographer;
 
-        $appointments = Appointment::where('photographer_id', $photographer->id)
-            ->orWhereHas('session', function ($query) use ($photographer) {
-                $query->where('photographer_id', $photographer->id);
-            })
+        $appointments = $photographer->appointments()
             ->select('id', 'name', 'date', 'start_time', 'end_time')
             ->get()
             ->map(function ($appointment) {

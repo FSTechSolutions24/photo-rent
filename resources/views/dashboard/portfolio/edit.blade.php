@@ -8,10 +8,9 @@
         $portfolioUrl = request()->getScheme() . '://' . $photographer->subdomain . '.' . env('APP_DOMAIN')
             . (in_array($portfolioPort, [80, 443]) ? '' : ':' . $portfolioPort) . '/portfolio';
     @endphp
-    <div class="portfolio-settings-head">
-        <div><h4 class="page_header mb-1">Portfolio</h4><p class="text-muted mb-0">Create a public home for your best work.</p></div>
-        <a class="btn btn-outline-primary" target="_blank" href="{{ $portfolioUrl }}"><i class="fas fa-external-link-alt mr-1"></i> View portfolio</a>
-    </div>
+    <x-page-header title="Portfolio" description="Shape your public photography presence and showcase your best work."
+        :breadcrumbs="[['label' => 'Portfolio']]" :action-url="$portfolioUrl" action-label="View portfolio"
+        action-icon="fas fa-external-link-alt" action-target="_blank" />
     <form method="POST" action="{{ route('dashboard.portfolio.update') }}" enctype="multipart/form-data">
         @csrf @method('PUT')
         <div class="row">
@@ -19,7 +18,7 @@
                 <h5>Brand & introduction</h5>
                 <div class="form-group"><label for="portfolio_title">Portfolio title</label><input id="portfolio_title" name="portfolio_title" class="form-control" maxlength="100" value="{{ old('portfolio_title', $photographer->portfolio_title ?: $photographer->user->name) }}" placeholder="e.g. Maria El-Sayed Photography">@error('portfolio_title')<small class="text-danger">{{ $message }}</small>@enderror</div>
                 <div class="form-group"><label for="portfolio_bio">Introduction</label><textarea id="portfolio_bio" name="portfolio_bio" class="form-control" rows="4" maxlength="1000" placeholder="Tell visitors about your photography style and services.">{{ old('portfolio_bio', $photographer->portfolio_bio) }}</textarea>@error('portfolio_bio')<small class="text-danger">{{ $message }}</small>@enderror</div>
-                <div class="form-group"><label for="portfolio_cover">Portfolio cover image</label><p class="text-muted small mb-2">This is the main image visitors see first. Recommended: landscape image, at least 1600 × 900 px.</p><div class="portfolio-cover-upload">@if($photographer->portfolio_cover_url)<img id="portfolioCoverPreview" src="{{ $photographer->portfolio_cover_url }}" alt="Portfolio cover preview">@else<i id="portfolioCoverIcon" class="far fa-image"></i><img id="portfolioCoverPreview" alt="Portfolio cover preview" style="display:none">@endif<div><label class="portfolio-cover-button mb-1" for="portfolio_cover"><i class="fas fa-cloud-upload-alt"></i>{{ $photographer->portfolio_cover_url ? 'Change cover image' : 'Upload cover image' }}</label><small class="d-block text-muted">JPG, PNG or WEBP · Maximum 5 MB</small></div><input id="portfolio_cover" name="portfolio_cover" type="file" accept="image/*" class="d-none"></div>@error('portfolio_cover')<small class="text-danger">{{ $message }}</small>@enderror</div>
+                <div class="form-group"><label for="portfolio_cover">Portfolio cover image</label><p class="text-muted small mb-2">This is the main image visitors see first. Recommended: landscape image, at least 1600 × 900 px.</p><div class="portfolio-cover-upload">@if($photographer->portfolio_cover_url)<img id="portfolioCoverPreview" src="{{ $photographer->portfolio_cover_url }}" alt="Portfolio cover preview">@else<i id="portfolioCoverIcon" class="far fa-image"></i><img id="portfolioCoverPreview" alt="Portfolio cover preview" style="display:none">@endif<div><label class="portfolio-cover-button mb-1" for="portfolio_cover"><i class="fas fa-cloud-upload-alt"></i>{{ $photographer->portfolio_cover_url ? 'Change cover image' : 'Upload cover image' }}</label><small class="d-block text-muted">JPG, PNG or WEBP · Maximum 5 MB</small></div><input id="portfolio_cover" name="portfolio_cover" type="file" accept=".jpg,.jpeg,.png,.webp" class="d-none"></div>@error('portfolio_cover')<small class="text-danger">{{ $message }}</small>@enderror</div>
                 <hr><h5>Choose your portfolio style</h5><p class="text-muted small mb-3">Select a design to see how your public portfolio will be structured.</p>
                 @php($selectedTheme = old('portfolio_theme', $photographer->portfolio_theme) === 'light' ? 'light' : 'bold')
                 <div class="theme-picker">

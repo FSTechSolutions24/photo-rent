@@ -1,8 +1,11 @@
 @extends('adminlte::page')
+@section('title', 'Edit Appointment')
 
 @section('content')
 
-<h4 class="page_header">Edit Appointment</h4>
+<x-page-header title="Edit Appointment" description="Update the date, time, type, or details for this appointment."
+    :breadcrumbs="[['label' => 'Scheduling', 'url' => route('photographer.appointments.index')], ['label' => 'Edit Appointment']]"
+    :action-url="route('photographer.appointments.index')" action-label="Open calendar" action-icon="far fa-calendar-alt" />
 
 <form method="POST" action="{{ route('photographer.appointments.update', $appointment->id) }}" enctype="multipart/form-data">
 

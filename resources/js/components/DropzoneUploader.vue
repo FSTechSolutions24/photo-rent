@@ -46,7 +46,7 @@ export default {
                 autoProcessQueue: true,
                 paramName: 'file',
                 maxFilesize: 30, // 30MB
-                acceptedFiles: ".jpeg,.jpg,.png,.gif,.mp4,.mov,.avi", // same formats
+                acceptedFiles: ".jpeg,.jpg,.png,.gif,.webp,.mp4,.mov,.avi",
                 dictDefaultMessage: '<i class="fas fa-ban dropzone-icon"></i> Please select a folder before uploading',
             });
 
