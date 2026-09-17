@@ -16,7 +16,8 @@ export default class {
         this.dropzone = new Dropzone(dropzoneElement, {
             url: `/dashboard/galleries/${galleryId}/folders/${folderId}/upload`, // use your route
             autoProcessQueue: true,
-            // maxFilesize: FleetCart.maxFileSize,
+            maxFilesize: 30,
+            acceptedFiles: '.jpeg,.jpg,.png,.gif,.webp,.mp4,.mov,.avi',
             headers: {
                 'X-CSRF-TOKEN': token
             }

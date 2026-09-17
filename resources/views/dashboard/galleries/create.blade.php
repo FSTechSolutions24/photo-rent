@@ -3,7 +3,9 @@
 
 
 @section('content')
-    <h4 class="page_header">Create Gallery</h4>
+    <x-page-header title="Create Gallery" description="Build a new gallery and prepare a beautiful collection for your client."
+        :breadcrumbs="[['label' => 'Galleries', 'url' => route('dashboard.galleries.index')], ['label' => 'Create Gallery']]"
+        :action-url="route('dashboard.galleries.index')" action-label="View galleries" action-icon="fas fa-images" />
     <form method="POST" action="{{ route('dashboard.galleries.store') }}" enctype="multipart/form-data">
         <div class="ibox-content">
             @include('dashboard.galleries._form')

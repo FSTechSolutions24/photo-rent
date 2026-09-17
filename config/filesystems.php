@@ -55,7 +55,7 @@ return [
             'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', false),
             'throw' => true,
             'http' => [
-                'verify' => false,
+                'verify' => env('AWS_SSL_VERIFY', true),
             ],
             'visibility' => 'private',
             'options' => [
@@ -73,7 +73,7 @@ return [
             'use_path_style_endpoint' => true,
             'visibility' => 'private',
             'http' => [
-                'verify' => false,
+                'verify' => env('WASABI_SSL_VERIFY', true),
             ],
         ],
 

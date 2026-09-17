@@ -2,7 +2,9 @@
 @section('title', 'View Plans')
 @section('content')
 
-  <h4 class="page_header">Plan List</h4>
+  <x-page-header title="Subscription Plans" description="Manage pricing, storage allowances, and features available to photographers."
+    :breadcrumbs="[['label' => 'Administration'], ['label' => 'Plans']]" :action-url="route('superadmin.plans.create')"
+    action-label="Create plan" action-icon="fas fa-plus" />
 
   <div class="ibox-content">
     <table class="table">

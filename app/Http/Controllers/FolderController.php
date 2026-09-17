@@ -16,6 +16,8 @@ use App\Models\GalleriesToBeEmailed;
 use App\Models\GalleryDownload;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 use Yajra\DataTables\Facades\DataTables;
 
 class FolderController extends Controller
@@ -28,7 +30,15 @@ class FolderController extends Controller
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
+            'id' => [
+                'nullable',
+                'integer',
+                Rule::exists('folders', 'id')->where('gallery_id', $gallery->id),
+            ],
+            'thumbnail_path' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
         ]);
+
+        unset($validated['id'], $validated['thumbnail_path']);
         
         // If ID exists -> update, else create
         $folder = $gallery->folders()->updateOrCreate(
@@ -58,15 +68,17 @@ class FolderController extends Controller
 
     public function index(Gallery $gallery)
     {
+        $this->authorizeGallery($gallery);
         // Pass gallery and folders to the Blade view
         return view('dashboard.folders.index', [
             'gallery' => $gallery,
         ]);
     }
 
-    public function listJson($galleryId)
+    public function listJson(Gallery $gallery)
     {
-        $folders = Folder::where('gallery_id', $galleryId)->get();
+        $this->authorizeGallery($gallery);
+        $folders = $gallery->folders()->get();
         return response()->json($folders);
     }
 
@@ -175,7 +187,7 @@ class FolderController extends Controller
         
     }
 
-    public function upload(Request $request, $galleryId, $folderId)
+    public function upload(Request $request, Gallery $gallery, Folder $folder)
     {
         /**
          * Important logic:
@@ -183,24 +195,39 @@ class FolderController extends Controller
          * We also need to add this validation in Dropzone to prevent the upload from starting
          */
 
-        // Validate file
+        $this->authorizeGallery($gallery);
+        abort_unless((int) $folder->gallery_id === (int) $gallery->id, 404);
+
         $request->validate([
-            'file' => 'required|file|mimes:jpeg,png,gif,mp4,mov,avi|max:30720', // max 30MB, adjust as needed
+            'file' => [
+                'required',
+                'file',
+                'mimes:jpg,jpeg,png,gif,webp,mp4,mov,avi',
+                'mimetypes:image/jpeg,image/png,image/gif,image/webp,video/mp4,video/quicktime,video/x-msvideo',
+                'max:30720',
+            ],
         ]);
 
         // Get uploaded file
         $file = $request->file('file');
         $userId = Auth::user()->id;
 
-        $extension = $file->getClientOriginalExtension();
+        $photographer = Auth::user()->photographer;
+        if ((int) $photographer->available_storage < (int) $file->getSize()) {
+            throw ValidationException::withMessages([
+                'file' => 'This upload exceeds your remaining storage allowance.',
+            ]);
+        }
+
+        $extension = $this->safeMediaExtension($file->getMimeType());
         $filename = Str::uuid() . '.' . $extension;
-        $basePath = "users/{$userId}/galleries/{$galleryId}/folders/{$folderId}/media";
+        $basePath = "users/{$userId}/galleries/{$gallery->id}/folders/{$folder->id}/media";
 
         // ✅ Store ORIGINAL only
         $originalPath = "{$basePath}/original/{$filename}";
         Storage::disk('wasabi')->put($originalPath, file_get_contents($file));
         // ✅ Save DB record (store only original for now)
-        $media = $this->save_media_record($galleryId, $folderId, $originalPath, $file);
+        $media = $this->save_media_record($gallery->id, $folder->id, $originalPath, $file);
 
         // dd([
         //     config('queue.default'),
@@ -262,6 +289,7 @@ class FolderController extends Controller
 
     public function destroy(Gallery $gallery, Folder $folder)
     {
+        $this->authorizeGallery($gallery);
         // Ensure folder belongs to this gallery
         if ($folder->gallery_id !== $gallery->id) {
             return response()->json(['message' => 'Folder does not belong to this gallery'], 403);
@@ -298,11 +326,12 @@ class FolderController extends Controller
 
         foreach ($media as $single_media) {
 
-            $mediaPath = $single_media->path;
-
-            if (Storage::disk('public')->exists($mediaPath)) {
-                Storage::disk('public')->delete($mediaPath);
-            }
+            $disk = $single_media->disk ?: 'wasabi';
+            Storage::disk($disk)->delete(array_unique([
+                $single_media->path,
+                str_replace('/original/', '/medium/', $single_media->path),
+                str_replace('/original/', '/thumb/', $single_media->path),
+            ]));
 
             $totalSize += $single_media->size;
 
@@ -316,9 +345,11 @@ class FolderController extends Controller
     }
 
 
-    public function listJsonMedia($galleryId, $folderId)
+    public function listJsonMedia(Gallery $gallery, Folder $folder)
     {
-        $eloquent = Media::where('gallery_id', $galleryId)->where('folder_id', $folderId);
+        $this->authorizeGallery($gallery);
+        abort_unless((int) $folder->gallery_id === (int) $gallery->id, 404);
+        $eloquent = Media::where('gallery_id', $gallery->id)->where('folder_id', $folder->id);
 
         return DataTables::eloquent($eloquent)
         ->editColumn('created_at', function ($model) {
@@ -343,14 +374,42 @@ class FolderController extends Controller
             $url = $this->get_pre_signed_url($model->path, 'thumb');            
             return '<div class="thumbnail-holder"><img class="img-fluid" src="'.$url.'" width="80"></div>';
         })
+        ->addColumn('private_toggle', function ($model) {
+            $checked = $model->private ? ' checked' : '';
+
+            return '<div class="custom-control custom-switch">'
+                .'<input type="checkbox" class="custom-control-input" id="media-private-'.$model->id.'" '
+                .'onchange="window.toggleMediaPrivate('.$model->id.', this)"'.$checked.'>'
+                .'<label class="custom-control-label" for="media-private-'.$model->id.'">Private</label>'
+                .'</div>';
+        })
         ->addColumn('actions', function($model){
             $buffer  = '<button onclick="window.deleteMedia('.$model->id.')" class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></button>';
             $buffer .= '<button onclick="window.downloadMedia('.$model->id.')" class="btn btn-sm btn-outline-success" style="margin-left: 4px;"><i class="fas fa-download"></i></button>';
             return $buffer;
         })
         ->addIndexColumn()
-        ->rawColumns(['thumbnail','multiselect','actions'])
+        ->rawColumns(['thumbnail','multiselect','private_toggle','actions'])
         ->make(true);
+    }
+
+    private function safeMediaExtension(string $mimeType): string
+    {
+        $extensions = [
+            'image/jpeg' => 'jpg',
+            'image/png' => 'png',
+            'image/gif' => 'gif',
+            'image/webp' => 'webp',
+            'video/mp4' => 'mp4',
+            'video/quicktime' => 'mov',
+            'video/x-msvideo' => 'avi',
+        ];
+
+        if (! isset($extensions[$mimeType])) {
+            throw ValidationException::withMessages(['file' => 'The uploaded file type is not allowed.']);
+        }
+
+        return $extensions[$mimeType];
     }
 
 }

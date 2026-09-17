@@ -25,8 +25,8 @@ class PortfolioController extends Controller
             'portfolio_primary_color' => ['required', 'regex:/^#[0-9A-Fa-f]{6}$/'],
             'portfolio_accent_color' => ['required', 'regex:/^#[0-9A-Fa-f]{6}$/'],
             'portfolio_show_contact' => ['nullable', 'boolean'],
-            'portfolio_cover' => ['nullable', 'image', 'max:5120'],
-            'portfolio_contact_email' => ['nullable', 'email', 'max:255'],
+            'portfolio_cover' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
+            'portfolio_contact_email' => ['nullable', 'email', 'not_regex:/[\r\n]/', 'max:255'],
             'portfolio_contact_phone' => ['nullable', 'string', 'max:30'],
             'portfolio_instagram' => ['nullable', 'string', 'max:100'],
             'portfolio_footer_text' => ['nullable', 'string', 'max:255'],
@@ -40,7 +40,7 @@ class PortfolioController extends Controller
         if ($request->hasFile('portfolio_cover')) {
             $this->deleteCover($photographer->portfolio_cover_path);
             $file = $request->file('portfolio_cover');
-            $extension = strtolower($file->getClientOriginalExtension() ?: $file->extension() ?: 'jpg');
+            $extension = strtolower($file->extension());
             $path = 'users/' . $request->user()->id . '/portfolio/cover/' . Str::uuid() . '.' . $extension;
             Storage::disk('wasabi')->put($path, file_get_contents($file));
             $photographer->update(['portfolio_cover_path' => $path]);

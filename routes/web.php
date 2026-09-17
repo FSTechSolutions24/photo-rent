@@ -35,7 +35,8 @@ Route::middleware(['auth', 'photographer'])->prefix('photographer')->name('photo
     Route::get('calendar/preview', [ProfileController::class, 'calendar'])->name('my.calendar');
 
     Route::get('appointments/data', [AppointmentController::class, 'getData'])->name('appointments.data');
-    Route::resource('appointments', AppointmentController::class);
+    Route::resource('appointments', AppointmentController::class)
+        ->only(['index', 'create', 'store', 'edit', 'update']);
 });
 
 Route::middleware(['auth', 'photographer'])->prefix('dashboard')->name('dashboard.')->group(function () {
@@ -43,25 +44,32 @@ Route::middleware(['auth', 'photographer'])->prefix('dashboard')->name('dashboar
     Route::put('portfolio', [PortfolioController::class, 'update'])->name('portfolio.update');
     // Clients
     Route::get('clients/data', [ClientController::class, 'getData'])->name('clients.data');
-    Route::resource('clients', ClientController::class);
+    Route::resource('clients', ClientController::class)
+        ->only(['index', 'create', 'store', 'show', 'edit', 'update']);
 
     // Galleries (nested under client)
     Route::post('folders/download', [FolderController::class, 'download'])->name('folders.download');
     Route::post('galleries/download', [GalleryController::class, 'download'])->name('galleries.download');
     Route::get('galleries/data', [GalleryController::class, 'getData'])->name('galleries.data');
     Route::get('galleries/{gallery}/whatsapp', [GalleryController::class, 'sendViaWhatsApp'])->name('galleries.whatsapp');
+<<<<<<< HEAD
     Route::post('galleries/{gallery}/faces/process', [GalleryController::class, 'processFaces'])->name('galleries.faces.process');
     Route::patch('galleries/{gallery}/faces/visibility', [GalleryController::class, 'updateAllFaceClusterVisibility'])->name('galleries.faces.visibility-all');
     Route::patch('galleries/{gallery}/faces/{cluster}/visibility', [GalleryController::class, 'updateFaceClusterVisibility'])->name('galleries.faces.visibility');
     Route::get('galleries/{gallery}/faces/{cluster}/thumbnail', [GalleryController::class, 'dashboardFaceThumbnail'])->name('galleries.faces.thumbnail');
     Route::resource('galleries', GalleryController::class);
+=======
+    Route::resource('galleries', GalleryController::class)
+        ->only(['index', 'create', 'store', 'edit', 'update']);
+>>>>>>> a31bd2fec3045937904a7877a43ad4b99c736685
 
     Route::get('whatsapp-template', [WhatsAppTemplateController::class, 'edit'])->name('whatsapp-template.edit');
     Route::put('whatsapp-template', [WhatsAppTemplateController::class, 'update'])->name('whatsapp-template.update');
     
     // Session
     Route::get('sessions/data', [SessionController::class, 'getData'])->name('sessions.data');
-    Route::resource('sessions', SessionController::class);
+    Route::resource('sessions', SessionController::class)
+        ->only(['index', 'create', 'store', 'edit', 'update']);
 
     // Finance report
     Route::get('finance-report', [FinanceReportController::class, 'index'])->name('finance-report.index');
@@ -71,12 +79,14 @@ Route::middleware(['auth', 'photographer'])->prefix('dashboard')->name('dashboar
     Route::post('/galleries/{gallery}/folders/{folder}/upload', [FolderController::class, 'upload'])->name('galleries.folders.upload');
     Route::post('/galleries/{gallery}/folders/{folder}/download', [FolderController::class, 'download'])->name('galleries.folders.download');
     Route::get('/api/galleries/{gallery}/folders', [FolderController::class, 'listJson'])->name('api.galleries.folders.index');
-    Route::resource('galleries.folders', FolderController::class);
+    Route::resource('galleries.folders', FolderController::class)
+        ->only(['index', 'store', 'destroy']);
     
     
     // Photos (nested under gallery)
     Route::post('galleries/{gallery}/photos', [MediaController::class, 'store'])->name('photos.store');        
     Route::delete('media/{gallery}/delete',[MediaController::class, 'destroy'])->name('media.destroy');
+    Route::patch('media/{gallery}/privacy',[MediaController::class, 'updatePrivacy'])->name('media.privacy');
     Route::post('media/{gallery}/download',[MediaController::class, 'download'])->name('media.download');
     Route::post('media/{gallery}/download_folder',[MediaController::class, 'download_folder'])->name('media.download_folder');
 
@@ -92,32 +102,43 @@ Route::middleware(['auth'])->prefix('dashboard')->name('dashboard.')->group(func
     Route::get('/profile/inactive', [ProfileController::class, 'inactivephotographer'])->name('profile.inactive');
     Route::post('/profile/renew-subscription', [ProfileController::class, 'renewSubscription'])->name('profile.renew-subscription');
     Route::get('/api/profile/checksubdomain', [ProfileController::class, 'checksubdomain'])->name('checksubdomain');
-    Route::get('/api/profile/createphotographerprofile', [ProfileController::class, 'createphotographerprofile'])->name('createphotographerprofile');
+    Route::post('/api/profile/createphotographerprofile', [ProfileController::class, 'createphotographerprofile'])
+        ->middleware('throttle:5,1')
+        ->name('createphotographerprofile');
     Route::resource('profile', ProfileController::class);
 });
 
 Route::get('paymobcallbackresponseview', [ProfileController::class, 'paymobcallbackresponseview'])->name('paymob.paymobcallbackresponseview');
-Route::post('paymobcallback', [ProfileController::class, 'callback'])->name('paymob.callback');
+Route::post('paymobcallback', [ProfileController::class, 'callback'])
+    ->middleware('throttle:30,1')
+    ->name('paymob.callback');
 
 
 Route::domain('{photographer_subdomain}.' . env('APP_DOMAIN'))->group(function () {
     // Public portfolio for a photographer's subdomain, e.g. pola.localhost:8000/portfolio.
     Route::get('/portfolio', [PortfolioController::class, 'show'])->name('portfolio.show');
+<<<<<<< HEAD
     Route::get('/{gallery_slug}/faces/{cluster_uuid}/thumbnail', [GalleryController::class, 'publicFaceThumbnail'])->name('gallery.faces.thumbnail');
     Route::post('/{gallery_slug}/download', [GalleryController::class, 'requestDownload'])->name('gallery.download');
     Route::match(['get', 'post'], '/{gallery_slug}', [GalleryController::class, 'show'])->name('gallery.show');
+=======
+    Route::post('/{gallery_slug}/download', [GalleryController::class, 'requestDownload'])
+        ->middleware('throttle:5,1')
+        ->name('gallery.download');
+    Route::match(['get', 'post'], '/{gallery_slug}', [GalleryController::class, 'show'])
+        ->middleware('throttle:20,1')
+        ->name('gallery.show');
+>>>>>>> a31bd2fec3045937904a7877a43ad4b99c736685
 });
 
 
 
 Route::middleware(['superadmin'])->prefix('superadmin')->name('superadmin.')->group(function () {
     Route::get('plans/data', [SubscriptionPlanController::class, 'getData'])->name('plans.data');
-    Route::resource('plans', SubscriptionPlanController::class);
+    Route::resource('plans', SubscriptionPlanController::class)
+        ->only(['index', 'create', 'store', 'edit', 'update']);
 });
 
 
 require __DIR__.'/auth.php';
-
-Auth::routes();
-
 

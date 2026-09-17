@@ -30,7 +30,7 @@
 
 <div class="mb-3">
     <label>Thumbnail:</label>
-    <input type="file" name="thumbnail_path" id="thumbnail_path" class="input form-control" accept="image/*">
+    <input type="file" name="thumbnail_path" id="thumbnail_path" class="input form-control" accept=".jpg,.jpeg,.png,.webp">
 
     <div class="mt-3">
         <img id="thumbnailPreview" width="200" src="{{ $thumbnailPath }}" alt="Thumbnail Preview" class="img-fluid border rounded" style="max-width: 250px; {{ $thumbnailPath ? '' : 'display:none;' }}">
@@ -103,7 +103,7 @@
 
 <div class="mb-3">
     <label for="background_path">Gallery Background:</label>
-    <input type="file" name="background_path" id="background_path" class="input form-control" accept="image/*">
+    <input type="file" name="background_path" id="background_path" class="input form-control" accept=".jpg,.jpeg,.png,.webp">
     <small class="form-text text-muted" id="backgroundImageHelp">For a sharp full-width hero, upload a landscape image of at least 1920 x 720 px. Recommended: 2560 x 1000 px, up to 15 MB.</small>
     <small class="form-text d-none" id="backgroundImageDimensions" aria-live="polite"></small>
 

@@ -2,7 +2,9 @@
 @section('title', 'View Clients')
 @section('content')
 
-  <h4 class="page_header">Client List</h4>
+  <x-page-header title="Clients" description="Manage client details and keep every photography relationship organized."
+    :breadcrumbs="[['label' => 'Clients']]" :action-url="route('dashboard.clients.create')"
+    action-label="Add client" action-icon="fas fa-user-plus" />
 
   <div class="ibox-content">
     <table class="table">

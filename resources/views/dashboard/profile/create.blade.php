@@ -10,7 +10,7 @@
     <p>Simple, transparent pricing to help you grow your portfolio.</p>
   </div>
 
-  <div class="row plan-grid g-4">
+  <div class="row plan-grid g-4 {{ ($plans->count() + ($canStartTrial ? 1 : 0)) === 1 ? 'single-plan-grid' : '' }}">
 
     @if ($canStartTrial)
       <div class="col-12 col-sm-6 col-lg-3 d-flex">
@@ -100,8 +100,6 @@
   </div>
 </div>
 
-<br><br><br><br>
-  
 @section('js')
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script>
@@ -157,7 +155,7 @@
         check_profile_creation();
       }
       if (response.data.available) {
-        status.innerHTML = `<span class="text-success fw-semibold"> ${response.data.message}</span>`;
+        status.innerHTML = `<span class="text-success fw-semibold availability-message"><i class="fas fa-check" aria-hidden="true"></i> ${response.data.message}</span>`;
         window.validSubdomain = true;
         check_profile_creation();
       } else {
@@ -210,11 +208,9 @@
 
     var plan = window.selectedPlan;
     var subdomain = $('#subdomain-input').val(); 
-    axios.get(`/dashboard/api/profile/createphotographerprofile`, {
-      params: { 
+    axios.post(`/dashboard/api/profile/createphotographerprofile`, {
         selectedPlan: window.selectedPlan, 
         subdomain: $('#subdomain-input').val(), 
-      }
     })
     .then(response => {
       if (response.data.trial) {
@@ -615,7 +611,7 @@
     gap: 8px;
   }
 
-  .plan-features li::before, .text-success.fw-semibold::before {
+  .plan-features li::before {
     content: "✓";
     color: #22c55e;
     font-weight: bold;
@@ -735,6 +731,223 @@
     .content-wrapper::after { width: 160px; height: 160px; bottom: -55px; left: -65px; }
   }
 
+</style>
+
+<style>
+  /* Clean, blue plan-selection experience */
+  .content-wrapper {
+    min-height: calc(100vh - 58px);
+    overflow-x: hidden;
+    background: #f4f7fb !important;
+  }
+
+  .content-wrapper::before,
+  .content-wrapper::after {
+    display: none !important;
+    content: none !important;
+  }
+
+  .content-wrapper > .content {
+    padding: 0 !important;
+  }
+
+  .setup-step {
+    width: 100%;
+    max-width: none;
+    padding: 30px clamp(20px, 3vw, 42px) 48px;
+  }
+
+  .pricing-section {
+    max-width: 660px;
+    margin: 0 auto 26px;
+  }
+
+  .pricing-section h1 {
+    margin: 6px 0 7px;
+    color: #163b63;
+    font-size: clamp(2rem, 3vw, 2.55rem);
+    font-weight: 800;
+  }
+
+  .pricing-section p {
+    margin-bottom: 0;
+    color: #6f8194;
+  }
+
+  .setup-progress > span.is-active,
+  .setup-progress > span.is-complete {
+    border-color: #1769c2;
+    background: #1769c2;
+  }
+
+  .setup-progress > i { background: #ccd9e7; }
+  .setup-step-label { color: #1769c2; }
+
+  .plan-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 300px));
+    justify-content: center;
+    gap: 20px;
+    width: 100%;
+    max-width: 1320px;
+    margin: 0 auto;
+  }
+
+  .plan-grid.single-plan-grid {
+    grid-template-columns: minmax(300px, 390px);
+    max-width: 390px;
+  }
+
+  .plan-grid > [class*='col-'] {
+    width: auto;
+    max-width: none;
+    padding: 0;
+  }
+
+  .pricing-card {
+    min-height: 410px;
+    border: 1px solid #dfe8f1;
+    border-radius: 18px;
+    background: #fff;
+    box-shadow: 0 12px 30px rgba(30, 68, 105, .08);
+  }
+
+  .pricing-card::before {
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #1455ac, #2f80d1);
+    content: '';
+  }
+
+  .pricing-card:hover {
+    transform: translateY(-4px);
+    border-color: #c8d9eb;
+    box-shadow: 0 18px 40px rgba(30, 68, 105, .13);
+  }
+
+  .plan-header { min-height: 125px; padding: 30px 24px 10px; }
+  .plan-name { color: #183b5c; font-weight: 750; }
+  .plan-price { color: #1455ac; }
+  .plan-duration { color: #728397; }
+
+  .plan-features { margin-top: 8px; color: #40576e; }
+  .plan-features li { gap: 10px; padding: 7px 24px; }
+  .plan-features li::before {
+    content: '\2713';
+    display: grid;
+    width: 19px;
+    height: 19px;
+    flex: 0 0 19px;
+    place-items: center;
+    border-radius: 50%;
+    background: #e7f1ff;
+    color: #1769c2;
+    font-size: .68rem;
+    font-weight: 800;
+  }
+
+  .plan-btn,
+  .trial-plan .plan-btn {
+    width: calc(100% - 48px);
+    margin: auto 24px 22px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #1769c2, #1455ac);
+    box-shadow: 0 7px 18px rgba(20, 85, 172, .18);
+  }
+
+  .plan-btn:hover,
+  .trial-plan .plan-btn:hover {
+    background: linear-gradient(135deg, #145dad, #10488f);
+  }
+
+  .trial-plan {
+    border: 1px solid #bcd3eb;
+    background: linear-gradient(180deg, #f4f8fd 0%, #fff 44%);
+  }
+
+  .trial-plan .plan-price { color: #1455ac; }
+
+  .badge-trial,
+  .badge-recommended {
+    top: 18px;
+    right: 18px;
+    padding: 6px 11px;
+    background: #e7f1ff;
+    box-shadow: none;
+    color: #1455ac;
+    font-size: .68rem;
+    font-weight: 800;
+  }
+
+  .recommended {
+    border: 2px solid #2b74bd;
+    box-shadow: 0 14px 34px rgba(20, 85, 172, .14);
+  }
+
+  .selected-plan {
+    border-color: #1769c2;
+    background: #f3f8fe;
+    box-shadow: 0 0 0 3px rgba(23, 105, 194, .12), 0 16px 38px rgba(30, 68, 105, .13);
+  }
+
+  .selected-plan::after { color: #1455ac; }
+
+  .pricing-card.selected-plan .plan-btn,
+  .pricing-card.selected-plan.trial-plan .plan-btn {
+    margin-bottom: 30px;
+  }
+
+  .pricing-card.selected-plan::after {
+    bottom: 13px;
+    line-height: 1;
+  }
+
+  .setup-action { margin: 24px 0 0; }
+  .setup-action .btn-checker {
+    min-width: 280px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #1769c2, #1455ac);
+    box-shadow: 0 8px 20px rgba(20, 85, 172, .16);
+  }
+  .setup-action .btn-checker:disabled {
+    background: #dce3eb;
+    box-shadow: none;
+    color: #8d9baa;
+  }
+
+  .domain-panel {
+    border-color: #dce6f0;
+    background: #fff;
+    box-shadow: 0 14px 36px rgba(30, 68, 105, .09);
+  }
+  .domain-input:focus-within {
+    border-color: #1769c2;
+    box-shadow: 0 0 0 3px rgba(23, 105, 194, .13);
+  }
+  .domain-navigation #back-to-plans { color: #1455ac; }
+  .domain-navigation #back-to-plans:hover { background: #eaf3fd; }
+  .domain-help i { color: #1769c2; }
+  .btn-checker { background: linear-gradient(135deg, #1769c2, #1455ac); }
+  .btn-checker:hover:not(:disabled) { background: linear-gradient(135deg, #145dad, #10488f); }
+  #status .availability-message {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    color: #16a34a !important;
+  }
+  #status .availability-message::before { content: none !important; }
+  #status .availability-message i { font-size: .78rem; }
+
+  @media (max-width: 767.98px) {
+    .setup-step { padding: 24px 16px 36px; }
+    .pricing-section { margin-bottom: 22px; }
+    .plan-grid,
+    .plan-grid.single-plan-grid { grid-template-columns: minmax(0, 390px); }
+    .pricing-card { min-height: 390px; margin-bottom: 0; }
+  }
 </style>
 
 @stop

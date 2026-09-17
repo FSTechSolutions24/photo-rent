@@ -3,7 +3,9 @@
 @section('title', 'Finance Report')
 
 @section('content')
-    <h4 class="page_header">Finance Report</h4>
+    <x-page-header title="Finance Report" description="Review income, expenses, outstanding balances, and performance over time."
+        :breadcrumbs="[['label' => 'Finance Report']]" :action-url="route('dashboard.sessions.index')"
+        action-label="View sessions" action-icon="fas fa-camera" />
 
     <div class="card card-outline card-primary">
         <div class="card-body">

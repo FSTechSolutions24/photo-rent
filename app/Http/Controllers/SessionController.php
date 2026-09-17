@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\ValidationException;
 use Yajra\DataTables\Facades\DataTables;
 use App\Traits\HelperTrait;
 
@@ -57,8 +58,9 @@ class SessionController extends Controller
     }
     
     public function edit($id){
-        $session = Session::with('finance')->findOrFail($id);
-        $clients = auth()->user()->photographer->clients;
+        $photographer = auth()->user()->photographer;
+        $session = $photographer->sessions()->with('finance')->findOrFail($id);
+        $clients = $photographer->clients;
         
         return view('dashboard.sessions.edit', compact('session','clients'));   
     }
@@ -79,6 +81,7 @@ class SessionController extends Controller
             ],
             'total_amount' => ['nullable','numeric','regex:/^\d+(\.\d{1,2})?$/'],
             'notes' => ['nullable', 'string', 'max:5000'],
+            'items' => ['nullable', 'json'],
         ]);
 
         $data['date'] = Carbon::createFromFormat('Y-m-d\TH:i', $data['date'])
@@ -94,15 +97,13 @@ class SessionController extends Controller
     }
 
     public function update(Request $request, Session $session){
+        $this->authorizeSession($session);
         $data = $this->validateSession($request);
-
+        unset($data['items']);
         $session->update($data);
 
-        $data = ($request->all());
-
-        $items_array = json_decode($data['items'], true); 
-
-        $this->storeDynamicTableRecords(SessionFinance::class,'session_id',$session->id,$items_array);
+        $items = json_decode((string) $request->input('items', '{"rows":[]}'), true) ?: ['rows' => []];
+        $this->storeSessionFinance($session, $items);
         
         return redirect()->route('dashboard.sessions.index')->with('success', 'Session updated successfully.');
     }
@@ -116,6 +117,35 @@ class SessionController extends Controller
         Session::create($data);
 
         return redirect()->route('dashboard.sessions.index', $data['client_id'])->with('success', 'Session created successfully.');
+    }
+
+    private function authorizeSession(Session $session): void
+    {
+        abort_unless((int) $session->photographer_id === (int) Auth::user()->photographer->id, 403);
+    }
+
+    private function storeSessionFinance(Session $session, array $items): void
+    {
+        if (! isset($items['rows']) || ! is_array($items['rows'])) {
+            throw ValidationException::withMessages(['items' => 'The finance rows are invalid.']);
+        }
+
+        $rows = collect($items['rows'] ?? [])->map(function ($row) {
+            if (! is_array($row)) {
+                throw ValidationException::withMessages(['items' => 'Each finance row must be an object.']);
+            }
+
+            return validator($row, [
+                'name' => ['required', 'string', 'max:255'],
+                'description' => ['nullable', 'string', 'max:2000'],
+                'credit_debit' => ['required', Rule::in(['credit', 'debit'])],
+                'amount' => ['required', 'numeric', 'min:0', 'max:999999999.99'],
+                'date' => ['nullable', 'date'],
+            ])->validate();
+        });
+
+        $session->finance()->delete();
+        $session->finance()->createMany($rows->all());
     }
 
 }

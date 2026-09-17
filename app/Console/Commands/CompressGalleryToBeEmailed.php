@@ -126,7 +126,7 @@ class CompressGalleryToBeEmailed extends Command
             $mediaItems = Media::where('folder_id', $folder->id);
 
             if($gallery_download->user_type == 'guest'){
-                $mediaItems->where('private', '!=', 1);
+                $mediaItems->visibleToGuests();
             }
 
             $mediaItems = $mediaItems->get();

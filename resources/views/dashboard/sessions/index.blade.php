@@ -2,7 +2,9 @@
 @section('title', 'Sessions')
 
 @section('content')
-  <h4 class="page_header">Session List</h4>
+  <x-page-header title="Sessions" description="Track photography sessions, client bookings, dates, and financial details."
+    :breadcrumbs="[['label' => 'Sessions']]" :action-url="route('dashboard.sessions.create')"
+    action-label="Create session" action-icon="fas fa-plus" />
   <div class="ibox-content">
     <table class="table">
       <thead>

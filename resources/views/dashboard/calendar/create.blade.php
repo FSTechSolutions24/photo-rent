@@ -1,8 +1,11 @@
 @extends('adminlte::page')
+@section('title', 'Create Appointment')
 
 @section('content')
 
-<h4 class="page_header">Create Appointment</h4>
+<x-page-header title="Create Appointment" description="Add a meeting or booking to your photography schedule."
+    :breadcrumbs="[['label' => 'Scheduling', 'url' => route('photographer.appointments.index')], ['label' => 'Create Appointment']]"
+    :action-url="route('photographer.appointments.index')" action-label="Open calendar" action-icon="far fa-calendar-alt" />
 
 <form method="POST" action="{{ route('photographer.appointments.store') }}" enctype="multipart/form-data">
 

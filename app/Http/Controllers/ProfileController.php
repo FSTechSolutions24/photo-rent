@@ -39,12 +39,14 @@ class ProfileController extends Controller
     public function profile_update(Request $request)
     {
         $user = auth()->user();
+        $requiresCurrentPassword = $request->filled('password') || $request->input('email') !== $user->email;
 
         // ✅ Validation
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->id)],
+            'email' => ['required', 'email', 'not_regex:/[\r\n]/', 'max:255', Rule::unique('users', 'email')->ignore($user->id)],
             'password' => ['nullable', 'string', 'min:8', 'confirmed'],
+            'current_password' => [Rule::requiredIf($requiresCurrentPassword), 'nullable', 'current_password'],
         ]);
 
         // ✅ Update basic fields
@@ -87,14 +89,17 @@ class ProfileController extends Controller
 
     public function store(Request $request)
     {
+        $photographer = Auth::user()->photographer;
+        abort_unless($photographer, 403);
+
         $validated = $request->validate([
             'name' => 'required|string|max:255|min:3',
             'phone' => ['required','regex:/^(?:\+20|0)?1[0125][0-9]{8}$/'],
             'phone2' => ['nullable','regex:/^(?:\+20|0)?1[0125][0-9]{8}$/'],            
-            'email' => 'nullable|email',
+            'email' => ['nullable', 'email', 'not_regex:/[\r\n]/', 'max:255'],
         ]);
 
-        $validated['photographer_id'] = Auth::id();
+        $validated['photographer_id'] = $photographer->id;
 
         Client::create($validated);
 
@@ -110,7 +115,11 @@ class ProfileController extends Controller
 
     private function authorizeClient(Client $client)
     {
-        
+        abort_unless(
+            Auth::user()->photographer &&
+            (int) $client->photographer_id === (int) Auth::user()->photographer->id,
+            403
+        );
     }
 
     public function checksubdomain(Request $request)
@@ -328,8 +337,11 @@ class ProfileController extends Controller
         $headers = array();
         $headers[] = 'Content-Type: application/json';
 
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 30);
         curl_setopt($ch, CURLOPT_POST, 1);
         curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($json));
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
@@ -338,7 +350,9 @@ class ProfileController extends Controller
 
         // Check if there was a cURL error
         if (curl_errno($ch)) {
-            dd('cURL error: ' . curl_error($ch));
+            $message = curl_error($ch);
+            curl_close($ch);
+            throw new \RuntimeException('The payment provider request failed: ' . $message);
         }
 
         curl_close($ch);
@@ -380,65 +394,82 @@ class ProfileController extends Controller
 
     public function callback(Request $request)
     {
+        $data = $request->validate([
+            'type' => ['required', 'in:TRANSACTION'],
+            'obj' => ['required', 'array'],
+            'obj.id' => ['required', 'integer'],
+            'obj.amount_cents' => ['required', 'integer', 'min:0'],
+            'obj.currency' => ['required', 'string', 'size:3'],
+            'obj.integration_id' => ['required', 'integer'],
+            'obj.order.id' => ['required', 'integer'],
+            'obj.success' => ['required', 'boolean'],
+            'obj.pending' => ['required', 'boolean'],
+            'obj.is_refunded' => ['required', 'boolean'],
+            'obj.is_voided' => ['required', 'boolean'],
+            'hmac' => ['required', 'string', 'size:128', 'regex:/^[a-fA-F0-9]+$/'],
+        ]);
 
-        $data = $request->all();
+        $object = $data['obj'];
+        abort_unless($this->validPaymobHmac($object, $data['hmac']), 403);
+        abort_unless(
+            $request->boolean('obj.success') &&
+            ! $request->boolean('obj.pending') &&
+            ! $request->boolean('obj.is_refunded') &&
+            ! $request->boolean('obj.is_voided'),
+            422
+        );
+        abort_unless((int) $object['integration_id'] === (int) $this->config_values['integration_id'], 403);
 
-        ksort($data);
-        $hmac = $data['hmac'];
+        DB::transaction(function () use ($object) {
+            $order = PaymentLog::where('order_id', data_get($object, 'order.id'))
+                ->lockForUpdate()
+                ->firstOrFail();
+            $plan = SubscriptionPlan::findOrFail($order->plan_id);
 
-        $array = [
-            'amount_cents',
-            'created_at',
-            'currency',
-            'error_occured',
-            'has_parent_transaction',
-            'id',
-            'integration_id',
-            'is_3d_secure',
-            'is_auth',
-            'is_capture',
-            'is_refunded',
-            'is_standalone_payment',
-            'is_voided',
-            'order',
-            'owner',
-            'pending',
-            'source_data_pan',
-            'source_data_sub_type',
-            'source_data_type',
-            'success',
+            abort_unless(
+                (int) $object['amount_cents'] === (int) round($plan->price * 100) &&
+                strtoupper($object['currency']) === 'EGP',
+                422
+            );
+
+            if (Transaction::where('order_id', (string) $order->order_id)->exists()) {
+                return;
+            }
+
+            Transaction::create([
+                'user_id' => $order->user_id,
+                'order_id' => $order->order_id,
+                'transaction_id' => (string) $object['id'],
+                'payment_method' => 'paymob',
+                'status' => 'completed',
+                'amount' => $object['amount_cents'] / 100,
+            ]);
+
+            $this->after_payment_success($order);
+        });
+
+        return response()->noContent();
+    }
+
+    private function validPaymobHmac(array $object, string $providedHmac): bool
+    {
+        $paths = [
+            'amount_cents', 'created_at', 'currency', 'error_occured',
+            'has_parent_transaction', 'id', 'integration_id', 'is_3d_secure',
+            'is_auth', 'is_capture', 'is_refunded', 'is_standalone_payment',
+            'is_voided', 'order.id', 'owner', 'pending', 'source_data.pan',
+            'source_data.sub_type', 'source_data.type', 'success',
         ];
 
-        $secret = $this->config_values['hmac'];
+        $connectedString = collect($paths)->map(function ($path) use ($object) {
+            $value = data_get($object, $path, '');
 
-        $connectedString = '';
-        foreach ($data as $key => $element) {
-            if (in_array($key, $array)) {
-                $connectedString .= $element;
-            }
-        }
+            return is_bool($value) ? ($value ? 'true' : 'false') : (string) $value;
+        })->implode('');
 
-        $hased = hash_hmac('sha512', $connectedString, $secret);
-        
-        $order_id = $data['obj']['order']['id'];
+        $expected = hash_hmac('sha512', $connectedString, (string) $this->config_values['hmac']);
 
-        $order = PaymentLog::where('order_id',$order_id)->firstOrFail();
-
-        if ($hased == $hmac &&  $data['obj']['success'] == "true") {    
-            Transaction::create([
-                'user_id' => $order['user_id'],
-                'order_id' => $order['order_id'],
-                'transaction_id' => $data['obj']['id'],
-                'payment_method' => 'paymob',
-                'created_at' => date('Y-m-d H:i:s'),
-                'status' => $data['obj']['order']['status'],
-                'amount' => $data['obj']['order']['price'],
-            ]);                
-            
-            $this->after_payment_success($order);
-            return redirect()->route('checkout.complete.show');
-        }      
-
+        return hash_equals($expected, strtolower($providedHmac));
     }
 
     public function after_payment_success(PaymentLog $order)

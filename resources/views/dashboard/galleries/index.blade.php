@@ -3,9 +3,9 @@
 
 @section('content')
 
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h4 class="page_header mb-0">Gallery List</h4>
-    </div>
+    <x-page-header title="Galleries" description="Create, organize, and deliver polished photo collections to your clients."
+        :breadcrumbs="[['label' => 'Galleries']]" :action-url="route('dashboard.galleries.create')"
+        action-label="Create gallery" action-icon="fas fa-plus" />
     <div class="ibox-content">
         <table class="table">
             <thead>

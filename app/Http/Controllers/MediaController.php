@@ -13,6 +13,8 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 
 class MediaController extends Controller
 {
@@ -23,12 +25,24 @@ class MediaController extends Controller
         $this->authorizeGallery($gallery);
 
         $validated = $request->validate([
-            'folder_id' => 'nullable|exists:folders,id',
-            'photo' => 'required|image|max:10240', // 10MB per file
+            'folder_id' => [
+                'nullable',
+                'integer',
+                Rule::exists('folders', 'id')->where('gallery_id', $gallery->id),
+            ],
+            'photo' => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:10240'],
         ]);
 
-        $userid = Auth::user()->id;
-        $path = $request->file('photo')->store(
+        $photo = $request->file('photo');
+        $photographer = Auth::user()->photographer;
+        if ((int) $photographer->available_storage < (int) $photo->getSize()) {
+            throw ValidationException::withMessages([
+                'photo' => 'This upload exceeds your remaining storage allowance.',
+            ]);
+        }
+
+        $userid = Auth::id();
+        $path = $photo->store(
             "users/{$userid}/galleries/{$gallery->id}/" . ($validated['folder_id'] ?? 'root'),
             's3'
         );
@@ -36,55 +50,45 @@ class MediaController extends Controller
         Media::create([
             'gallery_id' => $gallery->id,
             'folder_id' => $validated['folder_id'] ?? null,
-            'uploaded_by' => Auth::id(),
-            'file_path' => $path,
+            'path' => $path,
+            'name' => $photo->getClientOriginalName(),
+            'disk' => 's3',
+            'size' => $photo->getSize(),
         ]);
+
+        $photographer->decrement('available_storage', $photo->getSize());
 
         return back()->with('success', 'Photo uploaded successfully.');
     }
 
     public function destroy(Request $request, $galleryId)
     {
-        try {
-            $mediaId = $request->id;
+        $gallery = Gallery::findOrFail($galleryId);
+        $this->authorizeGallery($gallery);
+        $data = $request->validate(['id' => ['required', 'integer']]);
+        $media = $gallery->media()->findOrFail($data['id']);
 
-            if(!$this->unlink_media($mediaId, $galleryId)){
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Error while deleting!'
-                ], 500);
-            }
-
-            $media = Media::where('id', $mediaId)->where('gallery_id', $galleryId)->first();
-
-            if (! $media) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Media not found'
-                ], 404);
-            }
-
-            $media->delete();
-
+        if (! $this->unlink_media($media->id, $gallery->id)) {
             return response()->json([
-                'success' => true,
-                'message' => 'Media deleted successfully'
-            ], 200);
-
-        } catch (\Throwable $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Server error',
-                'error'   => $e->getMessage()
+                'message' => 'The media could not be deleted.',
             ], 500);
         }
+
+        $media->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Media deleted successfully',
+        ]);
     }
 
     public function download(Request $request, $galleryId)
     {
 
-        dd('hi');
-        $media = Media::findOrFail($request->id);
+        $gallery = Gallery::findOrFail($galleryId);
+        $this->authorizeGallery($gallery);
+        $data = $request->validate(['id' => ['required', 'integer']]);
+        $media = $gallery->media()->findOrFail($data['id']);
 
         $url = Storage::disk('wasabi')->temporaryUrl(
             $media->path,
@@ -104,11 +108,14 @@ class MediaController extends Controller
     public function download_folder(Request $request, $galleryId)
     {        
 
-        $folder = Folder::where('id', $request->id)->first();
-        $mediaItems = Media::where('folder_id', $request->id)->get();
+        $gallery = Gallery::findOrFail($galleryId);
+        $this->authorizeGallery($gallery);
+        $data = $request->validate(['id' => ['required', 'integer']]);
+        $folder = $gallery->folders()->findOrFail($data['id']);
+        $mediaItems = $folder->media()->where('gallery_id', $gallery->id)->get();
 
         // 2. Create a unique temporary path for the zip file
-        $zipFileName = $folder->name . '.zip';
+        $zipFileName = (string) Str::uuid() . '.zip';
         $zipFilePath = storage_path('app/public/' . $zipFileName);
 
         $zip = new \ZipArchive;
@@ -152,6 +159,29 @@ class MediaController extends Controller
 
     private function authorizeGallery(Gallery $gallery)
     {
-        abort_if($gallery->client->photographer_id !== Auth::id(), 403);
+        $photographer = Auth::user()->photographer;
+        abort_unless($photographer && (int) $gallery->photographer_id === (int) $photographer->id, 403);
+    }
+
+    public function updatePrivacy(Request $request, $galleryId)
+    {
+        $gallery = Gallery::findOrFail($galleryId);
+        $this->authorizeGallery($gallery);
+
+        $data = $request->validate([
+            'id' => ['required', 'integer'],
+            'private' => ['required', 'boolean'],
+        ]);
+
+        $media = $gallery->media()->findOrFail($data['id']);
+        $media->update(['private' => $data['private']]);
+
+        return response()->json([
+            'success' => true,
+            'private' => $media->private,
+            'message' => $media->private
+                ? 'Media is now visible only to the client and photographer.'
+                : 'Media is now visible to guests as well.',
+        ]);
     }
 }

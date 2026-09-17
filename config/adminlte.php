@@ -14,7 +14,7 @@ return [
     |
     */
 
-    'title' => 'AdminLTE 3',
+    'title' => 'PhotoRent',
     'title_prefix' => '',
     'title_postfix' => '',
 
@@ -63,9 +63,9 @@ return [
     |
     */
 
-    'logo' => '<b>Admin</b>LTE',
+    'logo' => '<b>Photo</b>Rent',
     'logo_img' => 'vendor/adminlte/dist/img/AdminLTELogo.png',
-    'logo_img_class' => 'brand-image img-circle elevation-3',
+    'logo_img_class' => 'brand-image img-circle',
     'logo_img_xl' => null,
     'logo_img_xl_class' => 'brand-image-xs',
     'logo_img_alt' => 'Admin Logo',
@@ -154,8 +154,8 @@ return [
 
     'layout_topnav' => null,
     'layout_boxed' => null,
-    'layout_fixed_sidebar' => null,
-    'layout_fixed_navbar' => null,
+    'layout_fixed_sidebar' => true,
+    'layout_fixed_navbar' => true,
     'layout_fixed_footer' => null,
     'layout_dark_mode' => null,
 
@@ -312,10 +312,16 @@ return [
         ],
 
         // Sidebar items:
+        ['header' => 'WORKSPACE'],
         [
-            'type' => 'sidebar-menu-search',
-            'text' => 'Search menu...',
+            'text' => 'Dashboard',
+            'url' => 'dashboard',
+            'icon' => 'fas fa-fw fa-th-large',
         ],
+        // [
+        //     'type' => 'sidebar-menu-search',
+        //     'text' => 'Search menu...',
+        // ],
         [
             'text' => 'blog',
             'url' => 'admin/blog',
@@ -370,6 +376,10 @@ return [
         //     ],
         // ],
         [
+            'header' => 'ADMINISTRATION',
+            'can' => 'is-superadmin',
+        ],
+        [
             'text' => 'plans',
             'icon' => 'fas fa-users',
             'can' => 'is-superadmin',
@@ -386,6 +396,7 @@ return [
                 ],                
             ],
         ],
+        ['header' => 'BUSINESS MANAGEMENT'],
         [
             'text' => 'clients',
             'icon' => 'fas fa-users',
