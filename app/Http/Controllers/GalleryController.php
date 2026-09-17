@@ -36,10 +36,6 @@ class GalleryController extends Controller
         // 3️⃣ Get the gallery with folders and images
         $gallery = $photographer->galleries()
             ->where('slug', $gallery_slug)
-<<<<<<< HEAD
-            ->with('folders')
-=======
->>>>>>> a31bd2fec3045937904a7877a43ad4b99c736685
             ->firstOrFail();
 
         // 4️⃣ Password protection logic
@@ -108,7 +104,14 @@ class GalleryController extends Controller
             }
         }
 
-        $gallery->load(['folders.media' => function ($query) use ($selectedCluster) {
+        // Apply privacy and face filters together. Loading this relationship
+        // twice would cause the second query to discard the first filter.
+        $canViewPrivateMedia = $this->canViewPrivateMedia($gallery);
+        $gallery->load(['folders.media' => function ($query) use ($canViewPrivateMedia, $selectedCluster) {
+            if (! $canViewPrivateMedia) {
+                $query->visibleToGuests();
+            }
+
             if ($selectedCluster) {
                 $query->whereHas('faces', function ($faceQuery) use ($selectedCluster) {
                     $faceQuery->where('gallery_face_cluster_id', $selectedCluster->id);
@@ -116,20 +119,7 @@ class GalleryController extends Controller
             }
         }]);
 
-        foreach ($gallery->folders as $folder) {
-            foreach ($folder->media as $media) {
-                $media->path = $this->get_pre_signed_url($media->path, 'medium');
-            }
-        }
-
         // 5️⃣ Access granted → show gallery
-        $canViewPrivateMedia = $this->canViewPrivateMedia($gallery);
-        $gallery->load(['folders.media' => function ($query) use ($canViewPrivateMedia) {
-            if (! $canViewPrivateMedia) {
-                $query->visibleToGuests();
-            }
-        }]);
-
         // Generate URLs only for media this viewer is permitted to see.
         foreach ($gallery->folders as $folder) {
             foreach ($folder->media as $media) {
@@ -257,20 +247,13 @@ class GalleryController extends Controller
     }
     
     public function edit($id){
-<<<<<<< HEAD
-        $gallery = Gallery::findOrFail($id);
-        $this->authorizePhotographerGallery($gallery);
+        $photographer = auth()->user()->photographer;
+        $gallery = $photographer->galleries()->findOrFail($id);
         $gallery->load(['faceClusters' => function ($query) {
             $query->orderByDesc('face_count');
         }]);
-        $clients = auth()->user()->photographer->clients;
-        $sessions = auth()->user()->photographer->sessions()->orderByDesc('date')->get();
-=======
-        $photographer = auth()->user()->photographer;
-        $gallery = $photographer->galleries()->findOrFail($id);
         $clients = $photographer->clients;
         $sessions = $photographer->sessions()->orderByDesc('date')->get();
->>>>>>> a31bd2fec3045937904a7877a43ad4b99c736685
         $gallery->client_password = Crypt::decryptString($gallery->client_password);
         $gallery->guest_password = Crypt::decryptString($gallery->guest_password);
         return view('dashboard.galleries.edit', compact('gallery', 'clients', 'sessions'));   
@@ -505,12 +488,8 @@ class GalleryController extends Controller
     }
 
     public function update(Request $request, Gallery $gallery){
-<<<<<<< HEAD
         $this->authorizePhotographerGallery($gallery);
         $wasEnabled = $gallery->face_processing_enabled;
-=======
-        $this->authorizeGallery($gallery);
->>>>>>> a31bd2fec3045937904a7877a43ad4b99c736685
         $data = $this->validateGallery($request, $gallery);
 
         $data = $this->prepare_gallery_data($data);

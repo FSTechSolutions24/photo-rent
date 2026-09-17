@@ -114,18 +114,13 @@ Route::post('paymobcallback', [ProfileController::class, 'callback'])
 Route::domain('{photographer_subdomain}.' . env('APP_DOMAIN'))->group(function () {
     // Public portfolio for a photographer's subdomain, e.g. pola.localhost:8000/portfolio.
     Route::get('/portfolio', [PortfolioController::class, 'show'])->name('portfolio.show');
-<<<<<<< HEAD
     Route::get('/{gallery_slug}/faces/{cluster_uuid}/thumbnail', [GalleryController::class, 'publicFaceThumbnail'])->name('gallery.faces.thumbnail');
-    Route::post('/{gallery_slug}/download', [GalleryController::class, 'requestDownload'])->name('gallery.download');
-    Route::match(['get', 'post'], '/{gallery_slug}', [GalleryController::class, 'show'])->name('gallery.show');
-=======
     Route::post('/{gallery_slug}/download', [GalleryController::class, 'requestDownload'])
         ->middleware('throttle:5,1')
         ->name('gallery.download');
     Route::match(['get', 'post'], '/{gallery_slug}', [GalleryController::class, 'show'])
         ->middleware('throttle:20,1')
         ->name('gallery.show');
->>>>>>> a31bd2fec3045937904a7877a43ad4b99c736685
 });
 
 
