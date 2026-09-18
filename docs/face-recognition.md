@@ -15,18 +15,20 @@ The global feature flag and each gallery's opt-in flag must both be enabled.
 Gallery flags default off. The public filter is not part of this phase, and no
 raw embeddings or private crop object keys should be serialized to visitors.
 
-## Planned phase 2
+## Phase 2 (implemented)
 
-1. Add `ClusterGalleryFaces`, scoped strictly by `gallery_id`, and choose/copy
-   the service's representative face crop into the cluster thumbnail fields.
-2. Add photographer review actions for merge, split, hide, and representative
-   selection, with ownership policies and validation.
-3. Add a controlled thumbnail route that authorizes gallery access and returns
-   a short-lived private Wasabi URL.
-4. Publish responsive face filters only for reviewed, visible clusters when
-   `face_filter_published` is true. Filtering will be relational DB queries only.
-5. Add an explicit upload-finished/manual clustering trigger and ready/partial
-   failure/unavailable UI states.
+- `ClusterGalleryFaces` calls `/cluster` with faces from one gallery only and
+  validates that every returned ID belongs to that request.
+- New groups start visible by default. A group explicitly hidden by the
+  photographer remains hidden conservatively when memberships overlap.
+- Representative face crops are copied to private cluster-thumbnail objects.
+- The dashboard provides enable, publish, process, show, and hide controls.
+- All three public gallery themes provide a responsive anonymous face row.
+- Public filtering is performed with Eloquent relationship queries only.
+- Dashboard and public thumbnail routes return short-lived private Wasabi URLs
+  only after gallery access and ownership checks.
+
+Still planned: manual merge, split, and representative-face selection tools.
 
 ## Safe activation checklist
 

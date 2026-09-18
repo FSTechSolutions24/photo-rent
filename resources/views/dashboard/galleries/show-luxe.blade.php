@@ -17,6 +17,8 @@
         </div>
     </nav>
 
+    @include('dashboard.galleries._face_filter', ['faceTheme' => 'luxe'])
+
     @if (session('download_requested'))
         <div class="luxe-toast"><i class="fas fa-check"></i><span>{{ session('download_requested') }}</span><button type="button" aria-label="Dismiss"><i class="fas fa-times"></i></button></div>
     @endif

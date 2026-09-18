@@ -130,6 +130,29 @@
     @enderror
 </div>
 
+@php($faceProcessingEnabled = old('face_processing_enabled', $gallery->face_processing_enabled ?? 0) == 1)
+@php($faceFilterPublished = old('face_filter_published', $gallery->face_filter_published ?? 0) == 1)
+<div class="card border-info mb-3">
+    <div class="card-body">
+        <h5 class="card-title"><i class="fas fa-user-friends mr-1"></i> Face photo filtering</h5>
+        <p class="card-text text-muted small">
+            Detect anonymous faces inside this gallery so visitors can choose a face and find matching photographs.
+            Face data is private, is never used for authentication, and is removed with the gallery.
+        </p>
+        <div class="form-check mb-2">
+            <input type="hidden" name="face_processing_enabled" value="0">
+            <input class="form-check-input" type="checkbox" name="face_processing_enabled" value="1" id="face_processing_enabled" {{ $faceProcessingEnabled ? 'checked' : '' }}>
+            <label class="form-check-label" for="face_processing_enabled">Enable face processing for this gallery</label>
+        </div>
+        <div class="form-check">
+            <input type="hidden" name="face_filter_published" value="0">
+            <input class="form-check-input" type="checkbox" name="face_filter_published" value="1" id="face_filter_published" {{ $faceFilterPublished ? 'checked' : '' }} {{ $faceProcessingEnabled ? '' : 'disabled' }}>
+            <label class="form-check-label" for="face_filter_published">Show face filters to gallery visitors</label>
+        </div>
+        <small class="form-text text-muted">New face groups are shown by default. You can hide unwanted groups from the edit page.</small>
+    </div>
+</div>
+
 <div class="mb-3">
     <label for="client_password">Client Password: <span class="password-required-marker required_start" {{ $isPublic ? 'hidden' : '' }}>*</span></label>
     <input id="client_password" type="text" name="client_password" value="{{ old('client_password', $gallery->client_password ?? '') }}" class="input form-control" {{ $isPublic ? '' : 'required' }}>
@@ -272,6 +295,15 @@
 
         publicCheckbox.addEventListener('change', syncPasswordRequirements);
         syncPasswordRequirements();
+
+        const faceProcessing = document.getElementById('face_processing_enabled');
+        const facePublishing = document.getElementById('face_filter_published');
+        const syncFacePublishing = () => {
+            facePublishing.disabled = !faceProcessing.checked;
+            if (!faceProcessing.checked) facePublishing.checked = false;
+        };
+        faceProcessing.addEventListener('change', syncFacePublishing);
+        syncFacePublishing();
 
         const layoutInputs = document.querySelectorAll('input[name="gallery_layout"]');
         const updateSelectedLayout = input => {

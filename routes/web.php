@@ -52,6 +52,11 @@ Route::middleware(['auth', 'photographer'])->prefix('dashboard')->name('dashboar
     Route::post('galleries/download', [GalleryController::class, 'download'])->name('galleries.download');
     Route::get('galleries/data', [GalleryController::class, 'getData'])->name('galleries.data');
     Route::get('galleries/{gallery}/whatsapp', [GalleryController::class, 'sendViaWhatsApp'])->name('galleries.whatsapp');
+    Route::post('galleries/{gallery}/faces/process', [GalleryController::class, 'processFaces'])->name('galleries.faces.process');
+    Route::patch('galleries/{gallery}/faces/visibility', [GalleryController::class, 'updateAllFaceClusterVisibility'])->name('galleries.faces.visibility-all');
+    Route::patch('galleries/{gallery}/faces/{cluster}/visibility', [GalleryController::class, 'updateFaceClusterVisibility'])->name('galleries.faces.visibility');
+    Route::get('galleries/{gallery}/faces/{cluster}/thumbnail', [GalleryController::class, 'dashboardFaceThumbnail'])->name('galleries.faces.thumbnail');
+    Route::resource('galleries', GalleryController::class);
     Route::resource('galleries', GalleryController::class)
         ->only(['index', 'create', 'store', 'edit', 'update']);
 
@@ -109,6 +114,7 @@ Route::post('paymobcallback', [ProfileController::class, 'callback'])
 Route::domain('{photographer_subdomain}.' . env('APP_DOMAIN'))->group(function () {
     // Public portfolio for a photographer's subdomain, e.g. pola.localhost:8000/portfolio.
     Route::get('/portfolio', [PortfolioController::class, 'show'])->name('portfolio.show');
+    Route::get('/{gallery_slug}/faces/{cluster_uuid}/thumbnail', [GalleryController::class, 'publicFaceThumbnail'])->name('gallery.faces.thumbnail');
     Route::post('/{gallery_slug}/download', [GalleryController::class, 'requestDownload'])
         ->middleware('throttle:5,1')
         ->name('gallery.download');
