@@ -161,6 +161,7 @@ body { color: var(--pr-ink); background: #f3f7f6; }
     border-radius: 16px;
     background: #fff;
     box-shadow: 0 18px 42px rgba(24, 54, 65, .18);
+    border-radius: 14px !important;
 }
 .account-summary { display: flex; align-items: center; gap: 12px; padding: 19px 19px 16px; }
 .account-avatar { width: 40px; height: 40px; font-size: .88rem; }
@@ -252,6 +253,15 @@ body { color: var(--pr-ink); background: #f3f7f6; }
 .sidebar-custom-primary .nav-sidebar > .nav-item > .nav-link > .nav-icon {
     width: 32px; height: 32px; display: inline-grid; place-items: center;
     margin-right: 10px; border-radius: 8px; background: rgba(255, 255, 255, .07); color: #b2c9e2;
+}
+.sidebar-custom-primary .nav-sidebar .nav-link > .right,
+.sidebar-custom-primary .nav-sidebar .nav-link > p > .right {
+    top: 50%;
+    transform: translateY(-50%);
+}
+.sidebar-custom-primary .nav-sidebar .menu-open > .nav-link i.right,
+.sidebar-custom-primary .nav-sidebar .menu-is-opening > .nav-link i.right {
+    transform: translateY(-50%) rotate(-90deg);
 }
 .sidebar-custom-primary .nav-sidebar > .nav-item > .nav-link:hover {
     background: rgba(255, 255, 255, .07); border-color: rgba(255, 255, 255, .06); transform: translateX(2px);

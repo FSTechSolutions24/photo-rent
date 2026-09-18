@@ -7,6 +7,7 @@
     }
 @endphp
 
+<div class="session-editor">
 <div class="row">
     <div class="mb-3 col-md-6">
         <label>Session Name: <span class="required_start">*</span></label>
@@ -69,59 +70,244 @@
     @enderror
 </div>
 
+<div class="session-section-heading">
+    <div>
+        <span class="session-section-heading__eyebrow">Financial overview</span>
+        <h2>Session balance</h2>
+    </div>
+    <span class="session-section-heading__hint"><i class="fas fa-sync-alt"></i> Updates as you edit</span>
+</div>
+
 <div class="session-finance-summary" aria-live="polite">
     <div class="session-finance-summary__item session-finance-summary__item--received">
-        <span class="session-finance-summary__label"><i class="fas fa-hand-holding-usd"></i> Received</span>
+        <div class="session-finance-summary__top">
+            <span class="session-finance-summary__icon"><i class="fas fa-hand-holding-usd"></i></span>
+            <span class="session-finance-summary__label">Received</span>
+        </div>
         <strong id="financeReceived">0.00</strong>
+        <small>Payments recorded</small>
     </div>
     <div class="session-finance-summary__item session-finance-summary__item--spent">
-        <span class="session-finance-summary__label"><i class="fas fa-receipt"></i> Spent</span>
+        <div class="session-finance-summary__top">
+            <span class="session-finance-summary__icon"><i class="fas fa-receipt"></i></span>
+            <span class="session-finance-summary__label">Spent</span>
+        </div>
         <strong id="financeSpent">0.00</strong>
+        <small>Session expenses</small>
     </div>
     <div class="session-finance-summary__item session-finance-summary__item--outstanding">
-        <span class="session-finance-summary__label"><i class="fas fa-clock"></i> Still to collect</span>
+        <div class="session-finance-summary__top">
+            <span class="session-finance-summary__icon"><i class="fas fa-clock"></i></span>
+            <span class="session-finance-summary__label">Still to collect</span>
+        </div>
         <strong id="financeOutstanding">0.00</strong>
+        <small>Remaining balance</small>
     </div>
     <div class="session-finance-summary__item session-finance-summary__item--net">
-        <span class="session-finance-summary__label" id="financeNetLabel"><i class="fas fa-chart-line"></i> Profit / Loss</span>
+        <div class="session-finance-summary__top">
+            <span class="session-finance-summary__icon"><i class="fas fa-chart-line"></i></span>
+            <span class="session-finance-summary__label" id="financeNetLabel">Profit / Loss</span>
+        </div>
         <strong id="financeNet">0.00</strong>
+        <small>Current net result</small>
     </div>
 </div>
 
-
-<div class="mt-3 table-responsive">
-    <br>
-    <table id="tblAppendGrid"></table>    
-    <input type="hidden" name="items" id="appendGridData">
+<div class="session-ledger">
+    <div class="session-ledger__header">
+        <div>
+            <span class="session-section-heading__eyebrow">Transactions</span>
+            <h2>Payments &amp; expenses</h2>
+            <p>Add credits you receive and debits you spend for this session.</p>
+        </div>
+        <span class="session-ledger__badge"><i class="fas fa-list-ul"></i> Finance activity</span>
+    </div>
+    <div class="table-responsive session-ledger__table">
+        <table id="tblAppendGrid"></table>
+        <input type="hidden" name="items" id="appendGridData">
+    </div>
+</div>
 </div>
 
 @section('js')
     <style>
+        .session-editor label {
+            margin-bottom: .45rem;
+            color: #30445a;
+            font-size: .79rem;
+            font-weight: 700;
+        }
+        .session-editor .form-control {
+            min-height: 42px;
+            border-color: #d9e2ec;
+            border-radius: .55rem;
+            background-color: #fbfdff;
+            color: #26384b;
+            transition: border-color .2s ease, box-shadow .2s ease, background-color .2s ease;
+        }
+        .session-editor textarea.form-control { min-height: 62px; }
+        .session-editor .form-control:focus {
+            border-color: #6da8e8;
+            background-color: #fff;
+            box-shadow: 0 0 0 3px rgba(49, 126, 211, .11);
+        }
+        .session-section-heading {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            gap: 1rem;
+            margin: 1.65rem 0 .85rem;
+        }
+        .session-section-heading__eyebrow {
+            display: block;
+            margin-bottom: .2rem;
+            color: #5280ad;
+            font-size: .66rem;
+            font-weight: 800;
+            letter-spacing: .12em;
+            text-transform: uppercase;
+        }
+        .session-section-heading h2,
+        .session-ledger__header h2 {
+            margin: 0;
+            color: #18364e;
+            font-size: 1.05rem;
+            font-weight: 750;
+        }
+        .session-section-heading__hint {
+            color: #8292a3;
+            font-size: .73rem;
+            font-weight: 600;
+        }
+        .session-section-heading__hint i { margin-right: .3rem; color: #4f8ccc; }
         .session-finance-summary {
             display: grid;
             grid-template-columns: repeat(4, minmax(0, 1fr));
-            margin: 1.25rem 0 1rem;
-            overflow: hidden;
-            border: 1px solid #e6eaf0;
-            border-radius: .65rem;
-            background: #fff;
-            box-shadow: 0 5px 18px rgba(35, 50, 70, .07);
+            gap: .85rem;
+            margin: 0 0 1.4rem;
         }
-        .session-finance-summary__item { padding: .85rem 1rem; border-right: 1px solid #e6eaf0; }
-        .session-finance-summary__item:last-child { border-right: 0; }
-        .session-finance-summary__label { display: block; margin-bottom: .3rem; color: #6c757d; font-size: .78rem; font-weight: 600; text-transform: uppercase; letter-spacing: .03em; }
-        .session-finance-summary__label i { margin-right: .25rem; }
-        .session-finance-summary__item strong { display: block; color: #273142; font-size: 1.25rem; line-height: 1.15; }
+        .session-finance-summary__item {
+            --summary-accent: #397fc3;
+            --summary-soft: #edf5fd;
+            position: relative;
+            min-width: 0;
+            overflow: hidden;
+            padding: 1rem 1.05rem .95rem;
+            border: 1px solid #e1e9f1;
+            border-radius: .85rem;
+            background: linear-gradient(145deg, #fff 55%, var(--summary-soft));
+            box-shadow: 0 8px 22px rgba(35, 63, 86, .07);
+            transition: transform .2s ease, box-shadow .2s ease;
+        }
+        .session-finance-summary__item::before {
+            position: absolute;
+            top: 0;
+            right: 0;
+            left: 0;
+            height: 3px;
+            background: var(--summary-accent);
+            content: '';
+        }
+        .session-finance-summary__item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 28px rgba(35, 63, 86, .11);
+        }
+        .session-finance-summary__top { display: flex; align-items: center; gap: .55rem; margin-bottom: .75rem; }
+        .session-finance-summary__icon {
+            display: inline-grid;
+            width: 30px;
+            height: 30px;
+            flex: 0 0 30px;
+            place-items: center;
+            border-radius: .55rem;
+            background: var(--summary-soft);
+            color: var(--summary-accent);
+            font-size: .75rem;
+        }
+        .session-finance-summary__label {
+            overflow: hidden;
+            color: #687b8d;
+            font-size: .7rem;
+            font-weight: 800;
+            letter-spacing: .06em;
+            text-overflow: ellipsis;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+        .session-finance-summary__item strong {
+            display: block;
+            overflow: hidden;
+            color: #20384d;
+            font-size: 1.45rem;
+            font-weight: 750;
+            letter-spacing: -.025em;
+            line-height: 1.15;
+            text-overflow: ellipsis;
+        }
+        .session-finance-summary__item small { display: block; margin-top: .35rem; color: #91a0af; font-size: .69rem; }
+        .session-finance-summary__item--received { --summary-accent: #159263; --summary-soft: #e9f8f1; }
+        .session-finance-summary__item--spent { --summary-accent: #df5360; --summary-soft: #fff0f1; }
+        .session-finance-summary__item--outstanding { --summary-accent: #db920d; --summary-soft: #fff7e7; }
+        .session-finance-summary__item--net { --summary-accent: #397fc3; --summary-soft: #edf5fd; }
         .session-finance-summary__item--received strong { color: #198754; }
         .session-finance-summary__item--spent strong { color: #dc3545; }
         .session-finance-summary__item--outstanding strong { color: #d98b00; }
         .session-finance-summary__item--net.is-profit strong { color: #198754; }
         .session-finance-summary__item--net.is-loss strong { color: #dc3545; }
         .session-finance-summary__item--net.is-zero strong { color: #6c757d; }
+        .session-ledger {
+            overflow: hidden;
+            margin-top: 1.7rem;
+            border: 1px solid #e1e9f1;
+            border-radius: .9rem;
+            background: #fff;
+            box-shadow: 0 8px 24px rgba(35, 63, 86, .055);
+        }
+        .session-ledger__header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            padding: 1.15rem 1.25rem;
+            border-bottom: 1px solid #e7edf3;
+            background: linear-gradient(135deg, #f8fbfe, #fff);
+        }
+        .session-ledger__header p { margin: .3rem 0 0; color: #8292a3; font-size: .75rem; }
+        .session-ledger__badge {
+            padding: .42rem .7rem;
+            border-radius: 999px;
+            background: #eaf3fc;
+            color: #3979b7;
+            font-size: .68rem;
+            font-weight: 750;
+            white-space: nowrap;
+        }
+        .session-ledger__badge i { margin-right: .3rem; }
+        .session-ledger__table { padding: .35rem .75rem .9rem; }
+        .session-ledger__table table { margin-bottom: .5rem; }
+        .session-ledger__table thead th {
+            border-top: 0;
+            border-bottom: 1px solid #dfe7ef;
+            background: #fbfcfe;
+            color: #61758a;
+            font-size: .7rem;
+            font-weight: 800;
+            letter-spacing: .045em;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+        .session-ledger__table tbody td { border-color: #e7edf3; vertical-align: middle; }
+        .session-ledger__table .form-control { background: #fff; }
+        .session-ledger__table .btn { min-width: 39px; min-height: 39px; border-color: #ccd8e4; color: #5c7185; }
+        .session-ledger__table .btn:hover { border-color: #79a8d6; background: #edf5fc; color: #2469a8; }
         @media (max-width: 767.98px) {
             .session-finance-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-            .session-finance-summary__item:nth-child(2) { border-right: 0; }
-            .session-finance-summary__item:nth-child(-n+2) { border-bottom: 1px solid #e6eaf0; }
+            .session-ledger__header { align-items: flex-start; flex-direction: column; }
+        }
+        @media (max-width: 479.98px) {
+            .session-finance-summary { grid-template-columns: 1fr; }
+            .session-section-heading { align-items: flex-start; flex-direction: column; gap: .35rem; }
+            .session-finance-summary__item strong { font-size: 1.35rem; }
         }
     </style>
     <script>
