@@ -15,6 +15,8 @@ use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use App\Models\PhotographerSubscription;
 use Illuminate\Support\Facades\Validator;
 
@@ -47,6 +49,7 @@ class ProfileController extends Controller
             'email' => ['required', 'email', 'not_regex:/[\r\n]/', 'max:255', Rule::unique('users', 'email')->ignore($user->id)],
             'password' => ['nullable', 'string', 'min:8', 'confirmed'],
             'current_password' => [Rule::requiredIf($requiresCurrentPassword), 'nullable', 'current_password'],
+            'avatar' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
         ]);
 
         // ✅ Update basic fields
@@ -58,7 +61,25 @@ class ProfileController extends Controller
             $user->password = Hash::make($request->password);
         }
 
+        $previousAvatarPath = null;
+        if ($request->hasFile('avatar')) {
+            $file = $request->file('avatar');
+            $extension = strtolower($file->extension());
+            $path = 'users/' . $user->id . '/profile/avatar/' . Str::uuid() . '.' . $extension;
+
+            Storage::disk('wasabi')->put($path, file_get_contents($file));
+            $previousAvatarPath = $user->avatar_path;
+            $user->avatar_path = $path;
+        }
+
         $user->save();
+
+        if ($previousAvatarPath && $previousAvatarPath !== $user->avatar_path) {
+            $disk = str_starts_with($previousAvatarPath, 'users/') ? 'wasabi' : 'public';
+            if (Storage::disk($disk)->exists($previousAvatarPath)) {
+                Storage::disk($disk)->delete($previousAvatarPath);
+            }
+        }
 
         return redirect()->back()->with('success', 'Profile updated successfully.');
     }

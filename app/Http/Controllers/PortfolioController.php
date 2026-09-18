@@ -38,12 +38,17 @@ class PortfolioController extends Controller
         $photographer->update($data);
 
         if ($request->hasFile('portfolio_cover')) {
-            $this->deleteCover($photographer->portfolio_cover_path);
+            $previousCoverPath = $photographer->portfolio_cover_path;
             $file = $request->file('portfolio_cover');
             $extension = strtolower($file->extension());
             $path = 'users/' . $request->user()->id . '/portfolio/cover/' . Str::uuid() . '.' . $extension;
-            Storage::disk('wasabi')->put($path, file_get_contents($file));
+
+            if (! Storage::disk('wasabi')->put($path, file_get_contents($file))) {
+                throw new \RuntimeException('The portfolio cover could not be uploaded to Wasabi.');
+            }
+
             $photographer->update(['portfolio_cover_path' => $path]);
+            $this->deleteCover($previousCoverPath);
         }
 
         return back()->with('success', 'Portfolio settings updated successfully.');

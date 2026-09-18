@@ -7,6 +7,7 @@
     $initials = collect($nameParts)->filter()->take(2)->map(fn ($part) => mb_strtoupper(mb_substr($part, 0, 1)))->implode('');
     $planStorageBytes = max(0, (float) ($photographer->plan_storage ?? 0));
     $availableStorageBytes = max(0, (float) ($photographer->available_storage ?? 0));
+    $avatarUrl = $user->avatar_url;
     $usedStoragePercentage = $planStorageBytes > 0
         ? max(0, min(100, (int) round((($planStorageBytes - $availableStorageBytes) / $planStorageBytes) * 100)))
         : 0;
@@ -25,13 +26,19 @@
 
         <div class="profile-identity">
             <div class="profile-avatar-wrap">
-                @if(!empty($user->avatar))
-                    <img class="profile-avatar" src="{{ $user->avatar }}" alt="{{ $user->name }} profile picture">
+                @if($avatarUrl)
+                    <img class="profile-avatar" id="profile-avatar-preview" src="{{ $avatarUrl }}" alt="{{ $user->name }} profile picture">
+                    <span class="profile-avatar profile-avatar--initials d-none" id="profile-avatar-fallback" aria-hidden="true">{{ $initials ?: 'U' }}</span>
                 @else
-                    <span class="profile-avatar profile-avatar--initials" aria-hidden="true">{{ $initials ?: 'U' }}</span>
+                    <img class="profile-avatar d-none" id="profile-avatar-preview" src="" alt="{{ $user->name }} profile picture">
+                    <span class="profile-avatar profile-avatar--initials" id="profile-avatar-fallback" aria-hidden="true">{{ $initials ?: 'U' }}</span>
                 @endif
                 <span class="profile-avatar-status" title="Active account"><i class="fas fa-check"></i></span>
+                <label class="profile-avatar-edit" for="profile-avatar" title="Change profile picture" aria-label="Change profile picture"><i class="fas fa-camera"></i></label>
+                <input class="sr-only" id="profile-avatar" type="file" name="avatar" accept="image/jpeg,image/png,image/webp" form="profile-settings-form">
             </div>
+            <label class="profile-change-photo" for="profile-avatar"><i class="fas fa-camera"></i> Change photo</label>
+            @error('avatar')<small class="text-danger d-block profile-avatar-error">{{ $message }}</small>@enderror
             <span class="profile-role-badge"><i class="fas fa-camera"></i> Photographer</span>
             <h2>{{ $user->name ?? '' }}</h2>
             <p>{{ $user->email ?? '' }}</p>
@@ -88,7 +95,7 @@
             </div>
         </div>
 
-        <form method="POST" action="{{ route('photographer.profile.update') }}" enctype="multipart/form-data" autocomplete="off">
+        <form id="profile-settings-form" method="POST" action="{{ route('photographer.profile.update') }}" enctype="multipart/form-data" autocomplete="off">
             @method('PUT')
             @csrf
 
@@ -182,6 +189,12 @@
     .profile-avatar { display: block; width: 94px; height: 94px; border: 5px solid #fff; border-radius: 50%; object-fit: cover; box-shadow: 0 8px 20px rgba(18, 54, 72, .18); }
     .profile-avatar--initials { display: grid; place-items: center; background: linear-gradient(145deg, #eaf4ff, #fff); color: #1769c2; font-size: 1.75rem; font-weight: 800; letter-spacing: -.04em; }
     .profile-avatar-status { position: absolute; right: 2px; bottom: 5px; display: grid; width: 24px; height: 24px; place-items: center; border: 3px solid #fff; border-radius: 50%; background: #20b86a; color: #fff; font-size: .55rem; }
+    .profile-avatar-edit { position: absolute; right: -8px; top: 5px; z-index: 3; display: grid; width: 29px; height: 29px; margin: 0; place-items: center; border: 3px solid #fff; border-radius: 50%; background: #1769c2; box-shadow: 0 4px 10px rgba(16,73,128,.25); color: #fff; font-size: .62rem; cursor: pointer; transition: .2s ease; }
+    .profile-avatar-edit:hover { background: #0f559f; transform: scale(1.07); }
+    .profile-avatar-edit i{ color: #fff; }
+    .profile-change-photo { display: inline-block; margin: 0 0 .65rem; color: #397fba; font-size: .67rem; font-weight: 750; cursor: pointer; }
+    .profile-change-photo i { margin-right: .25rem; }
+    .profile-avatar-error { margin: -.35rem 0 .65rem; }
     .profile-role-badge { display: inline-block; margin-bottom: .5rem; padding: .3rem .55rem; border-radius: 999px; background: #eaf3fc; color: #3378b8; font-size: .64rem; font-weight: 750; letter-spacing: .04em; text-transform: uppercase; }
     .profile-role-badge i { margin-right: .25rem; }
     .profile-identity h2 { margin: 0; color: #17384b; font-size: 1.18rem; font-weight: 750; }
@@ -250,6 +263,24 @@
 
 @section('js')
 <script>
+    var avatarInput = document.getElementById('profile-avatar');
+    avatarInput.addEventListener('change', function () {
+        var file = avatarInput.files && avatarInput.files[0];
+        if (!file || !file.type.startsWith('image/')) {
+            return;
+        }
+
+        var preview = document.getElementById('profile-avatar-preview');
+        var fallback = document.getElementById('profile-avatar-fallback');
+        var reader = new FileReader();
+        reader.addEventListener('load', function (event) {
+            preview.src = event.target.result;
+            preview.classList.remove('d-none');
+            fallback.classList.add('d-none');
+        });
+        reader.readAsDataURL(file);
+    });
+
     document.querySelectorAll('[data-password-toggle]').forEach(function (button) {
         button.addEventListener('click', function () {
             var input = document.getElementById(button.dataset.passwordToggle);

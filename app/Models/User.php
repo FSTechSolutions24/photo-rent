@@ -6,6 +6,7 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Storage;
 use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
@@ -21,6 +22,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'avatar_path',
     ];
 
     /**
@@ -46,5 +48,18 @@ class User extends Authenticatable
     public function photographer()
     {
         return $this->hasOne(Photographer::class);
+    }
+
+    public function getAvatarUrlAttribute(): ?string
+    {
+        if (! $this->avatar_path) {
+            return null;
+        }
+
+        if (! str_starts_with($this->avatar_path, 'users/')) {
+            return Storage::disk('public')->url($this->avatar_path);
+        }
+
+        return Storage::disk('wasabi')->temporaryUrl($this->avatar_path, now()->addDays(7));
     }
 }

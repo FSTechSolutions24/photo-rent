@@ -9,6 +9,9 @@
     $footerText = $photographer->portfolio_footer_text ?: 'Photography by ' . $title;
     $instagram = ltrim((string) $photographer->portfolio_instagram, '@/');
     $galleryCount = $galleries->count();
+    $avatarUrl = $photographer->user->avatar_url;
+    $ownerNameParts = preg_split('/\s+/', trim($photographer->user->name ?? 'Photographer'));
+    $ownerInitials = collect($ownerNameParts)->filter()->take(2)->map(fn ($part) => mb_strtoupper(mb_substr($part, 0, 1)))->implode('');
 @endphp
 <!doctype html>
 <html lang="en">
@@ -49,13 +52,43 @@
         .theme-light .contact-text small{color:rgba(32,36,42,.5)}
         .theme-light .contact-text strong{color:#20242a}
         .theme-light .footer{border-color:rgba(32,36,42,.1);background:#e5e3dd;color:#697078}
-        @media(max-width:760px){.theme-light .hero,.theme-light .hero-copy{min-height:560px}.theme-light .card,.theme-light .card:first-child{grid-column:1;grid-row:auto}.theme-light .card:first-child .card-media{height:auto;aspect-ratio:4/3}}
+        .nav,.contact-inner{max-width:1450px}
+        .footer{padding-right:max(2.2rem,calc((100vw - 1450px)/2 + 2.2rem));padding-left:max(2.2rem,calc((100vw - 1450px)/2 + 2.2rem))}
+        .theme-bold .hero-copy,.theme-light .hero-copy{width:100%;max-width:1450px;margin:0 auto;padding-right:2.2rem;padding-left:2.2rem}
+        .theme-bold .hero-copy-inner,.theme-light .hero-copy-inner{width:100%;max-width:840px}
+        .portfolio-avatar-wrap{position:relative;width:118px;height:118px;margin:0 0 2.1rem 7px}
+        .portfolio-avatar-wrap::before{position:absolute;inset:-8px;border:1px solid rgba(255,255,255,.24);border-radius:50%;content:''}
+        .portfolio-avatar{display:block;width:118px;height:118px;overflow:hidden;border:4px solid rgba(255,255,255,.9);border-radius:50%;object-fit:cover;box-shadow:0 18px 42px rgba(0,0,0,.3)}
+        .portfolio-avatar--initials{display:grid;place-items:center;background:linear-gradient(145deg,var(--accent),var(--ink));color:#fff;font-family:Arial,sans-serif;font-size:2.2rem;font-weight:800;letter-spacing:-.05em}
+        .portfolio-avatar-badge{position:absolute;right:-1px;bottom:3px;display:grid;width:35px;height:35px;place-items:center;border:4px solid var(--ink);border-radius:50%;background:var(--accent);color:#111820;box-shadow:0 6px 14px rgba(0,0,0,.24)}
+        .portfolio-avatar-badge svg{width:15px;height:15px}
+        .theme-light .portfolio-avatar-wrap::before{border-color:rgba(32,36,42,.2)}
+        .theme-light .portfolio-avatar{border-color:rgba(255,255,255,.95);box-shadow:0 18px 42px rgba(31,36,42,.2)}
+        .theme-light .portfolio-avatar-badge{border-color:#e9e6df}
+        @media(max-width:760px){.theme-bold .hero-copy,.theme-light .hero-copy{padding-right:1.5rem;padding-left:1.5rem}.footer{padding-right:1.5rem;padding-left:1.5rem}.theme-light .hero,.theme-light .hero-copy{min-height:560px}.theme-light .card,.theme-light .card:first-child{grid-column:1;grid-row:auto}.theme-light .card:first-child .card-media{height:auto;aspect-ratio:4/3}}
+        @media(max-width:760px){.portfolio-avatar-wrap{width:96px;height:96px;margin-bottom:1.7rem}.portfolio-avatar{width:96px;height:96px}.portfolio-avatar-badge{width:31px;height:31px}.portfolio-avatar-wrap::before{inset:-6px}}
     </style>
 </head>
 <body class="theme-{{ $theme }}">
     <nav class="nav"><span class="brand">{{ $title }}</span>@if($photographer->portfolio_show_contact)<a href="#contact">Contact</a>@endif</nav>
     <header class="hero" @if(in_array($theme, ['bold', 'light'], true) && $featuredImage) style="background-image:{{ $theme === 'light' ? 'linear-gradient(90deg,rgba(255,255,255,.9),rgba(255,255,255,.28))' : 'linear-gradient(90deg,rgba(8,14,22,.82),rgba(8,14,22,.15))' }},url('{{ $featuredImage }}')" @endif>
-        <div class="hero-copy"><p class="eyebrow">Photography portfolio</p><h1>{{ $title }}</h1>@if($photographer->portfolio_bio)<p>{{ $photographer->portfolio_bio }}</p>@endif</div>
+        <div class="hero-copy">
+            <div class="hero-copy-inner">
+                <div class="portfolio-avatar-wrap">
+                    @if($avatarUrl)
+                        <img class="portfolio-avatar" src="{{ $avatarUrl }}" alt="{{ $photographer->user->name }}">
+                    @else
+                        <span class="portfolio-avatar portfolio-avatar--initials" aria-hidden="true">{{ $ownerInitials ?: 'P' }}</span>
+                    @endif
+                    <span class="portfolio-avatar-badge" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h3l1.4-2h7.2L17 7h3v12H4z"/><circle cx="12" cy="13" r="3.5"/></svg>
+                    </span>
+                </div>
+                <p class="eyebrow">Photography portfolio</p>
+                <h1>{{ $title }}</h1>
+                @if($photographer->portfolio_bio)<p>{{ $photographer->portfolio_bio }}</p>@endif
+            </div>
+        </div>
         @if(! in_array($theme, ['bold', 'light'], true))<div class="hero-image {{ $featuredImage ? '' : 'hero-image--empty' }}" @if($featuredImage) style="background-image:url('{{ $featuredImage }}')" @endif></div>@endif
     </header>
     <main class="work">

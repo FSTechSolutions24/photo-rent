@@ -3,6 +3,7 @@
     $logoutUrl = View::getSection('logout_url') ?? config('adminlte.logout_url', 'logout');
     $logoutUrl = config('adminlte.use_route_url', false) ? route($logoutUrl) : url($logoutUrl);
     $initial = mb_strtoupper(mb_substr(trim($user->name ?? 'U'), 0, 1));
+    $avatarUrl = $user->avatar_url;
     $role = ($user->type ?? null) === 'superadmin'
         ? 'Administrator'
         : ucfirst(str_replace('_', ' ', $user->type ?? 'Photographer'));
@@ -11,7 +12,11 @@
 <li class="nav-item dropdown user-menu pr-user-menu">
     <a href="#" class="nav-link dropdown-toggle top-user-toggle" data-toggle="dropdown"
        aria-haspopup="true" aria-expanded="false">
-        <span class="top-user-avatar" aria-hidden="true">{{ $initial }}</span>
+        @if($avatarUrl)
+            <img class="top-user-avatar" src="{{ $avatarUrl }}" alt="">
+        @else
+            <span class="top-user-avatar" aria-hidden="true">{{ $initial }}</span>
+        @endif
         <span class="top-user-copy">
             <strong>{{ $user->name }}</strong>
             <small>{{ $role }}</small>
@@ -22,7 +27,11 @@
 
     <div class="dropdown-menu dropdown-menu-right account-dropdown">
         <div class="account-summary">
-            <span class="account-avatar" aria-hidden="true">{{ $initial }}</span>
+            @if($avatarUrl)
+                <img class="account-avatar" src="{{ $avatarUrl }}" alt="">
+            @else
+                <span class="account-avatar" aria-hidden="true">{{ $initial }}</span>
+            @endif
             <div>
                 <strong>{{ $user->name }}</strong>
                 <small>{{ $user->email }}</small>

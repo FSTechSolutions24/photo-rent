@@ -145,6 +145,7 @@ body { color: var(--pr-ink); background: #f3f7f6; }
     background: linear-gradient(135deg, #1769c2, #1455ac);
     color: #fff;
     font-weight: 800;
+    object-fit: cover;
 }
 .top-user-avatar { width: 34px; height: 34px; font-size: .78rem; }
 .top-user-copy { display: flex; min-width: 112px; flex-direction: column; line-height: 1.1; }
