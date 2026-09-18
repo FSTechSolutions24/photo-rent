@@ -1,425 +1,168 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth" data-theme="dark">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VUE | Galleries, Client Management & Delivery for Photographers</title>
-    <meta name="description" content="VUE gives photographers one workspace to manage clients and sessions, publish protected galleries, share work, and deliver downloads.">
-    <script>
-        (() => {
-            const savedTheme = localStorage.getItem('vue-theme');
-            document.documentElement.dataset.theme = savedTheme || 'dark';
-        })();
-    </script>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <meta name="theme-color" content="#080a09">
+    <title>VUE — Your photography business, beautifully in focus</title>
+    <meta name="description" content="VUE gives photographers one beautiful workspace for clients, sessions, galleries, portfolios, and delivery.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&family=Syne:wght@500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --bg: #050505;
-            --text: #ffffff;
-            --muted: rgba(255, 255, 255, 0.48);
-            --accent: #8B5CF6; /* Violet */
-            --glass: rgba(255, 255, 255, 0.03);
-            --border: rgba(255, 255, 255, 0.08);
-            color-scheme: dark;
-        }
-        html[data-theme="light"] {
-            --bg: #f6f5fb;
-            --text: #17131f;
-            --muted: rgba(23, 19, 31, 0.6);
-            --glass: rgba(255, 255, 255, 0.7);
-            --border: rgba(23, 19, 31, 0.12);
-            color-scheme: light;
-        }
-        body {
-            background-color: var(--bg);
-            color: var(--text);
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            overflow-x: hidden;
-            transition: background-color 0.3s ease, color 0.3s ease;
-        }
-        .font-display { font-family: 'Bricolage Grotesque', sans-serif; }
-        
-        /* Glass Effect */
-        .glass {
-            background: var(--glass);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid var(--border);
-        }
-        
-        /* Animated Background Glows */
-        .glow {
-            position: absolute;
-            width: 600px;
-            height: 600px;
-            background: radial-gradient(circle, rgba(139, 92, 246, 0.15) 0%, rgba(0, 0, 0, 0) 70%);
-            border-radius: 50%;
-            z-index: -1;
-            filter: blur(60px);
-        }
-        html[data-theme="light"] .glow {
-            background: radial-gradient(circle, rgba(139, 92, 246, 0.12) 0%, rgba(246, 245, 251, 0) 70%);
-        }
-
-        .theme-toggle {
-            width: 2.75rem;
-            height: 2.75rem;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            border: 1px solid var(--border);
-            border-radius: 9999px;
-            background: var(--glass);
-            color: var(--text);
-            transition: transform 0.2s ease, background-color 0.2s ease;
-        }
-        .theme-toggle:hover { transform: rotate(8deg) scale(1.05); }
-        .theme-toggle .sun-icon { display: none; }
-        html[data-theme="light"] .theme-toggle .sun-icon { display: block; }
-        html[data-theme="light"] .theme-toggle .moon-icon { display: none; }
-
-        html[data-theme="light"] .text-white { color: #17131f !important; }
-        html[data-theme="light"] .text-white\/70 { color: rgba(23, 19, 31, 0.72) !important; }
-        html[data-theme="light"] .text-white\/60 { color: rgba(23, 19, 31, 0.65) !important; }
-        html[data-theme="light"] .text-white\/50,
-        html[data-theme="light"] .text-white\/40,
-        html[data-theme="light"] .text-white\/30,
-        html[data-theme="light"] .text-white\/20,
-        html[data-theme="light"] .text-white\/10 { color: var(--muted) !important; }
-        html[data-theme="light"] .bg-white\/5,
-        html[data-theme="light"] .bg-white\/\[0\.02\],
-        html[data-theme="light"] .bg-white\/\[0\.04\] { background-color: rgba(23, 19, 31, 0.045) !important; }
-        html[data-theme="light"] .bg-white\/\[0\.01\] { background-color: rgba(23, 19, 31, 0.025) !important; }
-        html[data-theme="light"] .bg-black,
-        html[data-theme="light"] .bg-black\/50,
-        html[data-theme="light"] .bg-\[\#0A0A0A\]\/90 { background-color: rgba(255, 255, 255, 0.78) !important; }
-        html[data-theme="light"] .border-white\/5,
-        html[data-theme="light"] .border-white\/10,
-        html[data-theme="light"] .border-white\/20 { border-color: var(--border) !important; }
-        html[data-theme="light"] .on-accent,
-        html[data-theme="light"] .on-accent.text-white { color: #ffffff !important; }
-        html[data-theme="light"] .primary-cta { background: #17131f !important; color: #ffffff !important; }
-
-        /* Custom Hover for Images */
-        .img-card {
-            position: relative;
-            overflow: hidden;
-            border-radius: 24px;
-        }
-        .img-card::after {
-            content: 'VIEW EXIF';
-            position: absolute;
-            inset: 0;
-            background: rgba(0,0,0,0.6);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 800;
-            font-size: 0.75rem;
-            letter-spacing: 0.2em;
-            opacity: 0;
-            transition: opacity 0.4s ease;
-        }
-        .img-card:hover::after { opacity: 1; }
-
-        /* Step Line */
-        .step-line {
-            background: linear-gradient(to bottom, var(--accent), transparent);
-            width: 1px;
-            height: 100%;
-        }
-
-        /* Button Hover */
-        .btn-vue {
-            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
-            position: relative;
-            overflow: hidden;
-        }
-        .btn-vue::before {
-            content: '';
-            position: absolute;
-            top: 0; left: -100%;
-            width: 100%; height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            transition: 0.5s;
-        }
-        .btn-vue:hover::before { left: 100%; }
-
-        /* AI Orb Animation */
-        @keyframes pulse-orb {
-            0%, 100% { transform: scale(1); filter: brightness(1); }
-            50% { transform: scale(1.1); filter: brightness(1.3); }
-        }
-        .ai-orb {
-            animation: pulse-orb 4s infinite ease-in-out;
-            background: radial-gradient(circle at 30% 30%, var(--accent), #4c1d95);
-        }
-
-        /* Hide Scrollbar */
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: var(--bg); }
-        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+        :root{--ink:#080a09;--paper:#f2efe7;--muted:#9b9e96;--line:rgba(255,255,255,.12);--acid:#c9ff45;--aqua:#66e3d1;--orange:#ff7448;--rx:0deg;--ry:0deg;--scroll-width:0%;--aperture-turn:0deg}
+        *,*::before,*::after{box-sizing:border-box}html{scroll-behavior:smooth;background:var(--ink)}body{margin:0;min-width:320px;overflow-x:hidden;background:var(--ink);color:var(--paper);font-family:'Manrope',sans-serif;-webkit-font-smoothing:antialiased}body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:100;opacity:.035;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.92' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.9'/%3E%3C/svg%3E")}::selection{color:var(--ink);background:var(--acid)}a{color:inherit;text-decoration:none}button{font:inherit}img{display:block;max-width:100%}.shell{width:min(1380px,calc(100% - 48px));margin-inline:auto}.eyebrow{display:inline-flex;align-items:center;gap:10px;font:500 11px/1 'DM Mono',monospace;letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}.eyebrow::before{content:'';width:28px;height:1px;background:currentColor}.display{font-family:'Syne',sans-serif;letter-spacing:-.055em}
+        .scroll-progress{position:fixed;z-index:120;inset:0 auto auto 0;width:var(--scroll-width);height:2px;background:linear-gradient(90deg,var(--acid),var(--aqua),var(--orange));box-shadow:0 0 18px rgba(201,255,69,.5)}
+        .nav-wrap{position:fixed;inset:0 0 auto;z-index:90;padding:18px 0;transition:.35s ease}.nav-wrap.scrolled{padding:10px 0}.nav{height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 14px 0 20px;border:1px solid rgba(255,255,255,.1);border-radius:18px;background:rgba(9,11,10,.62);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);box-shadow:0 18px 50px rgba(0,0,0,.16)}.brand{display:flex;align-items:center;gap:11px;font:800 21px/1 'Syne',sans-serif;letter-spacing:-.05em}.brand-mark{width:34px;height:34px;position:relative;transform:rotate(-7deg)}.brand-mark::before,.brand-mark::after{content:'';position:absolute;border-radius:9px}.brand-mark::before{inset:0;background:var(--acid)}.brand-mark::after{width:11px;height:11px;left:11px;top:11px;background:var(--ink);border-radius:50%;box-shadow:0 0 0 3px rgba(8,10,9,.18)}.nav-links{display:flex;align-items:center;gap:36px}.nav-links a{position:relative;color:#a7aaa2;font-size:12px;font-weight:700}.nav-links a::after{content:'';position:absolute;left:0;right:100%;bottom:-6px;height:1px;background:var(--acid);transition:.25s}.nav-links a:hover{color:var(--paper)}.nav-links a:hover::after{right:0}.nav-actions{display:flex;align-items:center;gap:10px}.login{padding:11px 15px;font-size:12px;font-weight:700;color:#b7bab2}.pill-button{position:relative;display:inline-flex;align-items:center;justify-content:center;gap:12px;min-height:46px;padding:0 22px;overflow:hidden;border:1px solid transparent;border-radius:13px;background:var(--acid);color:#0a0c0a;font-size:12px;font-weight:800;transition:transform .25s,box-shadow .25s}.pill-button:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(201,255,69,.18)}.pill-button .arrow{font-size:16px;transition:transform .25s}.pill-button:hover .arrow{transform:translateX(4px)}.menu-button{display:none;width:42px;height:42px;border:0;border-radius:11px;background:#1a1d1a;color:white}
+        .hero{position:relative;min-height:100svh;padding:158px 0 58px;display:flex;align-items:center;isolation:isolate;overflow:hidden;background:radial-gradient(circle at 75% 48%,rgba(102,227,209,.12),transparent 31%),radial-gradient(circle at 17% 15%,rgba(201,255,69,.06),transparent 28%)}.hero::after{content:'';position:absolute;z-index:-1;inset:0;background-image:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);background-size:72px 72px;-webkit-mask-image:linear-gradient(to bottom,black,transparent 90%);mask-image:linear-gradient(to bottom,black,transparent 90%)}.hero-grid{display:grid;grid-template-columns:minmax(0,.9fr) minmax(480px,1.1fr);align-items:center;gap:20px}.hero-copy{position:relative;z-index:4;padding-top:10px}.hero-kicker{margin-bottom:24px}.status-dot{width:7px;height:7px;border-radius:50%;background:var(--acid);box-shadow:0 0 0 5px rgba(201,255,69,.1);animation:breathe 2.4s ease-in-out infinite}.hero-kicker::before{display:none}.hero h1{margin:0;font-size:clamp(64px,8.1vw,130px);line-height:.79;font-weight:700}.hero h1 .outline{color:transparent;-webkit-text-stroke:1px rgba(242,239,231,.65)}.hero h1 .accent-word{position:relative;display:inline-block;color:var(--acid);font-style:italic;font-weight:600}.hero h1 .accent-word::after{content:'';position:absolute;width:.13em;height:.13em;right:-.16em;bottom:.1em;border-radius:50%;background:var(--orange)}.hero-bottom{display:grid;grid-template-columns:minmax(250px,430px) auto;gap:36px;align-items:end;margin-top:40px}.hero-copy p{margin:0;color:#a6aaa1;font-size:16px;line-height:1.7}.hero-actions{display:flex;align-items:center;gap:14px}.play-link{width:46px;height:46px;flex:0 0 46px;display:grid;place-items:center;border:1px solid var(--line);border-radius:50%;transition:.25s}.play-link:hover{color:var(--acid);border-color:var(--acid);transform:rotate(8deg)}
+        .camera-stage{position:relative;min-height:590px;perspective:1300px;perspective-origin:50% 45%}.camera-halo{position:absolute;width:520px;height:520px;left:50%;top:48%;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(circle,rgba(156,124,255,.15),rgba(156,124,255,.02) 50%,transparent 70%)}.orbit{position:absolute;left:50%;top:48%;border:1px solid rgba(255,255,255,.08);border-radius:50%;transform:translate(-50%,-50%) rotateX(66deg) rotateZ(-10deg)}.orbit-one{width:610px;height:610px}.orbit-two{width:455px;height:455px;border-color:rgba(201,255,69,.13);transform:translate(-50%,-50%) rotateX(72deg) rotateZ(22deg)}.orbit-dot{position:absolute;width:10px;height:10px;left:calc(50% - 5px);top:calc(48% - 305px);border-radius:50%;background:var(--acid);box-shadow:0 0 20px var(--acid);transform-origin:5px 305px;animation:orbit 9s linear infinite}.camera-rig{position:absolute;width:460px;height:310px;left:50%;top:50%;transform-style:preserve-3d;transform:translate(-50%,-50%) rotateX(calc(-7deg + var(--rx))) rotateY(calc(-17deg + var(--ry))) rotateZ(-3deg);transition:transform .13s linear;filter:drop-shadow(28px 48px 36px rgba(0,0,0,.5))}.camera-body{position:absolute;inset:47px 22px 28px 18px;transform-style:preserve-3d;border-radius:32px 38px 38px 30px;background:linear-gradient(145deg,#2a2d2b 0%,#121513 38%,#080a09 100%);border:1px solid #363834;box-shadow:inset 0 2px 1px rgba(255,255,255,.12),inset 0 -28px 45px rgba(0,0,0,.55)}.camera-body::before{content:'';position:absolute;inset:14px 15px auto;height:20px;border-radius:14px;background:repeating-linear-gradient(90deg,transparent 0 3px,rgba(255,255,255,.05) 3px 4px);opacity:.55}.camera-body::after{content:'';position:absolute;inset:auto 30px 18px;height:2px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.12),transparent)}.camera-top{position:absolute;width:280px;height:67px;top:18px;left:74px;transform:translateZ(-2px);border-radius:18px 28px 5px 5px;background:linear-gradient(#272b28,#0c0e0d);border:1px solid #343834}.viewfinder{position:absolute;left:148px;top:-27px;width:111px;height:72px;transform:translateZ(-3px);clip-path:polygon(16% 100%,23% 23%,38% 0,73% 0,91% 25%,100% 100%);background:linear-gradient(130deg,#30332f,#0a0c0b 65%);border-radius:8px}.viewfinder::after{content:'';position:absolute;width:52px;height:20px;top:8px;left:34px;border-radius:5px;background:#050606;border:1px solid #464b46}.camera-logo{position:absolute;top:52px;left:53px;font:700 18px/1 'Syne',sans-serif;letter-spacing:-.08em;color:#e9e6dd}.camera-logo small{display:block;margin-top:6px;font:500 6px/1 'DM Mono';letter-spacing:.22em;color:#7d827b}.grip{position:absolute;width:88px;height:190px;right:-6px;bottom:17px;border-radius:36px 39px 28px 24px;background:repeating-linear-gradient(45deg,#111412 0 3px,#191c19 3px 5px);box-shadow:inset 10px 0 18px rgba(255,255,255,.035),-9px 0 14px rgba(0,0,0,.4)}.shutter-button{position:absolute;width:52px;height:21px;top:14px;right:55px;border-radius:50%;background:linear-gradient(#4b514b,#111);border:3px solid #090a09;box-shadow:0 -4px 0 #292e29}.mode-dial{position:absolute;width:58px;height:25px;left:39px;top:22px;border-radius:50%;background:repeating-conic-gradient(#555 0 5deg,#171a18 5deg 13deg);border:3px solid #0b0c0b}.flash-mark{position:absolute;width:20px;height:20px;right:107px;top:71px;border-radius:50%;background:var(--orange);box-shadow:inset 0 0 0 6px #1b1e1b}.lens-mount{position:absolute;left:50%;top:53%;width:246px;height:246px;transform:translate(-50%,-50%) translateZ(28px);border-radius:50%;background:repeating-conic-gradient(#3c403c 0 3deg,#101210 3deg 8deg);border:8px solid #080a09;box-shadow:0 0 0 3px #505550,18px 28px 30px rgba(0,0,0,.5)}.lens-barrel{position:absolute;inset:20px;transform:translateZ(35px);transform-style:preserve-3d;border-radius:50%;background:radial-gradient(circle at 42% 36%,#343936 0%,#101311 55%,#050606 72%);border:6px solid #232724;box-shadow:inset 0 0 0 8px #090b09,0 0 0 4px #151815}.lens-barrel::before{content:'VUE OPTICAL  35MM  1:1.4';position:absolute;inset:9px;display:grid;place-items:start center;padding-top:1px;border-radius:50%;color:#a8aca4;font:500 6px/1 'DM Mono';letter-spacing:.24em;transform:rotate(-18deg)}.lens-glass{position:absolute;inset:32px;overflow:hidden;border-radius:50%;background:radial-gradient(circle at 36% 31%,rgba(255,255,255,.8) 0 1%,rgba(137,255,211,.32) 2%,transparent 8%),radial-gradient(circle at 58% 64%,rgba(126,78,255,.65),transparent 21%),radial-gradient(circle at 42% 41%,#1f4b48,#10152a 40%,#020403 68%);border:5px solid #050606;box-shadow:inset -10px -12px 28px #000,inset 12px 13px 25px rgba(89,195,181,.18),0 0 0 7px #1c201d}.aperture{position:absolute;inset:24px;border-radius:50%;background:repeating-conic-gradient(from var(--aperture-turn),rgba(1,2,2,.93) 0 35deg,rgba(28,34,31,.82) 35deg 52deg);-webkit-mask:radial-gradient(circle,transparent 0 25%,black 27%);mask:radial-gradient(circle,transparent 0 25%,black 27%);opacity:.72}.lens-flare{position:absolute;width:21px;height:9px;left:36px;top:40px;background:rgba(206,255,240,.75);border-radius:50%;filter:blur(4px);transform:rotate(-35deg)}.camera-shadow{position:absolute;width:430px;height:90px;left:50%;bottom:58px;transform:translateX(-50%) rotate(-4deg);background:rgba(0,0,0,.72);filter:blur(30px);border-radius:50%}.float-tag{position:absolute;z-index:3;padding:12px 14px;border:1px solid rgba(255,255,255,.13);border-radius:12px;background:rgba(17,20,18,.72);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);font:500 9px/1 'DM Mono';letter-spacing:.12em;text-transform:uppercase;color:#aeb2a9}.float-tag strong{display:block;margin-top:7px;color:var(--paper);font-size:12px;letter-spacing:.03em}.tag-one{top:18%;right:2%;animation:float 4.5s ease-in-out infinite}.tag-two{left:2%;bottom:15%;animation:float 5s .8s ease-in-out infinite}.focus-corners{position:absolute;width:90px;height:70px;left:50%;top:50%;transform:translate(-50%,-50%);border:1px solid rgba(201,255,69,.35);clip-path:polygon(0 0,28% 0,28% 2%,2% 2%,2% 30%,0 30%,0 0,100% 0,100% 30%,98% 30%,98% 2%,72% 2%,72% 0,100% 0,100% 100%,72% 100%,72% 98%,98% 98%,98% 70%,100% 70%,100% 100%,0 100%,0 70%,2% 70%,2% 98%,28% 98%,28% 100%,0 100%)}.scroll-note{position:absolute;left:24px;bottom:34px;display:flex;align-items:center;gap:14px;color:#696e67;font:500 9px/1 'DM Mono';letter-spacing:.2em;text-transform:uppercase;writing-mode:vertical-rl}.scroll-note::before{content:'';width:1px;height:48px;background:linear-gradient(var(--acid),transparent)}
+        .camera-halo{background:radial-gradient(circle,rgba(102,227,209,.15),rgba(102,227,209,.02) 50%,transparent 70%)}.lens-glass{background:radial-gradient(circle at 36% 31%,rgba(255,255,255,.8) 0 1%,rgba(137,255,211,.32) 2%,transparent 8%),radial-gradient(circle at 58% 64%,rgba(102,227,209,.62),transparent 21%),radial-gradient(circle at 42% 41%,#1f4b48,#0c2928 40%,#020403 68%)}.orbit-dot{display:none}.orbit{transform-style:preserve-3d}.orbit-particle{position:absolute;inset:-1px;border-radius:50%;animation:orbit-path 8s linear infinite}.orbit-particle::after{content:'';position:absolute;left:calc(50% - 6px);top:-6px;width:12px;height:12px;border-radius:50%;background:var(--acid);box-shadow:0 0 8px var(--acid),0 0 24px rgba(201,255,69,.8)}.orbit-particle.two{animation-delay:-4s;animation-duration:10s;animation-direction:reverse}.orbit-particle.two::after{width:9px;height:9px;left:calc(50% - 4.5px);top:-4.5px;background:var(--aqua);box-shadow:0 0 8px var(--aqua),0 0 22px rgba(102,227,209,.8)}
+        .camera-stage{cursor:crosshair;outline:none}.camera-stage:focus-visible::after{content:'';position:absolute;inset:35px;border:1px dashed var(--aqua);border-radius:50%;opacity:.6}.capture-hint{position:absolute;z-index:7;right:4%;bottom:7%;display:flex;align-items:center;gap:9px;color:#777d75;font:500 8px/1 'DM Mono';letter-spacing:.14em;text-transform:uppercase}.capture-hint::before{content:'';width:18px;height:18px;border:1px solid rgba(255,255,255,.18);border-radius:50%;box-shadow:inset 0 0 0 5px rgba(102,227,209,.08)}.capture-flash{position:absolute;z-index:6;inset:5%;pointer-events:none;opacity:0;border-radius:50%;background:radial-gradient(circle at 50% 50%,rgba(255,255,255,.98) 0 4%,rgba(178,255,234,.72) 8%,rgba(102,227,209,.15) 31%,transparent 66%);mix-blend-mode:screen}.capture-card{position:absolute;z-index:8;left:50%;top:50%;width:112px;height:142px;padding:7px 7px 23px;pointer-events:none;opacity:0;background:#f0eee6;box-shadow:0 24px 55px rgba(0,0,0,.58);transform:translate(-50%,-50%) scale(.05);transform-style:preserve-3d}.capture-card::after{content:attr(data-label);position:absolute;left:8px;bottom:7px;color:#161916;font:500 6px/1 'DM Mono';letter-spacing:.09em}.capture-card i{display:block;width:100%;height:100%;background-position:center;background-size:cover}.capture-card.one i{background-image:url('https://images.unsplash.com/photo-1519225421980-715cb0215aed?auto=format&fit=crop&q=82&w=400')}.capture-card.two i{background-image:url('https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&q=82&w=400')}.capture-card.three i{background-image:url('https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&q=82&w=400')}.camera-stage.capturing .capture-flash{animation:shutter-flash .72s ease-out}.camera-stage.capturing .capture-card.one{animation:capture-one 1.8s cubic-bezier(.15,.75,.2,1)}.camera-stage.capturing .capture-card.two{animation:capture-two 1.8s .08s cubic-bezier(.15,.75,.2,1)}.camera-stage.capturing .capture-card.three{animation:capture-three 1.8s .16s cubic-bezier(.15,.75,.2,1)}.camera-stage.capturing .lens-glass{animation:lens-snap .65s ease}.depth-specks{position:absolute;inset:8%;z-index:1;pointer-events:none}.depth-specks i{position:absolute;width:3px;height:3px;border-radius:50%;background:var(--aqua);box-shadow:0 0 10px var(--aqua);opacity:.18;animation:depth-drift 5s ease-in-out infinite}.depth-specks i:nth-child(1){left:8%;top:26%;animation-delay:-1s}.depth-specks i:nth-child(2){left:22%;top:72%;animation-delay:-3.3s;animation-duration:7s}.depth-specks i:nth-child(3){left:78%;top:16%;animation-delay:-2s}.depth-specks i:nth-child(4){left:88%;top:67%;animation-delay:-4s;animation-duration:6.5s}.depth-specks i:nth-child(5){left:61%;top:84%;animation-delay:-.5s}.depth-specks i:nth-child(6){left:37%;top:11%;animation-delay:-2.7s;animation-duration:8s}
+        .ticker{overflow:hidden;border-block:1px solid var(--line);background:#0b0d0c}.ticker-track{width:max-content;display:flex;align-items:center;animation:ticker 24s linear infinite}.ticker-item{display:flex;align-items:center;gap:30px;padding:20px 30px;white-space:nowrap;color:#c5c7c0;font:600 12px/1 'DM Mono';letter-spacing:.12em;text-transform:uppercase}.ticker-item i{width:7px;height:7px;display:block;border-radius:50%;background:var(--acid)}
+        .intro{position:relative;padding:150px 0 110px}.intro-head{display:grid;grid-template-columns:.7fr 2fr;gap:80px;align-items:start}.intro h2{max-width:930px;margin:0;font-size:clamp(44px,6.2vw,93px);line-height:.98;font-weight:600}.intro h2 em{color:var(--violet);font-style:normal}.intro-foot{display:grid;grid-template-columns:.7fr 1fr 1fr;gap:55px;margin-top:75px;padding-top:26px;border-top:1px solid var(--line)}.intro-number{font:500 12px/1 'DM Mono';color:var(--acid)}.intro-foot h3{margin:0 0 12px;font:600 18px/1.2 'Syne'}.intro-foot p{margin:0;color:#858a82;font-size:14px;line-height:1.7}
+        .story{padding:90px 0 120px}.story-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(460px,.85fr);gap:7vw}.story-steps{padding:10vh 0}.story-step{min-height:72vh;display:flex;flex-direction:column;justify-content:center;opacity:.24;transform:translateX(-20px);transition:opacity .55s,transform .55s}.story-step.active{opacity:1;transform:none}.step-count{width:48px;height:25px;display:grid;place-items:center;margin-bottom:30px;border:1px solid var(--line);border-radius:30px;color:var(--acid);font:500 10px/1 'DM Mono'}.story-step h3{margin:0 0 24px;font-size:clamp(43px,5vw,78px);line-height:.96;font-weight:600}.story-step p{max-width:480px;margin:0;color:#93978f;font-size:16px;line-height:1.75}.step-link{display:inline-flex;align-items:center;gap:10px;margin-top:28px;color:var(--paper);font-size:12px;font-weight:800}.step-link span{color:var(--acid)}.story-visual{position:relative}.visual-sticky{position:sticky;top:115px;height:calc(100vh - 150px);min-height:600px;display:grid;place-items:center;overflow:hidden;border-radius:28px;background:radial-gradient(circle at 50% 42%,#22271f 0,#111410 38%,#090b09 73%);border:1px solid var(--line)}.visual-sticky::before{content:'';position:absolute;inset:22px;border:1px solid rgba(255,255,255,.045);border-radius:20px}.visual-index{position:absolute;left:28px;top:28px;font:500 10px/1 'DM Mono';color:#767b73;letter-spacing:.15em}.visual-status{position:absolute;right:28px;top:28px;display:flex;align-items:center;gap:8px;font:500 9px/1 'DM Mono';color:#8e938a;letter-spacing:.12em;text-transform:uppercase}.visual-status::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--acid)}.gallery-device{position:relative;width:min(73%,390px);aspect-ratio:.76;transform-style:preserve-3d;transition:transform .8s cubic-bezier(.2,.75,.2,1)}.gallery-device.step-1{transform:rotateX(3deg) rotateY(-9deg)}.gallery-device.step-2{transform:rotateX(-2deg) rotateY(7deg) scale(.94)}.gallery-device.step-3{transform:rotateX(4deg) rotateY(-4deg) scale(.9)}.device-screen{position:absolute;inset:0;padding:13px;overflow:hidden;border:1px solid #41463f;border-radius:26px;background:#171a17;box-shadow:30px 45px 65px rgba(0,0,0,.55),inset 0 1px rgba(255,255,255,.1)}.device-ui{height:100%;overflow:hidden;border-radius:17px;background:#eceae3;color:#0b0d0c}.device-nav{height:54px;display:flex;align-items:center;justify-content:space-between;padding:0 17px;border-bottom:1px solid #d7d4cc;font:700 9px/1 'Syne'}.device-dots{display:flex;gap:4px}.device-dots i{width:4px;height:4px;border-radius:50%;background:#111}.device-title{padding:22px 18px 16px}.device-title small{color:#777970;font:500 7px/1 'DM Mono';letter-spacing:.1em}.device-title h4{margin:8px 0 0;font:700 25px/1 'Syne';letter-spacing:-.05em}.photo-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:0 8px}.photo-grid .photo{min-height:115px;overflow:hidden;background-size:cover;background-position:center;transition:transform .8s ease}.photo-grid .photo:first-child{grid-row:span 2;background-image:url('https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&q=85&w=700')}.photo-grid .photo:nth-child(2){background-image:url('https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&q=85&w=700')}.photo-grid .photo:nth-child(3){background-image:url('https://images.unsplash.com/photo-1507501336603-6e31db2be093?auto=format&fit=crop&q=85&w=700')}.gallery-device.step-2 .photo:nth-child(2){transform:scale(1.08)}.gallery-device.step-3 .photo:first-child{transform:scale(1.06)}.share-toast{position:absolute;left:50%;bottom:24px;width:82%;padding:14px 15px;display:flex;justify-content:space-between;align-items:center;transform:translate(-50%,30px);opacity:0;border-radius:12px;background:rgba(10,12,10,.93);color:white;font:500 8px/1 'DM Mono';transition:.5s}.gallery-device.step-2 .share-toast{opacity:1;transform:translate(-50%,0)}.share-toast b{color:var(--acid)}.download-chip{position:absolute;right:-44px;top:42%;padding:14px 16px;opacity:0;transform:translateX(20px);border-radius:10px;background:var(--acid);color:#0b0d0b;font:700 9px/1 'DM Mono';box-shadow:0 15px 32px rgba(0,0,0,.3);transition:.5s}.gallery-device.step-3 .download-chip{opacity:1;transform:translateX(0)}
+        .features{padding:130px 0;background:var(--paper);color:var(--ink);border-radius:44px 44px 0 0}.section-top{display:flex;justify-content:space-between;align-items:end;gap:30px;margin-bottom:58px}.section-top h2{max-width:720px;margin:12px 0 0;font-size:clamp(46px,6vw,86px);line-height:.93;font-weight:650}.section-top p{max-width:350px;margin:0 0 8px;color:#686c65;font-size:14px;line-height:1.7}.features .eyebrow{color:#696d66}.bento{display:grid;grid-template-columns:1.2fr .8fr .8fr;grid-template-rows:310px 310px;gap:14px}.card{position:relative;overflow:hidden;padding:30px;border:1px solid rgba(8,10,9,.11);border-radius:22px;background:#e8e5dc}.card-dark{color:var(--paper);background:#111411}.card-acid{background:var(--acid)}.card-large{grid-row:span 2}.card-wide{grid-column:span 2}.card-number{font:500 9px/1 'DM Mono';letter-spacing:.14em;color:#787c74}.card-dark .card-number{color:#7d827a}.card h3{position:relative;z-index:2;margin:18px 0 9px;font:650 27px/1.08 'Syne';letter-spacing:-.04em}.card p{position:relative;z-index:2;max-width:340px;margin:0;color:#70736d;font-size:13px;line-height:1.65}.card-dark p{color:#8f948c}.stack-visual{position:absolute;inset:auto 28px 30px;height:285px;perspective:700px}.stack-photo{position:absolute;width:72%;height:185px;left:14%;border-radius:15px;background-size:cover;background-position:center;border:7px solid #f6f3eb;box-shadow:0 18px 40px rgba(0,0,0,.25);transition:transform .6s cubic-bezier(.2,.8,.2,1)}.stack-photo.one{top:72px;background-image:url('https://images.unsplash.com/photo-1519225421980-715cb0215aed?auto=format&fit=crop&q=85&w=700');transform:rotate(-8deg) translateX(-34px)}.stack-photo.two{top:48px;background-image:url('https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&q=85&w=700');transform:rotate(7deg) translateX(34px)}.stack-photo.three{top:28px;background-image:url('https://images.unsplash.com/photo-1606800052052-a08af7148866?auto=format&fit=crop&q=85&w=700')}.card:hover .stack-photo.one{transform:rotate(-13deg) translate(-58px,-6px)}.card:hover .stack-photo.two{transform:rotate(12deg) translate(58px,-8px)}.lock-visual{position:absolute;right:-35px;bottom:-45px;width:210px;height:210px;display:grid;place-items:center;border-radius:50%;border:1px solid rgba(255,255,255,.1);box-shadow:0 0 0 28px rgba(255,255,255,.02),0 0 0 56px rgba(255,255,255,.02)}.lock-body{width:68px;height:58px;display:grid;place-items:center;border-radius:13px;background:var(--violet);font-size:24px}.lock-body::before{content:'';position:absolute;width:35px;height:36px;margin-top:-61px;border:8px solid var(--violet);border-bottom:0;border-radius:22px 22px 0 0}.calendar-visual{position:absolute;right:25px;bottom:24px;width:190px;height:128px;padding:18px;border-radius:16px;background:#fff;box-shadow:0 18px 38px rgba(42,50,35,.12);transform:rotate(4deg)}.calendar-line{display:flex;gap:7px;margin-bottom:12px}.calendar-line i{width:7px;height:7px;border-radius:50%;background:#d6d4cc}.calendar-line i:first-child{background:var(--orange)}.calendar-row{height:9px;margin:8px 0;border-radius:5px;background:#edebe5}.calendar-row:nth-child(3){width:74%;background:#d9ef9f}.portfolio-ring{position:absolute;width:230px;height:230px;right:28px;top:50%;transform:translateY(-50%);border-radius:50%;border:1px solid rgba(8,10,9,.18)}.portfolio-ring::before,.portfolio-ring::after{content:'';position:absolute;border-radius:50%;border:1px solid rgba(8,10,9,.13)}.portfolio-ring::before{inset:25px}.portfolio-ring::after{inset:51px;background:url('https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&q=85&w=400') center/cover;border:7px solid #e8e5dc}
+        .intro h2 em{color:var(--aqua)}.lock-body{background:var(--aqua)}.lock-body::before{border-color:var(--aqua)}
+        .metrics{padding:110px 0 140px;background:var(--paper);color:var(--ink)}.metric-grid{display:grid;grid-template-columns:repeat(3,1fr);border-block:1px solid rgba(8,10,9,.15)}.metric{padding:45px 35px;border-right:1px solid rgba(8,10,9,.15)}.metric:last-child{border-right:0}.metric strong{display:block;font:600 clamp(50px,6vw,84px)/1 'Syne';letter-spacing:-.07em}.metric span{display:block;margin-top:13px;color:#6f736c;font:500 10px/1.4 'DM Mono';letter-spacing:.12em;text-transform:uppercase}
+        .final-cta{position:relative;padding:150px 0 130px;overflow:hidden;text-align:center;background:#0a0c0a}.cta-orbit{position:absolute;left:50%;top:50%;width:650px;height:650px;transform:translate(-50%,-50%);border:1px solid rgba(201,255,69,.09);border-radius:50%;box-shadow:0 0 0 80px rgba(201,255,69,.018),0 0 0 160px rgba(201,255,69,.012)}.final-cta .eyebrow{position:relative}.final-cta h2{position:relative;margin:28px auto 36px;max-width:1000px;font-size:clamp(56px,8vw,112px);line-height:.85;font-weight:650}.final-cta h2 span{color:var(--acid);font-style:italic}.final-cta .pill-button{min-height:56px;padding-inline:29px}.tiny-note{position:relative;margin-top:18px;color:#636861;font:500 9px/1 'DM Mono';letter-spacing:.1em;text-transform:uppercase}footer{padding:34px 0;border-top:1px solid var(--line);background:#0a0c0a}.footer-row{display:flex;align-items:center;justify-content:space-between;gap:24px}.footer-copy{color:#676b65;font:500 9px/1.5 'DM Mono';letter-spacing:.12em;text-transform:uppercase}.footer-links{display:flex;gap:28px;color:#8c9188;font-size:11px;font-weight:700}.footer-links a:hover{color:var(--acid)}
+        [data-reveal]{opacity:0;transform:translateY(28px);transition:opacity .75s ease,transform .75s cubic-bezier(.2,.75,.2,1)}[data-reveal].visible{opacity:1;transform:none}[data-reveal-delay="1"]{transition-delay:.12s}[data-reveal-delay="2"]{transition-delay:.24s}@keyframes breathe{50%{opacity:.45;box-shadow:0 0 0 9px rgba(201,255,69,0)}}@keyframes float{50%{transform:translateY(-10px)}}@keyframes orbit-path{to{transform:rotate(360deg)}}@keyframes ticker{to{transform:translateX(-50%)}}@keyframes depth-drift{0%,100%{transform:translate3d(0,0,0) scale(.7);opacity:.12}50%{transform:translate3d(12px,-18px,70px) scale(1.6);opacity:.65}}@keyframes shutter-flash{0%{opacity:0;transform:scale(.2)}12%{opacity:1;transform:scale(1.15)}34%{opacity:.42}100%{opacity:0;transform:scale(1.7)}}@keyframes lens-snap{0%,100%{filter:brightness(1)}16%{filter:brightness(4) saturate(.2)}40%{filter:brightness(.45)}}@keyframes capture-one{0%{opacity:0;transform:translate(-50%,-50%) translateZ(-80px) scale(.05)}18%{opacity:1;transform:translate(-50%,-50%) translateZ(50px) scale(.18)}62%{opacity:1;transform:translate(-270px,-190px) translateZ(120px) rotateY(18deg) rotateZ(-13deg) scale(.92)}100%{opacity:0;transform:translate(-305px,-220px) translateZ(160px) rotateY(25deg) rotateZ(-16deg) scale(.82)}}@keyframes capture-two{0%{opacity:0;transform:translate(-50%,-50%) translateZ(-80px) scale(.05)}18%{opacity:1;transform:translate(-50%,-50%) translateZ(45px) scale(.18)}62%{opacity:1;transform:translate(145px,-170px) translateZ(150px) rotateY(-20deg) rotateZ(12deg) scale(.88)}100%{opacity:0;transform:translate(185px,-205px) translateZ(180px) rotateY(-27deg) rotateZ(16deg) scale(.78)}}@keyframes capture-three{0%{opacity:0;transform:translate(-50%,-50%) translateZ(-80px) scale(.05)}18%{opacity:1;transform:translate(-50%,-50%) translateZ(35px) scale(.18)}62%{opacity:1;transform:translate(155px,80px) translateZ(95px) rotateY(-15deg) rotateZ(8deg) scale(.82)}100%{opacity:0;transform:translate(195px,115px) translateZ(135px) rotateY(-22deg) rotateZ(12deg) scale(.72)}}
+        @media(max-width:1100px){.hero-grid{grid-template-columns:.9fr 1fr}.camera-stage{min-height:520px;transform:scale(.85)}.hero-bottom{grid-template-columns:1fr}.story-layout{gap:4vw}.bento{grid-template-columns:1fr 1fr;grid-template-rows:500px 300px 300px}.card-large{grid-row:auto;grid-column:span 2}.card-wide{grid-column:span 1}}
+        @media(max-width:820px){.shell{width:min(100% - 30px,680px)}.nav-links,.nav-actions .login{display:none}.menu-button{display:grid;place-items:center}.nav.mobile-open{height:auto;min-height:64px;flex-wrap:wrap;padding-bottom:14px}.nav.mobile-open .nav-links{order:3;width:100%;display:flex;flex-direction:column;align-items:flex-start;gap:18px;padding:22px 4px 8px}.hero{padding-top:130px;min-height:auto}.hero-grid{grid-template-columns:1fr}.hero-copy{z-index:5}.hero h1{font-size:clamp(62px,18vw,112px)}.hero-bottom{max-width:520px}.camera-stage{min-height:510px;margin:-10px 0 10px;transform:scale(.88)}.intro{padding:100px 0 60px}.intro-head{grid-template-columns:1fr;gap:30px}.intro-foot{grid-template-columns:1fr 1fr}.intro-foot .intro-number{grid-column:span 2}.story-layout{grid-template-columns:1fr}.story-steps{padding:0}.story-step{min-height:auto;padding:90px 0;opacity:1;transform:none;border-top:1px solid var(--line)}.story-visual{order:-1}.visual-sticky{position:relative;top:0;height:640px}.section-top{display:block}.section-top p{margin-top:25px}.bento{grid-template-columns:1fr;grid-template-rows:520px repeat(3,300px)}.card-large,.card-wide{grid-column:auto}.metric-grid{grid-template-columns:1fr}.metric{border-right:0;border-bottom:1px solid rgba(8,10,9,.15)}.metric:last-child{border-bottom:0}}
+        @media(max-width:560px){.shell{width:calc(100% - 24px)}.nav-wrap{padding-top:10px}.nav{border-radius:15px}.nav-actions .pill-button{display:none}.hero{padding-top:118px}.hero h1{font-size:clamp(54px,18vw,88px)}.hero-bottom{gap:25px;margin-top:30px}.hero-actions .pill-button{padding-inline:17px}.camera-stage{min-height:390px;margin:-15px -85px 15px;transform:scale(.65)}.tag-one{right:12%}.tag-two{left:12%}.scroll-note{display:none}.intro h2{font-size:42px}.intro-foot{grid-template-columns:1fr;gap:34px}.intro-foot .intro-number{grid-column:auto}.story{padding-top:50px}.visual-sticky{min-height:520px;height:75vh}.gallery-device{width:78%}.story-step h3{font-size:45px}.features{padding:90px 0;border-radius:28px 28px 0 0}.section-top h2{font-size:44px}.bento{grid-template-rows:485px repeat(3,310px)}.card{padding:24px}.calendar-visual{right:-15px;bottom:20px}.portfolio-ring{opacity:.75;right:-70px}.footer-row{align-items:flex-start;flex-direction:column}}
+        @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}[data-reveal]{opacity:1;transform:none}.camera-rig{transform:translate(-50%,-50%) rotateX(-7deg) rotateY(-17deg) rotateZ(-3deg)}}
     </style>
 </head>
-<body class="antialiased selection:bg-violet-500 selection:text-white">
-    <div class="glow top-[-200px] left-[-200px]"></div>
-    <div class="glow bottom-[-200px] right-[-200px]"></div>
-
-    <!-- Navigation -->
-    <nav class="fixed top-0 left-0 w-full z-50 p-6 md:px-12">
-        <div class="max-w-7xl mx-auto flex items-center justify-between glass py-4 px-8 rounded-full border-white/5">
-            <div class="flex items-center gap-3">
-                <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500 to-fuchsia-500 rotate-12 flex items-center justify-center">
-                    <span class="on-accent font-display font-black text-white italic">V</span>
+<body>
+    <div class="scroll-progress" aria-hidden="true"></div>
+    <div class="nav-wrap" id="nav-wrap">
+        <nav class="nav shell" id="nav" aria-label="Primary navigation">
+            <a class="brand" href="#top" aria-label="VUE home"><span class="brand-mark" aria-hidden="true"></span><span>VUE</span></a>
+            <div class="nav-links"><a href="#experience">Experience</a><a href="#workflow">Workflow</a><a href="#features">Studio tools</a></div>
+            <div class="nav-actions"><a class="login" href="/login">Log in</a><a class="pill-button" href="/register">Start for free <span class="arrow">↗</span></a><button class="menu-button" id="menu-button" type="button" aria-label="Open menu" aria-expanded="false">☰</button></div>
+        </nav>
+    </div>
+    <main id="top">
+        <section class="hero" aria-labelledby="hero-title">
+            <div class="shell hero-grid">
+                <div class="hero-copy">
+                    <div class="hero-kicker eyebrow"><span class="status-dot"></span> The creative OS for photographers</div>
+                    <h1 class="display" id="hero-title">SHOOT.<br><span class="outline">SHARE.</span><br><span class="accent-word">WOW.</span></h1>
+                    <div class="hero-bottom"><p>From first inquiry to final download, VUE turns the business behind your photography into one beautifully focused experience.</p><div class="hero-actions"><a class="pill-button" href="/register">Create your space <span class="arrow">↗</span></a><a class="play-link" href="#experience" aria-label="Explore the VUE experience">↓</a></div></div>
                 </div>
-                <span class="text-xl font-display font-bold tracking-tighter uppercase">Vue</span>
+                <div class="camera-stage" id="camera-stage" role="button" tabindex="0" aria-label="Interactive 3D camera. Click to capture a photograph.">
+                    <div class="camera-halo"></div><div class="depth-specks" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div><div class="orbit orbit-one"><span class="orbit-particle one"></span></div><div class="orbit orbit-two"><span class="orbit-particle two"></span></div><div class="camera-shadow"></div>
+                    <div class="camera-rig"><div class="camera-top"></div><div class="viewfinder"></div><div class="camera-body"><div class="camera-logo">VUE<small>STUDIO SYSTEM</small></div><div class="grip"></div><div class="shutter-button"></div><div class="mode-dial"></div><div class="flash-mark"></div><div class="lens-mount"><div class="lens-barrel"><div class="lens-glass"><div class="aperture"></div><div class="lens-flare"></div></div></div></div></div></div>
+                    <div class="focus-corners" aria-hidden="true"></div><div class="float-tag tag-one">Live galleries<strong>Ready to share</strong></div><div class="float-tag tag-two">This month<strong>12 sessions ↑</strong></div><div class="capture-flash" aria-hidden="true"></div><div class="capture-card one" data-label="FOREVER / 01" aria-hidden="true"><i></i></div><div class="capture-card two" data-label="MOMENTS / 02" aria-hidden="true"><i></i></div><div class="capture-card three" data-label="STORIES / 03" aria-hidden="true"><i></i></div><div class="capture-hint" aria-hidden="true">Auto capture · click anytime</div>
+                </div>
+            </div><div class="scroll-note">Scroll to explore</div>
+        </section>
+        <div class="ticker" aria-hidden="true"><div class="ticker-track">@for ($i = 0; $i < 2; $i++)<div class="ticker-item"><i></i> Client galleries</div><div class="ticker-item"><i></i> Session planning</div><div class="ticker-item"><i></i> Private delivery</div><div class="ticker-item"><i></i> Portfolio builder</div><div class="ticker-item"><i></i> One calm workspace</div>@endfor</div></div>
+        <section class="intro" id="experience"><div class="shell"><div class="intro-head"><div class="eyebrow" data-reveal>Built around your art</div><h2 class="display" data-reveal data-reveal-delay="1">Less time managing. More time making work that <em>moves people.</em></h2></div><div class="intro-foot"><div class="intro-number">01 — THE BIG PICTURE</div><div data-reveal><h3>Everything stays connected.</h3><p>Clients, appointments, galleries, and delivery live together. No spreadsheet archaeology. No lost links.</p></div><div data-reveal data-reveal-delay="1"><h3>Your brand stays visible.</h3><p>Every touchpoint feels considered and unmistakably yours—from booking through the final download.</p></div></div></div></section>
+        <section class="story" id="workflow"><div class="shell story-layout">
+            <div class="story-steps">
+                <article class="story-step active" data-step="1"><div class="step-count">01</div><h3 class="display">Create the moment.</h3><p>Plan sessions, keep client details close, and see every moving piece without letting admin break your creative flow.</p><a class="step-link" href="/register">Organize your studio <span>↗</span></a></article>
+                <article class="story-step" data-step="2"><div class="step-count">02</div><h3 class="display">Send the feeling.</h3><p>Publish a cinematic, password-protected gallery and share it in seconds. Your photographs get the stage they deserve.</p><a class="step-link" href="/register">Build a gallery <span>↗</span></a></article>
+                <article class="story-step" data-step="3"><div class="step-count">03</div><h3 class="display">Deliver the magic.</h3><p>Give clients a polished download experience they remember—simple on the surface, secure underneath.</p><a class="step-link" href="/register">Deliver beautifully <span>↗</span></a></article>
             </div>
-            
-            <div class="hidden lg:flex items-center gap-10 text-[10px] font-bold uppercase tracking-[0.2em] opacity-60">
-                <a href="#process" class="hover:opacity-100 transition-opacity">Workflow</a>
-                <a href="#features" class="hover:opacity-100 transition-opacity">Features</a>
-                <a href="#studio" class="hover:opacity-100 transition-opacity">Studio tools</a>
-            </div>
-
-            <div class="flex items-center gap-4">
-                <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Switch to light mode" title="Switch theme">
-                    <svg class="moon-icon w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"/></svg>
-                    <svg class="sun-icon w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><circle cx="12" cy="12" r="4" stroke-width="2"/><path stroke-linecap="round" stroke-width="2" d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"/></svg>
-                </button>
-                <a href="/login" class="text-[10px] font-bold uppercase tracking-widest hidden sm:block">Login</a>
-                <a href="/register" class="primary-cta bg-white text-black px-6 py-2.5 rounded-full text-[10px] font-bold uppercase tracking-widest hover:scale-105 transition-transform active:scale-95">
-                    Start Free
-                </a>
-            </div>
-        </div>
-    </nav>
-
-    <!-- Hero Section -->
-    <header class="pt-40 pb-20 px-6">
-        <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-16 items-center">
-            <div class="lg:col-span-7">
-                <div class="inline-flex items-center gap-2 bg-white/5 border border-white/10 px-4 py-1.5 rounded-full mb-8">
-                    <span class="w-2 h-2 rounded-full bg-violet-400 animate-ping"></span>
-                    <span class="text-[9px] font-bold uppercase tracking-[0.2em] text-violet-300">One workspace for your photography business</span>
-                </div>
-                <h1 class="font-display text-6xl md:text-[9.5rem] leading-[0.85] tracking-tighter mb-10">
-                    STORAGE <br><span class="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-fuchsia-400 italic font-medium">REIMAGINED.</span>
-                </h1>
-                <p class="text-lg md:text-xl text-white/50 max-w-xl leading-relaxed mb-12 font-light">
-                    VUE helps photographers organize clients and sessions, publish polished galleries, protect private work, and deliver photos without piecing together multiple tools.
-                </p>
-                <div class="flex flex-col sm:flex-row gap-4">
-                    <a href="/register" class="btn-vue on-accent bg-violet-600 text-white px-10 py-5 rounded-2xl font-bold uppercase tracking-widest text-xs text-center shadow-2xl shadow-violet-500/20">Create your account</a>
-                    <a href="#features" class="px-10 py-5 rounded-2xl font-bold uppercase tracking-widest text-xs text-center border border-white/10 hover:bg-white/5 transition-colors">See what VUE does</a>
-                </div>
-            </div>
-            <div class="lg:col-span-5 relative">
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="space-y-4 pt-12">
-                        <div class="img-card h-64"><img src="https://images.unsplash.com/photo-1554048612-b6a482bc67e5?auto=format&fit=crop&q=80&w=600" alt="Photographer working in a studio" class="w-full h-full object-cover" loading="eager"></div>
-                        <div class="img-card h-40"><img src="https://images.unsplash.com/photo-1493863641943-9b68992a8d07?auto=format&fit=crop&q=80&w=600" alt="Professional camera equipment" class="w-full h-full object-cover" loading="lazy"></div>
-                    </div>
-                    <div class="space-y-4">
-                        <div class="img-card h-40"><img src="https://images.unsplash.com/photo-1542038784456-1ea8e935640e?auto=format&fit=crop&q=80&w=600" alt="Photographer holding a camera" class="w-full h-full object-cover" loading="lazy"></div>
-                        <div class="img-card h-64"><img src="https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&q=80&w=600" alt="Camera ready for a photo session" class="w-full h-full object-cover" loading="lazy"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </header>
-
-    <!-- The Process Section -->
-    <section id="process" class="py-32 px-6">
-        <div class="max-w-7xl mx-auto">
-            <div class="text-center mb-24">
-                <span class="text-[10px] font-black uppercase tracking-[0.4em] text-violet-500 mb-4 block">A simpler workflow</span>
-                <h2 class="font-display text-4xl md:text-6xl tracking-tighter">From booking to <span class="italic text-white/40">final delivery.</span></h2>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-0 border border-white/5 rounded-[3rem] overflow-hidden bg-white/[0.02]">
-                <div class="p-12 md:p-16 border-b md:border-b-0 md:border-r border-white/5 hover:bg-white/[0.04] transition-colors group">
-                    <div class="w-12 h-12 rounded-full border border-white/20 flex items-center justify-center mb-10 font-display text-xl group-hover:border-violet-500 transition-colors">01</div>
-                    <h3 class="text-2xl font-display mb-6 uppercase">Organize</h3>
-                    <p class="text-white/40 text-sm leading-relaxed mb-10">Keep client details, appointments, sessions, and galleries connected in one dashboard built around a photographer's workflow.</p>
-                    <div class="h-40 bg-black rounded-2xl border border-white/5 overflow-hidden flex items-center justify-center italic text-[10px] opacity-20 uppercase tracking-widest">
-                        Client • Session • Gallery
-                    </div>
-                </div>
-                <div class="p-12 md:p-16 border-b md:border-b-0 md:border-r border-white/5 hover:bg-white/[0.04] transition-colors group">
-                    <div class="w-12 h-12 rounded-full border border-white/20 flex items-center justify-center mb-10 font-display text-xl group-hover:border-violet-500 transition-colors">02</div>
-                    <h3 class="text-2xl font-display mb-6 uppercase">Present</h3>
-                    <p class="text-white/40 text-sm leading-relaxed mb-10">Upload photos into folders, choose a gallery layout, add a cover, and publish a client-ready experience on your own subdomain.</p>
-                    <div class="h-40 bg-black rounded-2xl border border-white/5 overflow-hidden p-4 space-y-3">
-                        <div class="w-full h-1.5 bg-violet-900/40 rounded-full overflow-hidden"><div class="w-[70%] h-full bg-violet-500"></div></div>
-                        <div class="w-full h-1.5 bg-white/5 rounded-full overflow-hidden"><div class="w-[40%] h-full bg-violet-500"></div></div>
-                        <div class="w-full h-1.5 bg-white/5 rounded-full overflow-hidden"><div class="w-[90%] h-full bg-violet-500"></div></div>
-                    </div>
-                </div>
-                <div class="p-12 md:p-16 hover:bg-white/[0.04] transition-colors group">
-                    <div class="w-12 h-12 rounded-full border border-white/20 flex items-center justify-center mb-10 font-display text-xl group-hover:border-violet-500 transition-colors">03</div>
-                    <h3 class="text-2xl font-display mb-6 uppercase">Deliver</h3>
-                    <p class="text-white/40 text-sm leading-relaxed mb-10">Share a public or password-protected gallery through WhatsApp and let clients request complete or selected-folder downloads.</p>
-                    <div class="h-40 bg-violet-500/10 rounded-2xl border border-violet-500/30 flex items-center justify-center">
-                        <div class="bg-white/10 px-4 py-2 rounded-lg text-[10px] font-bold tracking-tighter">yourstudio.vue/gallery-name</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Features Section -->
-    <section id="features" class="py-32 px-6 bg-white/[0.01]">
-        <div class="max-w-7xl mx-auto">
-            <div class="flex flex-col lg:flex-row justify-between items-end gap-12 mb-20">
-                <div class="max-w-2xl">
-                    <span class="text-[10px] font-black uppercase tracking-[0.4em] text-violet-500 mb-4 block">Built for real client work</span>
-                    <h2 class="font-display text-5xl md:text-7xl tracking-tighter uppercase leading-[0.9]">Your studio, <br> <span class="italic text-white/30">under control.</span></h2>
-                </div>
-                <div class="hidden lg:block text-right">
-                    <p class="text-[10px] font-bold text-white/20 uppercase tracking-[0.5em] mb-4">Core features</p>
-                    <div class="flex gap-2">
-                        <div class="w-1 h-1 bg-white"></div>
-                        <div class="w-1 h-1 bg-white"></div>
-                        <div class="w-1 h-1 bg-white"></div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <div class="glass p-12 rounded-[3rem] hover:border-white/20 transition-all group">
-                    <h3 class="text-xl font-display mb-2 uppercase">Client Galleries</h3>
-                    <p class="text-[10px] font-bold text-white/20 uppercase tracking-[0.2em] mb-12">Presentation & delivery</p>
-                    <ul class="space-y-6 mb-12 text-xs font-bold uppercase tracking-widest text-white/60">
-                        <li class="flex items-center gap-3"><div class="w-1.5 h-1.5 rounded-full bg-violet-500"></div> Multiple gallery layouts</li>
-                        <li class="flex items-center gap-3"><div class="w-1.5 h-1.5 rounded-full bg-violet-500"></div> Client & guest passwords</li>
-                        <li class="flex items-center gap-3"><div class="w-1.5 h-1.5 rounded-full bg-violet-500"></div> Folder or full downloads</li>
-                    </ul>
-                    <a href="/register" class="block text-center w-full py-5 rounded-2xl border border-white/10 bg-white/5 font-bold uppercase tracking-widest text-[10px] transition-all hover:border-violet-500">Build a gallery</a>
-                </div>
-
-                <div class="bg-gradient-to-b from-violet-600/20 to-transparent p-[1px] rounded-[3rem]">
-                    <div class="glass p-12 rounded-[3rem] bg-[#0A0A0A]/90 h-full relative overflow-hidden">
-                        <div class="absolute top-8 right-8 on-accent bg-violet-500 text-white text-[9px] font-black px-3 py-1 rounded-full uppercase">All in one</div>
-                        <h3 class="text-xl font-display mb-2 uppercase">Studio Management</h3>
-                        <p class="text-[10px] font-bold text-violet-400 uppercase tracking-[0.2em] mb-12">Daily operations</p>
-                        <ul class="space-y-6 mb-12 text-xs font-bold uppercase tracking-widest text-white">
-                            <li class="flex items-center gap-3"><div class="w-1.5 h-1.5 rounded-full bg-violet-500"></div> Client records</li>
-                            <li class="flex items-center gap-3"><div class="w-1.5 h-1.5 rounded-full bg-violet-500"></div> Sessions & appointments</li>
-                            <li class="flex items-center gap-3"><div class="w-1.5 h-1.5 rounded-full bg-violet-500"></div> Calendar overview</li>
-                            <li class="flex items-center gap-3"><div class="w-1.5 h-1.5 rounded-full bg-violet-500"></div> Finance reporting</li>
-                        </ul>
-                        <a href="/register" class="block text-center w-full py-5 rounded-2xl on-accent bg-violet-500 text-white font-bold uppercase tracking-widest text-[10px] shadow-2xl shadow-violet-500/40 hover:scale-105 transition-transform">Start your workspace</a>
-                    </div>
-                </div>
-
-                <div class="glass p-12 rounded-[3rem] hover:border-white/20 transition-all group">
-                    <h3 class="text-xl font-display mb-2 uppercase">Your Brand</h3>
-                    <p class="text-[10px] font-bold text-white/20 uppercase tracking-[0.2em] mb-12">A professional presence</p>
-                    <ul class="space-y-6 mb-12 text-xs font-bold uppercase tracking-widest text-white/60">
-                        <li class="flex items-center gap-3"><div class="w-1.5 h-1.5 rounded-full bg-violet-500"></div> Portfolio page</li>
-                        <li class="flex items-center gap-3"><div class="w-1.5 h-1.5 rounded-full bg-violet-500"></div> Custom colors & cover</li>
-                        <li class="flex items-center gap-3"><div class="w-1.5 h-1.5 rounded-full bg-violet-500"></div> Dedicated subdomain</li>
-                    </ul>
-                    <a href="/register" class="block text-center w-full py-5 rounded-2xl border border-white/10 bg-white/5 font-bold uppercase tracking-widest text-[10px] transition-all hover:border-violet-500">Create your portfolio</a>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Studio tools -->
-    <section id="studio" class="py-32 px-6 relative">
-        <div class="max-w-4xl mx-auto glass p-12 md:p-20 rounded-[4rem] relative z-10">
-            <div class="flex flex-col items-center text-center mb-12">
-                <div class="w-20 h-20 rounded-full ai-orb mb-8 flex items-center justify-center shadow-2xl shadow-violet-500/50">
-                    <svg class="on-accent w-8 h-8 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 19V9m5 10V5m5 14v-7m5 7V3"/></svg>
-                </div>
-                <h2 class="font-display text-4xl md:text-5xl mb-6 tracking-tighter uppercase">RUN THE BUSINESS.</h2>
-                <p class="text-white/40 max-w-xl leading-relaxed text-sm font-medium">VUE keeps the administrative side of your studio close to the work, so you can track upcoming shoots, client history, and income without losing the creative flow.</p>
-            </div>
-            <div class="grid sm:grid-cols-3 gap-4 mb-10">
-                <div class="bg-white/5 border border-white/5 rounded-2xl p-6 text-center"><strong class="block font-display text-2xl mb-2">Calendar</strong><span class="text-xs text-white/40">See scheduled appointments at a glance.</span></div>
-                <div class="bg-white/5 border border-white/5 rounded-2xl p-6 text-center"><strong class="block font-display text-2xl mb-2">Reports</strong><span class="text-xs text-white/40">Review session revenue and studio activity.</span></div>
-                <div class="bg-white/5 border border-white/5 rounded-2xl p-6 text-center"><strong class="block font-display text-2xl mb-2">Sharing</strong><span class="text-xs text-white/40">Send gallery details with your saved WhatsApp message.</span></div>
-            </div>
-            <a href="/register" class="block mx-auto max-w-xs text-center py-5 rounded-2xl on-accent bg-violet-500 text-white font-bold uppercase tracking-widest text-[10px] hover:scale-105 transition-transform">Get started</a>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer class="py-24 px-6 border-t border-white/5">
-        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-start gap-16">
-            <div class="max-w-xs">
-                <div class="flex items-center gap-3 mb-8">
-                    <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center">
-                        <span class="on-accent font-display font-black text-white italic">V</span>
-                    </div>
-                    <span class="text-xl font-display font-bold tracking-tighter uppercase">Vue</span>
-                </div>
-                <p class="text-xs text-white/30 leading-relaxed font-medium uppercase tracking-widest">A practical studio workspace for photographers—from first booking to final gallery delivery.</p>
-            </div>
-            <div class="grid grid-cols-2 sm:grid-cols-3 gap-16">
-                <div>
-                    <h4 class="text-[10px] font-black uppercase tracking-[0.3em] text-white mb-8">Product</h4>
-                    <ul class="text-[10px] font-bold uppercase tracking-widest text-white/30 space-y-4">
-                        <li><a href="#process" class="hover:text-violet-400 transition-colors">Workflow</a></li>
-                        <li><a href="#features" class="hover:text-violet-400 transition-colors">Features</a></li>
-                        <li><a href="#studio" class="hover:text-violet-400 transition-colors">Studio tools</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h4 class="text-[10px] font-black uppercase tracking-[0.3em] text-white mb-8">Studio</h4>
-                    <ul class="text-[10px] font-bold uppercase tracking-widest text-white/30 space-y-4">
-                        <li><a href="/login" class="hover:text-violet-400 transition-colors">Log in</a></li>
-                        <li><a href="/register" class="hover:text-violet-400 transition-colors">Create account</a></li>
-                        <li><a href="/dashboard" class="hover:text-violet-400 transition-colors">Dashboard</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h4 class="text-[10px] font-black uppercase tracking-[0.3em] text-white mb-8">Highlights</h4>
-                    <ul class="text-[10px] font-bold uppercase tracking-widest text-white/30 space-y-4">
-                        <li><a href="#features" class="hover:text-violet-400 transition-colors">Protected galleries</a></li>
-                        <li><a href="#features" class="hover:text-violet-400 transition-colors">Portfolio pages</a></li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-        <div class="max-w-7xl mx-auto pt-24 flex justify-between items-center text-[9px] font-black uppercase tracking-[0.5em] text-white/10">
-            <span>&copy; {{ date('Y') }} VUE.</span>
-            <span>BUILT FOR PHOTOGRAPHERS</span>
-        </div>
-    </footer>
-
+            <div class="story-visual"><div class="visual-sticky"><div class="visual-index">VUE / EXPERIENCE</div><div class="visual-status">Live preview</div><div class="gallery-device step-1" id="gallery-device"><div class="device-screen"><div class="device-ui"><div class="device-nav"><span>ANNA × MARK</span><span class="device-dots"><i></i><i></i><i></i></span></div><div class="device-title"><small>THE WEDDING · 08.24.26</small><h4>Our forever,<br>in frames.</h4></div><div class="photo-grid"><div class="photo"></div><div class="photo"></div><div class="photo"></div></div><div class="share-toast"><span>vue.gallery/anna-mark</span><b>LINK COPIED ✓</b></div></div></div><div class="download-chip">↓ 248 PHOTOS READY</div></div></div></div>
+        </div></section>
+        <section class="features" id="features"><div class="shell"><div class="section-top"><div><div class="eyebrow" data-reveal>One studio. Every tool.</div><h2 class="display" data-reveal>Built to keep you in focus.</h2></div><p data-reveal>Powerful where it matters. Delightfully quiet everywhere else. VUE handles the workflow so your work can take center stage.</p></div><div class="bento">
+            <article class="card card-dark card-large" data-reveal><div class="card-number">01 / GALLERIES</div><h3>Make every delivery<br>feel like an exhibition.</h3><p>Immersive client galleries designed around the photographs—not the software.</p><div class="stack-visual" aria-hidden="true"><div class="stack-photo one"></div><div class="stack-photo two"></div><div class="stack-photo three"></div></div></article>
+            <article class="card card-dark" data-reveal data-reveal-delay="1"><div class="card-number">02 / PRIVACY</div><h3>Private by design.</h3><p>Password protection and intentional access controls keep personal moments personal.</p><div class="lock-visual" aria-hidden="true"><div class="lock-body">•</div></div></article>
+            <article class="card card-acid" data-reveal data-reveal-delay="2"><div class="card-number">03 / SESSIONS</div><h3>Your schedule,<br>beautifully clear.</h3><p>Keep the shoot, the people, and the details in one view.</p><div class="calendar-visual" aria-hidden="true"><div class="calendar-line"><i></i><i></i><i></i></div><div class="calendar-row"></div><div class="calendar-row"></div><div class="calendar-row"></div><div class="calendar-row"></div></div></article>
+            <article class="card card-wide" data-reveal><div class="card-number">04 / PORTFOLIO</div><h3>Your best work.<br>Your own corner<br>of the internet.</h3><p>A refined portfolio that is always connected to your latest work.</p><div class="portfolio-ring" aria-hidden="true"></div></article>
+        </div></div></section>
+        <section class="metrics" aria-label="VUE benefits"><div class="shell metric-grid"><div class="metric" data-reveal><strong>01</strong><span>Workspace instead of<br>a dozen disconnected tools</span></div><div class="metric" data-reveal data-reveal-delay="1"><strong>24/7</strong><span>Your galleries stay ready<br>whenever clients are</span></div><div class="metric" data-reveal data-reveal-delay="2"><strong>100%</strong><span>Your brand, your clients,<br>your creative world</span></div></div></section>
+        <section class="final-cta"><div class="cta-orbit" aria-hidden="true"></div><div class="shell"><div class="eyebrow">Your next chapter</div><h2 class="display" data-reveal>Put your business<br><span>in focus.</span></h2><a class="pill-button" href="/register">Start creating for free <span class="arrow">↗</span></a><div class="tiny-note">A calmer photography business starts here</div></div></section>
+    </main>
+    <footer><div class="shell footer-row"><a class="brand" href="#top"><span class="brand-mark" aria-hidden="true"></span><span>VUE</span></a><div class="footer-links"><a href="#workflow">Workflow</a><a href="#features">Features</a><a href="/login">Log in</a></div><div class="footer-copy">© {{ date('Y') }} VUE<br>Made for photographers</div></div></footer>
     <script>
-        const themeToggle = document.getElementById('theme-toggle');
+        (()=>{const root=document.documentElement,navWrap=document.getElementById('nav-wrap'),nav=document.getElementById('nav'),menuButton=document.getElementById('menu-button'),cameraStage=document.getElementById('camera-stage'),device=document.getElementById('gallery-device'),reducedMotion=window.matchMedia('(prefers-reduced-motion: reduce)').matches;const updateScroll=()=>{const max=document.documentElement.scrollHeight-window.innerHeight,progress=max>0?window.scrollY/max*100:0;root.style.setProperty('--scroll-width',`${progress.toFixed(2)}%`);root.style.setProperty('--aperture-turn',`${(progress*.4).toFixed(2)}deg`);navWrap.classList.toggle('scrolled',window.scrollY>40)};updateScroll();window.addEventListener('scroll',updateScroll,{passive:true});if(!reducedMotion&&cameraStage){cameraStage.addEventListener('pointermove',event=>{const rect=cameraStage.getBoundingClientRect(),mx=((event.clientX-rect.left)/rect.width)*2-1,my=((event.clientY-rect.top)/rect.height)*2-1;root.style.setProperty('--ry',`${(mx*13).toFixed(2)}deg`);root.style.setProperty('--rx',`${(my*-7).toFixed(2)}deg`)});cameraStage.addEventListener('pointerleave',()=>{root.style.setProperty('--ry','0deg');root.style.setProperty('--rx','0deg')})}const revealObserver=new IntersectionObserver(entries=>{entries.forEach(entry=>{if(entry.isIntersecting){entry.target.classList.add('visible');revealObserver.unobserve(entry.target)}})},{threshold:.14});document.querySelectorAll('[data-reveal]').forEach(item=>revealObserver.observe(item));const steps=[...document.querySelectorAll('.story-step')];const stepObserver=new IntersectionObserver(entries=>{entries.forEach(entry=>{if(!entry.isIntersecting)return;const step=entry.target.dataset.step;steps.forEach(item=>item.classList.toggle('active',item===entry.target));device.className=`gallery-device step-${step}`})},{rootMargin:'-34% 0px -34% 0px',threshold:0});steps.forEach(step=>stepObserver.observe(step));menuButton.addEventListener('click',()=>{const isOpen=nav.classList.toggle('mobile-open');menuButton.setAttribute('aria-expanded',String(isOpen));menuButton.textContent=isOpen?'×':'☰'});nav.querySelectorAll('a[href^="#"]').forEach(link=>link.addEventListener('click',()=>{nav.classList.remove('mobile-open');menuButton.setAttribute('aria-expanded','false');menuButton.textContent='☰'}))})();
+    </script>
+    <script>
+        (() => {
+            const stage = document.getElementById('camera-stage');
+            const cards = [...stage.querySelectorAll('.capture-card')];
+            const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            const captureInterval = 7000;
+            const photos = [
+                ['1519225421980-715cb0215aed', 'FOREVER / 01'],
+                ['1519741497674-611481863552', 'MOMENTS / 02'],
+                ['1490481651871-ab68de25d43d', 'STORIES / 03'],
+                ['1511285560929-80b456fea0bc', 'TOGETHER / 04'],
+                ['1520854221256-17451cc331bf', 'GOLDEN / 05'],
+                ['1516035069371-29a1b244cc32', 'FOCUS / 06'],
+                ['1507501336603-6e31db2be093', 'WILD / 07'],
+                ['1493863641943-9b68992a8d07', 'CREATE / 08'],
+                ['1542038784456-1ea8e935640e', 'VISION / 09'],
+                ['1522673607200-164d1b6ce486', 'JOY / 10'],
+                ['1500648767791-00dcc994a43e', 'PORTRAIT / 11'],
+                ['1554048612-b6a482bc67e5', 'LIGHT / 12']
+            ];
+            let photoIndex = 3;
+            let cleanupTimer;
+            let autoTimer;
+            let firstCaptureTimer;
+            let heroIsVisible = false;
 
-        function updateThemeToggle(theme) {
-            const nextTheme = theme === 'dark' ? 'light' : 'dark';
-            themeToggle.setAttribute('aria-label', `Switch to ${nextTheme} mode`);
-        }
-
-        updateThemeToggle(document.documentElement.dataset.theme);
-        themeToggle.addEventListener('click', () => {
-            const nextTheme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
-            document.documentElement.dataset.theme = nextTheme;
-            localStorage.setItem('vue-theme', nextTheme);
-            updateThemeToggle(nextTheme);
-        });
-
-        // Scroll Observer for smooth entry
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) entry.target.style.opacity = '1';
+            photos.forEach(photo => {
+                const image = new Image();
+                image.src = `https://images.unsplash.com/photo-${photo[0]}?auto=format&fit=crop&q=82&w=400`;
             });
-        }, { threshold: 0.1 });
 
-        document.querySelectorAll('section').forEach(section => {
-            section.style.transition = 'opacity 1s ease';
-            section.style.opacity = '0';
-            observer.observe(section);
-        });
+            const loadNextPhotos = () => {
+                cards.forEach((card, index) => {
+                    const photo = photos[(photoIndex + index) % photos.length];
+                    card.querySelector('i').style.backgroundImage = `url('https://images.unsplash.com/photo-${photo[0]}?auto=format&fit=crop&q=82&w=400')`;
+                    card.dataset.label = photo[1];
+                });
+                photoIndex = (photoIndex + cards.length) % photos.length;
+            };
 
+            const capture = () => {
+                loadNextPhotos();
+                stage.classList.remove('capturing');
+                void stage.offsetWidth;
+                stage.classList.add('capturing');
+                window.clearTimeout(cleanupTimer);
+                cleanupTimer = window.setTimeout(() => stage.classList.remove('capturing'), 2100);
+            };
+
+            const stopAutoCapture = () => {
+                window.clearInterval(autoTimer);
+                window.clearTimeout(firstCaptureTimer);
+                autoTimer = null;
+                firstCaptureTimer = null;
+            };
+
+            const startAutoCapture = () => {
+                if (reducedMotion || !heroIsVisible || document.hidden || autoTimer || firstCaptureTimer) return;
+                firstCaptureTimer = window.setTimeout(() => {
+                    firstCaptureTimer = null;
+                    capture();
+                    autoTimer = window.setInterval(capture, captureInterval);
+                }, 2800);
+            };
+
+            const visibilityObserver = new IntersectionObserver(([entry]) => {
+                heroIsVisible = entry.isIntersecting;
+                if (heroIsVisible) startAutoCapture();
+                else stopAutoCapture();
+            }, { threshold: .3 });
+
+            visibilityObserver.observe(stage);
+            document.addEventListener('visibilitychange', () => {
+                if (document.hidden) stopAutoCapture();
+                else startAutoCapture();
+            });
+            stage.addEventListener('click', capture);
+            stage.addEventListener('keydown', event => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    capture();
+                }
+            });
+        })();
     </script>
 </body>
 </html>
