@@ -109,9 +109,27 @@ body { color: var(--pr-ink); background: #f3f7f6; }
     background: #073b74 !important; color: #fff !important;
     font-size: 1.35rem; letter-spacing: -.03em;
 }
-.main-sidebar .brand-link b { color: #62a7f1; }
-.main-sidebar .brand-link .brand-image { display: none; }
-.main-sidebar .brand-link .brand-text { margin-left: 2px; font-weight: 400; }
+.main-sidebar .brand-link .galerive-admin-logo {
+    display: block;
+    width: 190px;
+    max-width: calc(100% - 8px);
+    height: 48px;
+    margin: 0;
+    object-fit: contain;
+    object-position: left center;
+}
+.main-sidebar .brand-link .brand-text { display: none; }
+@media (min-width: 992px) {
+    .sidebar-mini.sidebar-collapse .main-sidebar:not(:hover):not(.sidebar-focused) .brand-link {
+        padding: 0 9px;
+    }
+    .sidebar-mini.sidebar-collapse .main-sidebar:not(:hover):not(.sidebar-focused) .brand-link .galerive-admin-logo {
+        width: 54px;
+        height: 42px;
+        object-fit: cover;
+        object-position: left center;
+    }
+}
 .main-header { min-height: 58px; padding-top: 0; padding-bottom: 0; padding-left: 14px; border-bottom: 1px solid #e4ecea; box-shadow: 0 3px 16px rgba(23, 52, 61, .04); }
 .main-header .navbar-nav .nav-link { height: 58px; display: flex; align-items: center; }
 .main-header .navbar-nav:first-child .nav-link[data-widget="pushmenu"] {

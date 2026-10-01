@@ -84,18 +84,10 @@
             letter-spacing: .04em;
         }
         .brand-mark {
-            display: inline-flex;
-            width: 36px;
-            height: 36px;
-            align-items: center;
-            justify-content: center;
-            border: 1px solid rgba(255,255,255,.28);
-            border-radius: 11px;
-            background: rgba(255,255,255,.13);
-            box-shadow: 0 10px 30px rgba(0,0,0,.16);
-            font-style: italic;
-            font-weight: 900;
-            backdrop-filter: blur(14px);
+            display: block;
+            width: auto;
+            height: 42px;
+            object-fit: contain;
         }
         .preview-copy { bottom: clamp(38px, 7vw, 88px); max-width: 650px; }
         .preview-kicker {
@@ -310,7 +302,7 @@
         <section class="gallery-preview" aria-label="Gallery preview">
             <img src="{{ $galleryImage }}" alt="" aria-hidden="true">
             <div class="preview-top">
-                <span class="brand-mark">V</span>
+                <img class="brand-mark" src="{{ asset('images/final_logo.png') }}" alt="Galerive">
                 <span>{{ $studioName }}</span>
             </div>
             <div class="preview-copy">

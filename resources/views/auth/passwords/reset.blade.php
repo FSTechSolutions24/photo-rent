@@ -1,9 +1,8 @@
 @extends('adminlte::auth.passwords.reset')
 
 @section('auth_body')
-    <a href="{{ url('/') }}" class="auth-brand" aria-label="VUE home">
-        <span class="auth-brand-mark">V</span>
-        <span>VUE</span>
+    <a href="{{ url('/') }}" class="auth-brand" aria-label="Galerive home">
+        <img class="auth-brand-logo" src="{{ asset('images/final_logo.png') }}" alt="Galerive">
     </a>
 
     <div class="auth-heading">

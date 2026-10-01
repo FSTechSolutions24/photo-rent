@@ -74,28 +74,14 @@
     .auth-brand {
         display: inline-flex;
         align-items: center;
-        gap: 10px;
         margin-bottom: 34px;
-        color: var(--auth-ink);
-        font-size: 18px;
-        font-weight: 800;
-        letter-spacing: -.04em;
     }
-    .auth-brand:hover { color: var(--auth-ink); text-decoration: none; }
+    .auth-brand:hover { text-decoration: none; }
 
-    .auth-brand-mark {
-        display: inline-flex;
-        width: 34px;
-        height: 34px;
-        align-items: center;
-        justify-content: center;
-        border-radius: 10px;
-        background: linear-gradient(135deg, var(--auth-accent), #d946ef);
-        box-shadow: 0 8px 18px rgba(139, 92, 246, .28);
-        color: #fff;
-        font-style: italic;
-        font-weight: 900;
-        transform: rotate(5deg);
+    .auth-brand-logo {
+        display: block;
+        width: min(230px, 72vw);
+        height: auto;
     }
 
     .auth-heading { margin-bottom: 30px; }
