@@ -69,7 +69,7 @@
         <button type="submit" class="auth-submit">Log in</button>
 
         <p class="auth-switch">
-            New to VUE?
+            New to GALERIVE?
             <a href="{{ route('register') }}">Create an account</a>
         </p>
     </form>

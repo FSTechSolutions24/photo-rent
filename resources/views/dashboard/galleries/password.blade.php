@@ -1,5 +1,5 @@
 @php
-    $studioName = $photographer->portfolio_title ?: optional($photographer->user)->name ?: 'VUE Studio';
+    $studioName = $photographer->portfolio_title ?: optional($photographer->user)->name ?: 'GALERIVE Studio';
     $galleryImage = $gallery->background_url ?: $gallery->thumbnail_url ?: $photographer->portfolio_cover_url ?: asset('images/password_screen7.jpg');
     $primaryColor = preg_match('/^#[0-9a-f]{6}$/i', (string) $photographer->portfolio_primary_color)
         ? $photographer->portfolio_primary_color

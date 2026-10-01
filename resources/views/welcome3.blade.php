@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VUE | Cinematic Storage & Delivery for Photographers</title>
+    <title>GALERIVE | Cinematic Storage & Delivery for Photographers</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -310,7 +310,7 @@
             </div>
             <div class="flex gap-4 justify-center flex-wrap">
                 <span class="text-[9px] font-black uppercase tracking-[0.2em] text-white/20">Neural Engine: Active</span>
-                <span class="text-[9px] font-black uppercase tracking-[0.2em] text-white/20">Model: VUE-PRO-1.2</span>
+                <span class="text-[9px] font-black uppercase tracking-[0.2em] text-white/20">Model: GALERIVE-PRO-1.2</span>
                 <span class="text-[9px] font-black uppercase tracking-[0.2em] text-white/20">Latency: 12ms</span>
             </div>
         </div>
@@ -355,7 +355,7 @@
             </div>
         </div>
         <div class="max-w-7xl mx-auto pt-24 flex justify-between items-center text-[9px] font-black uppercase tracking-[0.5em] text-white/10">
-            <span>&copy; 2024 VUE SYSTEMS CO.</span>
+            <span>&copy; 2024 GALERIVE SYSTEMS CO.</span>
             <span>DATA INTEGRITY: VERIFIED</span>
         </div>
     </footer>
@@ -411,7 +411,7 @@
                 const ai = new GoogleGenAI({ apiKey: "ENV_KEY" }); // handled
                 const response = await ai.models.generateContent({
                     model: 'gemini-3-flash-preview',
-                    contents: `Context: You are Lia, an AI studio manager for VUE (photography cloud storage). User query: "${msg}". Goal: Recommend a plan (Shutter $15, Exposure $45, Aperture $120) or help with storage projections. Be sophisticated, professional, and slightly futuristic. Use brief, punchy sentences.`,
+                    contents: `Context: You are Lia, an AI studio manager for GALERIVE (photography cloud storage). User query: "${msg}". Goal: Recommend a plan (Shutter $15, Exposure $45, Aperture $120) or help with storage projections. Be sophisticated, professional, and slightly futuristic. Use brief, punchy sentences.`,
                 });
                 loading.remove();
                 addMessage('ai', response.text);

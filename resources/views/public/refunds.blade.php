@@ -1,9 +1,9 @@
 @extends('layouts.public')
 @section('title', 'Refund and cancellation policy')
-@section('description', 'VUE subscription cancellation and refund terms.')
+@section('description', 'GALERIVE subscription cancellation and refund terms.')
 @section('content')
     <div class="eyebrow">Refund &amp; cancellation policy</div><h1 class="page-title">Clear subscription terms.</h1>
-    <p class="lead">This policy applies to paid VUE software subscriptions. Your plan price and billing period are shown before payment and in the website pricing section.</p>
+    <p class="lead">This policy applies to paid GALERIVE software subscriptions. Your plan price and billing period are shown before payment and in the website pricing section.</p>
     <div class="updated">Last updated: October 1, 2026</div>
     <div class="content">
         <section><h2>Cancelling a subscription</h2><p>You may request cancellation at any time by contacting <a href="mailto:{{ config('business.email') }}">{{ config('business.email') }}</a> from the email address registered to your account. Cancellation stops future renewal charges. Unless a refund is approved, access continues until the end of the paid billing period.</p></section>

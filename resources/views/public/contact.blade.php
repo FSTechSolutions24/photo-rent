@@ -1,6 +1,6 @@
 @extends('layouts.public')
 @section('title', 'Contact us')
-@section('description', 'Contact VUE by email or phone, or find our business location.')
+@section('description', 'Contact GALERIVE by email or phone, or find our business location.')
 @section('content')
     <div class="eyebrow">Contact us</div>
     <h1 class="page-title">We are here to help.</h1>

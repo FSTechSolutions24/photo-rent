@@ -8,7 +8,7 @@
     <div class="auth-heading">
         <span class="auth-eyebrow">Secure your account</span>
         <h1>Choose a new password</h1>
-        <p>Create a new password for your VUE studio account.</p>
+        <p>Create a new password for your GALERIVE studio account.</p>
     </div>
 
     <form action="{{ url('/password/reset') }}" method="post" autocomplete="on">

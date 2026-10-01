@@ -1,36 +1,39 @@
-<x-guest-layout>
-    <x-auth-card>
-        <x-slot name="logo">
-            <a href="/">
-                <x-application-logo class="w-20 h-20 fill-current text-gray-500" />
-            </a>
-        </x-slot>
+@extends('adminlte::auth.login')
 
-        <div class="mb-4 text-sm text-gray-600">
-            {{ __('This is a secure area of the application. Please confirm your password before continuing.') }}
+@section('auth_body')
+    <a href='{{ url('/') }}' class='auth-brand' aria-label='Galerive home'>
+        <img class='auth-brand-logo' src='{{ asset('images/final_logo.png') }}' alt='Galerive'>
+    </a>
+
+    <div class='auth-heading'>
+        <span class='auth-eyebrow'>Secure area</span>
+        <h1>Confirm your password</h1>
+        <p>This part of your studio contains sensitive information. Enter your password to continue.</p>
+    </div>
+
+    <form method='post' action='{{ route('password.confirm') }}'>
+        @csrf
+        <div class='auth-field'>
+            <label for='password'>Password</label>
+            <div class='auth-password-wrap'>
+                <input id='password' type='password' name='password'
+                       class='auth-input @error('password') is-invalid @enderror'
+                       autocomplete='current-password' required autofocus>
+                <button class='password-toggle' type='button' data-password-toggle='password' aria-label='Show password'>Show</button>
+            </div>
+            @error('password')
+                <span class='auth-error' role='alert'>{{ $message }}</span>
+            @enderror
         </div>
 
-        <!-- Validation Errors -->
-        <x-auth-validation-errors class="mb-4" :errors="$errors" />
+        <button type='submit' class='auth-submit'>Confirm password</button>
+    </form>
+@endsection
 
-        <form method="POST" action="{{ route('password.confirm') }}">
-            @csrf
+@push('css')
+    @include('auth.partials.styles')
+@endpush
 
-            <!-- Password -->
-            <div>
-                <x-label for="password" :value="__('Password')" />
-
-                <x-input id="password" class="block mt-1 w-full"
-                                type="password"
-                                name="password"
-                                required autocomplete="current-password" />
-            </div>
-
-            <div class="flex justify-end mt-4">
-                <x-button>
-                    {{ __('Confirm') }}
-                </x-button>
-            </div>
-        </form>
-    </x-auth-card>
-</x-guest-layout>
+@push('js')
+    @include('auth.partials.password-toggle')
+@endpush

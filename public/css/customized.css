@@ -340,7 +340,7 @@ body { color: var(--pr-ink); background: #f3f7f6; }
     border-color: rgb(208, 219, 233) !important;
 }
 label {
-    color: #334257 !important;
+    color: #8d8d8d !important;
     font-weight: 500 !important;
     font-size: .875rem !important;
 }

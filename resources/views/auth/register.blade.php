@@ -6,7 +6,7 @@
     </a>
 
     <div class="auth-heading">
-        <span class="auth-eyebrow">Start with VUE</span>
+        <span class="auth-eyebrow">Start with GALERIVE</span>
         <h1>Create your studio account</h1>
         <p>Set up your workspace and begin delivering a better client experience.</p>
     </div>
