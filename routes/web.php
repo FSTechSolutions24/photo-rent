@@ -13,6 +13,7 @@ use App\Http\Controllers\SubscriptionPlanController;
 use App\Http\Controllers\WhatsAppTemplateController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PortfolioController;
+use App\Http\Controllers\PublicSiteController;
 
 /*
 |--------------------------------------------------------------------------
@@ -25,9 +26,12 @@ use App\Http\Controllers\PortfolioController;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', [PublicSiteController::class, 'home'])->name('home');
+Route::get('/about', [PublicSiteController::class, 'about'])->name('about');
+Route::get('/contact', [PublicSiteController::class, 'contact'])->name('contact');
+Route::get('/privacy-policy', [PublicSiteController::class, 'privacy'])->name('privacy');
+Route::get('/delivery-shipping-policy', [PublicSiteController::class, 'delivery'])->name('delivery');
+Route::get('/refund-cancellation-policy', [PublicSiteController::class, 'refunds'])->name('refunds');
 
 Route::middleware(['auth', 'photographer'])->prefix('photographer')->name('photographer.')->group(function () {
     Route::put('profile/update', [ProfileController::class, 'profile_update'])->name('profile.update');

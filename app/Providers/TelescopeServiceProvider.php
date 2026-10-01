@@ -10,30 +10,44 @@ use Laravel\Telescope\TelescopeApplicationServiceProvider;
 class TelescopeServiceProvider extends TelescopeApplicationServiceProvider
 {
     /**
+     * Require an authenticated admin session in every environment.
+     *
+     * @return void
+     */
+    protected function authorization()
+    {
+        $this->gate();
+
+        Telescope::auth(function ($request) {
+            $user = $request->user();
+
+            return $user && $user->type === 'admin';
+        });
+    }
+
+    /**
      * Register any application services.
      *
      * @return void
      */
     public function register()
     {
-        // Keep hiding sensitive data
         $this->hideSensitiveRequestDetails();
 
         Telescope::filter(function (IncomingEntry $entry) {
-            // Always record entries for local environment
+            // Always record entries for local development.
             if ($this->app->environment('local')) {
                 return true;
             }
 
-            // ✅ For other environments (staging/production):
-            // Only record for Superadmins OR for important events
+            // Record all entries generated during an admin request.
             $user = auth()->user();
 
-            if ($user && $user->type === 'superadmin') {
+            if ($user && $user->type === 'admin') {
                 return true;
             }
 
-            // Otherwise, only log critical events
+            // Otherwise, only record critical events.
             return $entry->isReportableException() ||
                 $entry->isFailedRequest() ||
                 $entry->isFailedJob() ||
@@ -65,14 +79,14 @@ class TelescopeServiceProvider extends TelescopeApplicationServiceProvider
     /**
      * Register the Telescope gate.
      *
-     * This gate determines who can access Telescope in non-local environments.
+     * This gate mirrors the Telescope authorization callback.
      *
      * @return void
      */
     protected function gate()
     {
         Gate::define('viewTelescope', function ($user) {
-            return $user->type == 'superadmin';
+            return $user->type === 'admin';
         });
     }
 }

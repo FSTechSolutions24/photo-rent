@@ -89,7 +89,11 @@ class ProfileController extends Controller
         $photographer = Auth::user()->photographer;
         abort_unless($photographer && ! $photographer->active, 404);
 
-        $plans = SubscriptionPlan::with('lines')->get();
+        $plans = SubscriptionPlan::paid()
+            ->with(['lines' => fn ($query) => $query->orderBy('sort_order')])
+            ->orderByDesc('most_popular')
+            ->orderBy('price')
+            ->get();
         return view('dashboard.profile.inactive', compact('plans', 'photographer'));
     }
 
@@ -240,13 +244,19 @@ class ProfileController extends Controller
     public function renewSubscription(Request $request)
     {
         $data = $request->validate([
-            'selectedPlan' => ['required', 'integer', Rule::exists('subscription_plans', 'id')],
+            'selectedPlan' => [
+                'required',
+                'integer',
+                Rule::exists('subscription_plans', 'id')->where(
+                    fn ($query) => $query->where('price', '>', 0)
+                ),
+            ],
         ]);
 
         $photographer = Auth::user()->photographer;
         abort_unless($photographer && ! $photographer->active, 422, 'This account cannot be renewed.');
 
-        $plan = SubscriptionPlan::findOrFail($data['selectedPlan']);
+        $plan = SubscriptionPlan::paid()->findOrFail($data['selectedPlan']);
 
         return response()->json([
             'success' => true,

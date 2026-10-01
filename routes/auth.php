@@ -7,6 +7,7 @@ use App\Http\Controllers\Auth\EmailVerificationPromptController;
 use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Controllers\Auth\RegistrationOtpController;
 use App\Http\Controllers\Auth\VerifyEmailController;
 use Illuminate\Support\Facades\Route;
 
@@ -14,7 +15,19 @@ Route::middleware('guest')->group(function () {
     Route::get('register', [RegisteredUserController::class, 'create'])
                 ->name('register');
 
-    Route::post('register', [RegisteredUserController::class, 'store']);
+    Route::post('register', [RegisteredUserController::class, 'store'])
+                ->middleware('throttle:5,1');
+
+    Route::get('register/verify-whatsapp', [RegistrationOtpController::class, 'show'])
+                ->name('registration.verify.notice');
+
+    Route::post('register/verify-whatsapp', [RegistrationOtpController::class, 'verify'])
+                ->middleware('throttle:10,1')
+                ->name('registration.verify');
+
+    Route::post('register/resend-whatsapp', [RegistrationOtpController::class, 'resend'])
+                ->middleware('throttle:3,10')
+                ->name('registration.verify.resend');
 
     Route::get('login', [AuthenticatedSessionController::class, 'create'])
                 ->name('login');

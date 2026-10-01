@@ -9,7 +9,12 @@ class SubscriptionPlanLine extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['subscription_plan_id', 'feature_name', 'description', 'is_included'];
+    protected $fillable = ['subscription_plan_id', 'feature_name', 'description', 'is_included', 'sort_order'];
+
+    protected $casts = [
+        'is_included' => 'boolean',
+        'sort_order' => 'integer',
+    ];
 
     public function plan()
     {

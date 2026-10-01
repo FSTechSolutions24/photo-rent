@@ -30,4 +30,13 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'whatsapp_otp' => [
+        'driver' => env('WHATSAPP_OTP_DRIVER', 'log'),
+        'graph_version' => env('WHATSAPP_GRAPH_VERSION', 'v25.0'),
+        'access_token' => env('WHATSAPP_ACCESS_TOKEN'),
+        'phone_number_id' => env('WHATSAPP_PHONE_NUMBER_ID'),
+        'template_name' => env('WHATSAPP_OTP_TEMPLATE_NAME', 'registration_otp'),
+        'template_language' => env('WHATSAPP_OTP_TEMPLATE_LANGUAGE', 'en_US'),
+    ],
+
 ];

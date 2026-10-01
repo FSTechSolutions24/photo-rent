@@ -52,6 +52,25 @@
         </div>
 
         <div class="auth-field">
+            <label for="phone">WhatsApp mobile number</label>
+            <input id="phone"
+                   type="tel"
+                   name="phone"
+                   class="auth-input @error('phone') is-invalid @enderror"
+                   placeholder="01012345678"
+                   value="{{ old('phone') }}"
+                   autocomplete="tel"
+                   inputmode="tel"
+                   dir="ltr"
+                   @error('phone') aria-describedby="phone-help phone-error" aria-invalid="true" @else aria-describedby="phone-help" @enderror
+                   required>
+            <span id="phone-help" class="auth-help">We will send a 6-digit verification code to this number.</span>
+            @error('phone')
+                <span id="phone-error" class="auth-error" role="alert">{{ $message }}</span>
+            @enderror
+        </div>
+
+        <div class="auth-field">
             <label for="password">Password</label>
             <div class="auth-password-wrap">
                 <input id="password"
@@ -87,7 +106,7 @@
             </div>
         </div>
 
-        <button type="submit" class="auth-submit">Create account</button>
+        <button type="submit" class="auth-submit">Continue with WhatsApp</button>
 
         <p class="auth-switch">
             Already have an account?
